@@ -94,16 +94,22 @@ class HaWebSocketClient(
 
     private suspend fun runSession(config: HaConfig) {
         val client = clientFactory()
+        val wsUrl = config.webSocketUrl()
         try {
-            client.webSocket(config.webSocketUrl()) {
+            log.i { "opening WebSocket: $wsUrl" }
+            client.webSocket(wsUrl) {
+                log.i { "WebSocket open; awaiting auth_required" }
                 // 1. Auth handshake.
                 (incoming.receive() as Frame.Text).readText() // auth_required
+                log.i { "auth_required received; sending auth" }
                 send(Frame.Text(HaProtocol.encodeAuth(config.token)))
                 val authResp = (incoming.receive() as Frame.Text).readText()
+                log.i { "auth response: ${HaProtocol.messageType(authResp)}" }
                 if (HaProtocol.messageType(authResp) != "auth_ok") {
                     throw HaException("Authentication failed (${HaProtocol.messageType(authResp)})")
                 }
                 _connection.value = ConnectionStatus.Connected
+                log.i { "connected; seeding states + subscribing" }
 
                 // 2. Seed current states + subscribe to live changes.
                 val statesId = nextId()

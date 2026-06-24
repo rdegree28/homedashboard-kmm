@@ -1,4 +1,5 @@
 import java.util.Properties
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -14,11 +15,46 @@ val localProps = Properties().apply {
     if (f.exists()) f.inputStream().use { load(it) }
 }
 
+// Generate a WebDefaults constant for the web target (no BuildConfig on wasmJs) from local.properties.
+// The generated file lands in build/ (gitignored), so the token never enters source control.
+val generateWebConfig = tasks.register("generateWebConfig") {
+    val outDir = layout.buildDirectory.dir("generated/webConfig")
+    val url = localProps.getProperty("ha.url", "")
+    val token = localProps.getProperty("ha.token", "")
+    inputs.property("url", url)
+    inputs.property("token", token)
+    outputs.dir(outDir)
+    doLast {
+        val file = outDir.get().file("com/degree/homedash/WebDefaults.kt").asFile
+        file.parentFile.mkdirs()
+        file.writeText(
+            """
+            |package com.degree.homedash
+            |
+            |internal object WebDefaults {
+            |    const val HA_URL = "$url"
+            |    const val HA_TOKEN = "$token"
+            |}
+            |""".trimMargin(),
+        )
+    }
+}
+
 kotlin {
     androidTarget {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)
         }
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser {
+            commonWebpackConfig {
+                outputFileName = "composeApp.js"
+            }
+        }
+        binaries.executable()
     }
 
     sourceSets {
@@ -34,6 +70,12 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(compose.uiTooling)
             implementation(libs.kotlinx.coroutines.android)
+        }
+        wasmJsMain {
+            kotlin.srcDir(generateWebConfig)
+            dependencies {
+                implementation(libs.kotlinx.browser)
+            }
         }
     }
 }
