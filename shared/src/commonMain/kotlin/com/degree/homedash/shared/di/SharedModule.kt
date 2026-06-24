@@ -1,5 +1,6 @@
 package com.degree.homedash.shared.di
 
+import com.degree.homedash.shared.data.ConfigStore
 import com.degree.homedash.shared.data.HaRepository
 import com.degree.homedash.shared.network.HaWebSocketClient
 import org.koin.dsl.module
@@ -8,4 +9,5 @@ import org.koin.dsl.module
 val sharedModule = module {
     single { HaWebSocketClient() }
     single { HaRepository(get()) }
+    single { ConfigStore() }
 }

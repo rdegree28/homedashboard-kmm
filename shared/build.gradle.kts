@@ -27,6 +27,7 @@ kotlin {
             implementation(libs.ktor.client.websockets)
             implementation(libs.koin.core)
             implementation(libs.kermit)
+            implementation(libs.multiplatform.settings)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
@@ -35,6 +36,7 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.kotlinx.coroutines.android)
+            implementation(libs.multiplatform.settings.no.arg)
         }
         wasmJsMain.dependencies {
             implementation(libs.ktor.client.js)

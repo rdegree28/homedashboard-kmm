@@ -22,6 +22,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,7 +39,7 @@ import com.degree.homedash.shared.network.ConnectionStatus
 import kotlinx.coroutines.launch
 
 @Composable
-fun OfficeScreen(repository: HaRepository) {
+fun OfficeScreen(repository: HaRepository, onOpenSettings: () -> Unit) {
     val states by repository.states.collectAsState()
     val connection by repository.connection.collectAsState()
     val scope = rememberCoroutineScope()
@@ -50,11 +51,18 @@ fun OfficeScreen(repository: HaRepository) {
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text(
-            text = "Office",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = "Office",
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+            )
+            TextButton(onClick = onOpenSettings) { Text("Settings") }
+        }
         ConnectionBanner(connection)
 
         SectionCard("Lights") {
