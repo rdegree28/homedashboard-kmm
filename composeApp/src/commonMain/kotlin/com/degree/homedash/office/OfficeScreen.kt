@@ -17,7 +17,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Air
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -90,10 +89,10 @@ fun OfficeScreen(repository: HaRepository, onOpenSettings: () -> Unit) {
         }
 
         SectionCard("Fans") {
-            FanControl("Office Fan", states[OfficeEntities.OFFICE_FAN], Icons.Filled.Air) {
+            FanControl("Office Fan", states[OfficeEntities.OFFICE_FAN]) {
                 scope.launch { repository.toggle(OfficeEntities.OFFICE_FAN) }
             }
-            FanControl("Box Fan", states[OfficeEntities.BOX_FAN], Icons.Filled.Air) {
+            FanControl("Box Fan", states[OfficeEntities.BOX_FAN]) {
                 scope.launch { repository.toggle(OfficeEntities.BOX_FAN) }
             }
         }
