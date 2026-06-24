@@ -1,0 +1,20 @@
+import { chromium } from 'playwright';
+import { readFileSync } from 'node:fs';
+const token=readFileSync('./.ha_token','utf8').trim();
+const base=readFileSync('./.ha_env','utf8').match(/HA_URL=(.*)/)[1].trim();
+const t={access_token:token,token_type:'Bearer',expires_in:1800,hassUrl:base,clientId:base+'/',expires:Date.now()+3.15e11,refresh_token:'x'};
+const b=await chromium.launch();const c=await b.newContext({viewport:{width:500,height:1000}});const p=await c.newPage();
+await p.addInitScript(x=>localStorage.setItem('hassTokens',JSON.stringify(x)),t);
+await p.goto(base+'/scratch-pad/scratch',{waitUntil:'load'});await p.waitForTimeout(3500);
+const r=await p.evaluate(()=>{
+  const ft=(n,tag,d)=>{if(d>20)return null;const k=[...(n.shadowRoot?n.shadowRoot.children:[]),...n.children];for(const e of k){if(e.tagName.toLowerCase()===tag)return e;const x=ft(e,tag,d+1);if(x)return x;}return null;};
+  const ent=ft(document.body,'hui-entities-card',0);
+  const h1=ent.shadowRoot.querySelector('.card-header');
+  const before=getComputedStyle(h1).fontSize;
+  const injectedStyles=[...ent.shadowRoot.querySelectorAll('style')].map(s=>s.textContent.replace(/\s+/g,' ').slice(0,50));
+  const st=document.createElement('style');st.textContent='.card-header{font-size:15px!important;font-weight:600!important;padding:10px 16px 4px!important;}';ent.shadowRoot.appendChild(st);
+  const after=getComputedStyle(h1).fontSize;
+  return JSON.stringify({before,after,injectedStylesInCardShadow:injectedStyles});
+});
+console.log(r);
+await b.close();

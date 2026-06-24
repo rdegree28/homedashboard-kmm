@@ -1,0 +1,29 @@
+# Gradle / Kotlin
+.gradle/
+build/
+**/build/
+.kotlin/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Android
+local.properties
+captures/
+*.apk
+*.ap_
+*.dex
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Secrets / Home Assistant
+**/.ha_token
+**/.ha_env
+
+# Node (HA dashboard loop rig)
+node_modules/
+
+# macOS
+.DS_Store

@@ -1,0 +1,273 @@
+title: Office
+views:
+  - title: Office
+    path: office
+    icon: mdi:desk
+    cards:
+      - type: custom:stack-in-card
+        cards:
+          - type: custom:mushroom-template-card
+            primary: Lights
+            card_mod:
+              style: |
+                ha-card {
+                  box-shadow: none !important;
+                  border: none !important;
+                  background: none !important;
+                  padding: 10px 12px 0 !important;
+                }
+                .container {
+                  padding: 0 !important;
+                }
+                .primary {
+                  font-size: 15px !important;
+                  font-weight: 600 !important;
+                  letter-spacing: 0.02em;
+                }
+          - type: custom:mushroom-chips-card
+            card_mod:
+              style:
+                $: |
+                  ha-card {
+                    border: none !important;
+                    box-shadow: none !important;
+                    background: none !important;
+                  }
+                  .container {
+                    width: 100%;
+                    display: flex;
+                    gap: 8px;
+                    padding: 0 8px 12px;
+                    box-sizing: border-box;
+                  }
+                  mushroom-template-chip {
+                    flex: 1;
+                  }
+            chips:
+              - type: template
+                entity: light.office_light
+                icon: mdi:ceiling-light
+                icon_color: '{{ ''amber'' if is_state(''light.office_light'', ''on'') else ''disabled'' }}'
+                content: Office · {{ 'On' if is_state('light.office_light', 'on') else 'Off' }}
+                tap_action:
+                  action: toggle
+                hold_action:
+                  action: more-info
+              - type: template
+                entity: light.office_small_light
+                icon: mdi:lamp
+                icon_color: '{{ ''amber'' if is_state(''light.office_small_light'', ''on'') else ''disabled'' }}'
+                content: Small · {{ 'On' if is_state('light.office_small_light', 'on') else 'Off' }}
+                tap_action:
+                  action: toggle
+                hold_action:
+                  action: more-info
+      - type: custom:stack-in-card
+        cards:
+          - type: entities
+            title: Fans
+            entities:
+              - entity: fan.office_fan_office_fan
+                name: Office Fan
+              - entity: fan.office_box_fan
+                name: Box Fan
+            card_mod:
+              style: |
+
+                .card-header {
+                  font-size: 15px !important;
+                  font-weight: 600 !important;
+                  padding: 10px 16px 4px !important;
+                  letter-spacing: 0.02em;
+                }
+      - type: custom:stack-in-card
+        card_mod:
+          style: |
+            ha-card {
+              padding-bottom: 12px !important;
+            }
+        cards:
+          - type: custom:mushroom-template-card
+            primary: Status
+            card_mod:
+              style: |
+                ha-card {
+                  box-shadow: none !important;
+                  border: none !important;
+                  background: none !important;
+                  padding: 10px 12px 0 !important;
+                }
+                .container {
+                  padding: 0 !important;
+                }
+                .primary {
+                  font-size: 15px !important;
+                  font-weight: 600 !important;
+                  letter-spacing: 0.02em;
+                }
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-template-card
+                primary: 'Off'
+                tap_action:
+                  action: call-service
+                  service: light.turn_off
+                  target:
+                    entity_id: light.office_traffic_signal
+                card_mod:
+                  style: |
+                    ha-card {
+                      --ha-card-background: {% if is_state('sensor.office_signal_mode', 'off') %}rgba(150,150,150,1.0){% else %}rgba(120,120,120,0.3){% endif %} !important;
+                      background: var(--ha-card-background) !important;
+                      border-radius: 8px !important;
+                      border: {% if is_state('sensor.office_signal_mode', 'off') %}2px solid rgba(180,180,180,0.8){% else %}none{% endif %} !important;
+                      margin: 0 4px 0 8px;
+                      display: flex !important;
+                      align-items: center !important;
+                      justify-content: center !important;
+                      text-align: center !important;
+                    }
+              - type: custom:mushroom-template-card
+                primary: Available
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  target:
+                    entity_id: script.office_signal_set_green
+                card_mod:
+                  style: |
+                    ha-card {
+                      --ha-card-background: {% if is_state('sensor.office_signal_mode', 'green') %}rgba(7,200,0,0.85){% else %}rgba(7,200,0,0.3){% endif %} !important;
+                      background: var(--ha-card-background) !important;
+                      border-radius: 8px !important;
+                      border: {% if is_state('sensor.office_signal_mode', 'green') %}2px solid rgba(7,255,0,0.8){% else %}none{% endif %} !important;
+                      margin: 0 4px;
+                      display: flex !important;
+                      align-items: center !important;
+                      justify-content: center !important;
+                      text-align: center !important;
+                    }
+              - type: custom:mushroom-template-card
+                primary: Focused
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  target:
+                    entity_id: script.office_signal_set_amber
+                card_mod:
+                  style: |
+                    ha-card {
+                      --ha-card-background: {% if is_state('sensor.office_signal_mode', 'amber') %}rgba(255,198,0,0.9){% else %}rgba(255,198,0,0.3){% endif %} !important;
+                      background: var(--ha-card-background) !important;
+                      border-radius: 8px !important;
+                      border: {% if is_state('sensor.office_signal_mode', 'amber') %}2px solid rgba(255,198,0,0.8){% else %}none{% endif %} !important;
+                      margin: 0 4px;
+                      display: flex !important;
+                      align-items: center !important;
+                      justify-content: center !important;
+                      text-align: center !important;
+                    }
+              - type: custom:mushroom-template-card
+                primary: Meeting
+                tap_action:
+                  action: call-service
+                  service: script.turn_on
+                  target:
+                    entity_id: script.office_signal_set_red
+                card_mod:
+                  style: |
+                    ha-card {
+                      --ha-card-background: {% if is_state('sensor.office_signal_mode', 'red') %}rgba(255,0,0,0.85){% else %}rgba(255,0,0,0.3){% endif %} !important;
+                      background: var(--ha-card-background) !important;
+                      border-radius: 8px !important;
+                      border: {% if is_state('sensor.office_signal_mode', 'red') %}2px solid rgba(255,0,0,0.8){% else %}none{% endif %} !important;
+                      margin: 0 8px 0 4px;
+                      display: flex !important;
+                      align-items: center !important;
+                      justify-content: center !important;
+                      text-align: center !important;
+                    }
+      - type: custom:stack-in-card
+        cards:
+          - type: custom:mushroom-template-card
+            primary: Workstation
+            card_mod:
+              style: |
+                ha-card {
+                  box-shadow: none !important;
+                  border: none !important;
+                  background: none !important;
+                  padding: 10px 12px 0 !important;
+                }
+                .container {
+                  padding: 0 !important;
+                }
+                .primary {
+                  font-size: 15px !important;
+                  font-weight: 600 !important;
+                  letter-spacing: 0.02em;
+                }
+          - type: horizontal-stack
+            cards:
+              - type: custom:mushroom-template-card
+                primary: Workstation On
+                icon: mdi:desktop-tower
+                tap_action:
+                  action: call-service
+                  service: switch.turn_on
+                  target:
+                    entity_id: switch.office_workstation
+                card_mod:
+                  style: |
+                    ha-card { border: none !important; }
+              - type: custom:mushroom-template-card
+                primary: Workstation Off
+                icon: mdi:desktop-tower-monitor
+                tap_action:
+                  action: call-service
+                  service: switch.turn_off
+                  target:
+                    entity_id: switch.office_workstation
+                  confirmation:
+                    text: Are you sure you want to turn off the workstation?
+                card_mod:
+                  style: |
+                    ha-card { border: none !important; }
+          - type: custom:mushroom-template-card
+            primary: Hexagon Lights
+            entity: light.hexagon_lights
+            icon: '{{ ''mdi:hexagon-multiple'' if is_state(''light.hexagon_lights'', ''on'') else ''mdi:hexagon-multiple-outline'' }}'
+            tap_action:
+              action: toggle
+            card_mod:
+              style: |
+                ha-card { border: none !important; }
+          - type: history-graph
+            title: Power Usage
+            hours_to_show: 168
+            entities:
+              - entity: sensor.office_workstation_power
+                name: Power
+            card_mod:
+              style: |
+                ha-card {
+                  border: none !important;
+                  box-shadow: none !important;
+                  --ha-card-border-width: 0px;
+                }
+
+                .card-header {
+                  font-size: 15px !important;
+                  font-weight: 600 !important;
+                  padding: 10px 16px 4px !important;
+                  letter-spacing: 0.02em;
+                }
+          - type: entities
+            entities:
+              - entity: sensor.office_workstation_power
+                name: Power
+              - entity: sensor.office_workstation_summation_delivered
+                name: Total Power Used
+            card_mod:
+              style: |
+                ha-card { border: none !important; }

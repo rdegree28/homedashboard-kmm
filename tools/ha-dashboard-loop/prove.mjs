@@ -1,0 +1,24 @@
+import { chromium } from 'playwright';
+import { readFileSync } from 'node:fs';
+const token = readFileSync('./.ha_token','utf8').trim();
+const base = readFileSync('./.ha_env','utf8').match(/HA_URL=(.*)/)[1].trim();
+const hassTokens={access_token:token,token_type:'Bearer',expires_in:1800,hassUrl:base,clientId:base+'/',expires:Date.now()+3.15e11,refresh_token:'x'};
+const b=await chromium.launch();const c=await b.newContext({viewport:{width:500,height:1000},deviceScaleFactor:2});const p=await c.newPage();
+await p.addInitScript(t=>localStorage.setItem('hassTokens',JSON.stringify(t)),hassTokens);
+await p.goto(base+'/scratch-pad/scratch',{waitUntil:'load'});await p.waitForTimeout(3500);
+const moved=await p.evaluate(()=>{
+  const findTag=(node,tag,d)=>{if(d>18)return null;const kids=[...(node.shadowRoot?node.shadowRoot.children:[]),...node.children];
+    for(const el of kids){if(el.tagName.toLowerCase()===tag)return el;const r=findTag(el,tag,d+1);if(r)return r;}return null;};
+  const sic=findTag(document.body,'stack-in-card',0);
+  const ha=sic.shadowRoot.querySelector('ha-card');
+  const h1=ha.shadowRoot.querySelector('h1.card-header');
+  const before=Math.round(h1.getBoundingClientRect().height);
+  const st=document.createElement('style');
+  st.textContent='.card-header{font-size:15px!important;padding:8px 12px 2px!important;font-weight:600!important;}';
+  ha.shadowRoot.appendChild(st);
+  const after=Math.round(h1.getBoundingClientRect().height);
+  return {before, after};
+});
+console.log('h1.card-header height  before:',moved.before,' after direct-inject:',moved.after);
+await p.screenshot({path:'scratch_proof.png',fullPage:true});
+await b.close();

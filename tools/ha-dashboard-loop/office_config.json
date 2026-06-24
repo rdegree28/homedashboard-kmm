@@ -1,0 +1,224 @@
+{
+  "title": "Office",
+  "views": [
+    {
+      "title": "Office",
+      "path": "office",
+      "icon": "mdi:desk",
+      "cards": [
+        {
+          "type": "custom:stack-in-card",
+          "title": "Lights",
+          "cards": [
+            {
+              "type": "custom:mushroom-chips-card",
+              "card_mod": {
+                "style": {
+                  "$": "ha-card {\n  border: none !important;\n  box-shadow: none !important;\n  background: none !important;\n}\n.container {\n  width: 100%;\n  display: flex;\n  gap: 8px;\n  padding: 0 8px 12px;\n  box-sizing: border-box;\n}\nmushroom-template-chip {\n  flex: 1;\n}\n"
+                }
+              },
+              "chips": [
+                {
+                  "type": "template",
+                  "entity": "light.office_light",
+                  "icon": "mdi:ceiling-light",
+                  "icon_color": "{{ 'amber' if is_state('light.office_light', 'on') else 'disabled' }}",
+                  "content": "Office · {{ 'On' if is_state('light.office_light', 'on') else 'Off' }}",
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  }
+                },
+                {
+                  "type": "template",
+                  "entity": "light.office_small_light",
+                  "icon": "mdi:lamp",
+                  "icon_color": "{{ 'amber' if is_state('light.office_small_light', 'on') else 'disabled' }}",
+                  "content": "Small · {{ 'On' if is_state('light.office_small_light', 'on') else 'Off' }}",
+                  "tap_action": {
+                    "action": "toggle"
+                  },
+                  "hold_action": {
+                    "action": "more-info"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "entities",
+          "title": "Fans",
+          "entities": [
+            {
+              "entity": "fan.office_fan_office_fan",
+              "name": "Office Fan"
+            },
+            {
+              "entity": "fan.office_box_fan",
+              "name": "Box Fan"
+            }
+          ]
+        },
+        {
+          "type": "custom:stack-in-card",
+          "title": "Status",
+          "card_mod": {
+            "style": "ha-card {\n  padding-bottom: 12px !important;\n}\n"
+          },
+          "cards": [
+            {
+              "type": "horizontal-stack",
+              "cards": [
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "Off",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "light.turn_off",
+                    "target": {
+                      "entity_id": "light.office_traffic_signal"
+                    }
+                  },
+                  "card_mod": {
+                    "style": "ha-card {\n  --ha-card-background: {% if is_state('sensor.office_signal_mode', 'off') %}rgba(150,150,150,1.0){% else %}rgba(120,120,120,0.3){% endif %} !important;\n  background: var(--ha-card-background) !important;\n  border-radius: 8px !important;\n  border: {% if is_state('sensor.office_signal_mode', 'off') %}2px solid rgba(180,180,180,0.8){% else %}none{% endif %} !important;\n  margin: 0 4px 0 8px;\n  display: flex !important;\n  align-items: center !important;\n  justify-content: center !important;\n  text-align: center !important;\n}\n"
+                  }
+                },
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "Available",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "script.turn_on",
+                    "target": {
+                      "entity_id": "script.office_signal_set_green"
+                    }
+                  },
+                  "card_mod": {
+                    "style": "ha-card {\n  --ha-card-background: {% if is_state('sensor.office_signal_mode', 'green') %}rgba(7,200,0,0.85){% else %}rgba(7,200,0,0.3){% endif %} !important;\n  background: var(--ha-card-background) !important;\n  border-radius: 8px !important;\n  border: {% if is_state('sensor.office_signal_mode', 'green') %}2px solid rgba(7,255,0,0.8){% else %}none{% endif %} !important;\n  margin: 0 4px;\n  display: flex !important;\n  align-items: center !important;\n  justify-content: center !important;\n  text-align: center !important;\n}\n"
+                  }
+                },
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "Focused",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "script.turn_on",
+                    "target": {
+                      "entity_id": "script.office_signal_set_amber"
+                    }
+                  },
+                  "card_mod": {
+                    "style": "ha-card {\n  --ha-card-background: {% if is_state('sensor.office_signal_mode', 'amber') %}rgba(255,198,0,0.9){% else %}rgba(255,198,0,0.3){% endif %} !important;\n  background: var(--ha-card-background) !important;\n  border-radius: 8px !important;\n  border: {% if is_state('sensor.office_signal_mode', 'amber') %}2px solid rgba(255,198,0,0.8){% else %}none{% endif %} !important;\n  margin: 0 4px;\n  display: flex !important;\n  align-items: center !important;\n  justify-content: center !important;\n  text-align: center !important;\n}\n"
+                  }
+                },
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "Meeting",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "script.turn_on",
+                    "target": {
+                      "entity_id": "script.office_signal_set_red"
+                    }
+                  },
+                  "card_mod": {
+                    "style": "ha-card {\n  --ha-card-background: {% if is_state('sensor.office_signal_mode', 'red') %}rgba(255,0,0,0.85){% else %}rgba(255,0,0,0.3){% endif %} !important;\n  background: var(--ha-card-background) !important;\n  border-radius: 8px !important;\n  border: {% if is_state('sensor.office_signal_mode', 'red') %}2px solid rgba(255,0,0,0.8){% else %}none{% endif %} !important;\n  margin: 0 8px 0 4px;\n  display: flex !important;\n  align-items: center !important;\n  justify-content: center !important;\n  text-align: center !important;\n}\n"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "custom:stack-in-card",
+          "title": "Workstation",
+          "cards": [
+            {
+              "type": "horizontal-stack",
+              "cards": [
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "Workstation On",
+                  "icon": "mdi:desktop-tower",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "switch.turn_on",
+                    "target": {
+                      "entity_id": "switch.office_workstation"
+                    }
+                  },
+                  "card_mod": {
+                    "style": "ha-card { border: none !important; }\n"
+                  }
+                },
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "Workstation Off",
+                  "icon": "mdi:desktop-tower-monitor",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "switch.turn_off",
+                    "target": {
+                      "entity_id": "switch.office_workstation"
+                    },
+                    "confirmation": {
+                      "text": "Are you sure you want to turn off the workstation?"
+                    }
+                  },
+                  "card_mod": {
+                    "style": "ha-card { border: none !important; }\n"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "custom:mushroom-template-card",
+              "primary": "Hexagon Lights",
+              "entity": "light.hexagon_lights",
+              "icon": "{{ 'mdi:hexagon-multiple' if is_state('light.hexagon_lights', 'on') else 'mdi:hexagon-multiple-outline' }}",
+              "tap_action": {
+                "action": "toggle"
+              },
+              "card_mod": {
+                "style": "ha-card { border: none !important; }\n"
+              }
+            },
+            {
+              "type": "history-graph",
+              "title": "Power Usage",
+              "hours_to_show": 168,
+              "entities": [
+                {
+                  "entity": "sensor.office_workstation_power",
+                  "name": "Power"
+                }
+              ],
+              "card_mod": {
+                "style": "ha-card {\n  border: none !important;\n  box-shadow: none !important;\n  --ha-card-border-width: 0px;\n}\n"
+              }
+            },
+            {
+              "type": "entities",
+              "entities": [
+                {
+                  "entity": "sensor.office_workstation_power",
+                  "name": "Power"
+                },
+                {
+                  "entity": "sensor.office_workstation_summation_delivered",
+                  "name": "Total Power Used"
+                }
+              ],
+              "card_mod": {
+                "style": "ha-card { border: none !important; }\n"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "type": "custom:stack-in-card",
+  "cards": [
+    {
+      "type": "custom:mushroom-template-card",
+      "primary": "Lights",
+      "card_mod": {
+        "style": "ha-card {\n  box-shadow: none !important;\n  border: none !important;\n  background: none !important;\n  padding: 10px 12px 0 !important;\n  --mush-rgb-disabled: 0,0,0;\n}\n.container {\n  padding: 0 !important;\n}\n.primary {\n  font-size: 15px !important;\n  font-weight: 600 !important;\n  letter-spacing: 0.02em;\n}\n"
+      }
+    },
+    {
+      "type": "custom:mushroom-chips-card",
+      "card_mod": {
+        "style": {
+          "$": "ha-card {\n  border: none !important;\n  box-shadow: none !important;\n  background: none !important;\n}\n.container {\n  width: 100%;\n  display: flex;\n  gap: 8px;\n  padding: 0 8px 12px;\n  box-sizing: border-box;\n}\nmushroom-template-chip {\n  flex: 1;\n}\n"
+        }
+      },
+      "chips": [
+        {
+          "type": "template",
+          "entity": "light.office_light",
+          "icon": "mdi:ceiling-light",
+          "icon_color": "{{ 'amber' if is_state('light.office_light', 'on') else 'disabled' }}",
+          "content": "Office · {{ 'On' if is_state('light.office_light', 'on') else 'Off' }}",
+          "tap_action": { "action": "toggle" },
+          "hold_action": { "action": "more-info" }
+        },
+        {
+          "type": "template",
+          "entity": "light.office_small_light",
+          "icon": "mdi:lamp",
+          "icon_color": "{{ 'amber' if is_state('light.office_small_light', 'on') else 'disabled' }}",
+          "content": "Small · {{ 'On' if is_state('light.office_small_light', 'on') else 'Off' }}",
+          "tap_action": { "action": "toggle" },
+          "hold_action": { "action": "more-info" }
+        }
+      ]
+    }
+  ]
+}
