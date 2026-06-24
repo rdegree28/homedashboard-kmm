@@ -16,6 +16,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Air
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -24,9 +27,13 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.data.HaRepository
 import com.degree.homedash.shared.model.EntityState
+import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.network.ConnectionStatus
 import kotlinx.coroutines.launch
 
@@ -43,6 +51,13 @@ fun OfficeScreen(repository: HaRepository, onOpenSettings: () -> Unit) {
     val states by repository.states.collectAsState()
     val connection by repository.connection.collectAsState()
     val scope = rememberCoroutineScope()
+
+    var powerHistory by remember { mutableStateOf<List<HistoryPoint>>(emptyList()) }
+    LaunchedEffect(connection) {
+        if (connection == ConnectionStatus.Connected) {
+            runCatching { powerHistory = repository.powerHistory(OfficeEntities.POWER, hoursBack = 168) }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -66,19 +81,19 @@ fun OfficeScreen(repository: HaRepository, onOpenSettings: () -> Unit) {
         ConnectionBanner(connection)
 
         SectionCard("Lights") {
-            ControlRow("Office", states[OfficeEntities.OFFICE_LIGHT]) {
+            LightControl("Office", states[OfficeEntities.OFFICE_LIGHT], Icons.Filled.Lightbulb) {
                 scope.launch { repository.toggle(OfficeEntities.OFFICE_LIGHT) }
             }
-            ControlRow("Small", states[OfficeEntities.SMALL_LIGHT]) {
+            LightControl("Small", states[OfficeEntities.SMALL_LIGHT], Icons.Filled.Lightbulb) {
                 scope.launch { repository.toggle(OfficeEntities.SMALL_LIGHT) }
             }
         }
 
         SectionCard("Fans") {
-            ControlRow("Office Fan", states[OfficeEntities.OFFICE_FAN]) {
+            FanControl("Office Fan", states[OfficeEntities.OFFICE_FAN], Icons.Filled.Air) {
                 scope.launch { repository.toggle(OfficeEntities.OFFICE_FAN) }
             }
-            ControlRow("Box Fan", states[OfficeEntities.BOX_FAN]) {
+            FanControl("Box Fan", states[OfficeEntities.BOX_FAN], Icons.Filled.Air) {
                 scope.launch { repository.toggle(OfficeEntities.BOX_FAN) }
             }
         }
@@ -103,6 +118,9 @@ fun OfficeScreen(repository: HaRepository, onOpenSettings: () -> Unit) {
             ControlRow("Hexagon Lights", states[OfficeEntities.HEXAGON]) {
                 scope.launch { repository.toggle(OfficeEntities.HEXAGON) }
             }
+            Spacer(Modifier.height(8.dp))
+            Text("Power Usage", style = MaterialTheme.typography.titleMedium)
+            PowerGraph(powerHistory)
             Spacer(Modifier.height(4.dp))
             StatRow("Power", states[OfficeEntities.POWER])
             StatRow("Total Power Used", states[OfficeEntities.ENERGY])

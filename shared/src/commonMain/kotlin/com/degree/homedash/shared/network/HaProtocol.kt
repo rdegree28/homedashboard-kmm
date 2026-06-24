@@ -3,6 +3,8 @@ package com.degree.homedash.shared.network
 import com.degree.homedash.shared.model.AuthMessage
 import com.degree.homedash.shared.model.CallServiceCommand
 import com.degree.homedash.shared.model.EntityState
+import com.degree.homedash.shared.model.HistoryCommand
+import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.model.SimpleCommand
 import com.degree.homedash.shared.model.StateChanged
 import com.degree.homedash.shared.model.SubscribeEventsCommand
@@ -11,6 +13,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -88,4 +92,31 @@ object HaProtocol {
             serviceData = serviceData,
         ),
     )
+
+    fun encodeHistory(id: Long, entityId: String, startTimeIso: String, endTimeIso: String): String =
+        json.encodeToString(
+            HistoryCommand.serializer(),
+            HistoryCommand(
+                id = id,
+                startTime = startTimeIso,
+                endTime = endTimeIso,
+                entityIds = listOf(entityId),
+            ),
+        )
+
+    /**
+     * Parse a `history/history_during_period` result into numeric samples for [entityId].
+     * Entries use the compressed form: `s` = state value, `lu`/`lc` = last updated/changed (epoch s).
+     * Non-numeric states (e.g. "unavailable") are skipped.
+     */
+    fun parseHistory(resultText: String, entityId: String): List<HistoryPoint> = runCatching {
+        val arr = json.parseToJsonElement(resultText).jsonObject["result"]
+            ?.jsonObject?.get(entityId)?.jsonArray ?: return emptyList()
+        arr.mapNotNull { el ->
+            val o = el.jsonObject
+            val value = o["s"]?.jsonPrimitive?.contentOrNull?.toDoubleOrNull() ?: return@mapNotNull null
+            val time = (o["lu"] ?: o["lc"])?.jsonPrimitive?.doubleOrNull ?: return@mapNotNull null
+            HistoryPoint(timeSeconds = time, value = value)
+        }
+    }.getOrDefault(emptyList())
 }

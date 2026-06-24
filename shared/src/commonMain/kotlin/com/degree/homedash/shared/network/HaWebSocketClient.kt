@@ -10,20 +10,26 @@ import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.JsonObject
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -42,6 +48,9 @@ class HaWebSocketClient(
 
     private val _connection = MutableStateFlow<ConnectionStatus>(ConnectionStatus.Disconnected)
     val connection: StateFlow<ConnectionStatus> = _connection.asStateFlow()
+
+    // All `result` messages are re-broadcast here so request() can await its matching id.
+    private val results = MutableSharedFlow<String>(extraBufferCapacity = 16)
 
     private val idMutex = Mutex()
     private var lastId = 0L
@@ -92,6 +101,23 @@ class HaWebSocketClient(
         active.send(Frame.Text(HaProtocol.encodeCallService(nextId(), domain, service, entityId, serviceData)))
     }
 
+    /** Send a command (built with the allocated id) and await its matching `result` message. */
+    suspend fun request(buildCommand: (Long) -> String): String = coroutineScope {
+        val id = nextId()
+        // Subscribe before sending (UNDISPATCHED) so we can't miss a fast reply.
+        val awaiter = async(start = CoroutineStart.UNDISPATCHED) {
+            withTimeout(20_000L) {
+                results.first { HaProtocol.resultId(it) == id }
+            }
+        }
+        val active = session ?: run {
+            awaiter.cancel()
+            throw HaException("Not connected")
+        }
+        active.send(Frame.Text(buildCommand(id)))
+        awaiter.await()
+    }
+
     private suspend fun runSession(config: HaConfig) {
         val client = clientFactory()
         val wsUrl = config.webSocketUrl()
@@ -140,6 +166,7 @@ class HaWebSocketClient(
     private fun handleMessage(text: String, statesId: Long) {
         when (HaProtocol.messageType(text)) {
             "result" -> {
+                results.tryEmit(text) // let any pending request() match by id
                 if (HaProtocol.resultId(text) == statesId && HaProtocol.isResultSuccess(text)) {
                     val list = HaProtocol.parseStates(text)
                     if (list.isNotEmpty()) _states.value = list.associateBy { it.entityId }

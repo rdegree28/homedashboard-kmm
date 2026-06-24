@@ -1,10 +1,15 @@
 package com.degree.homedash.shared.data
 
 import com.degree.homedash.shared.model.EntityState
+import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.network.ConnectionStatus
+import com.degree.homedash.shared.network.HaProtocol
 import com.degree.homedash.shared.network.HaWebSocketClient
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.ExperimentalTime
 
 /**
  * High-level entry point for the UI: live entity states + connection status, plus typed actions.
@@ -39,4 +44,15 @@ class HaRepository(private val client: HaWebSocketClient) {
         entityId: String?,
         serviceData: JsonObject? = null,
     ) = client.callService(domain, service, entityId, serviceData)
+
+    /** Fetch [hoursBack] hours of numeric history for [entityId] over the WebSocket. */
+    @OptIn(ExperimentalTime::class)
+    suspend fun powerHistory(entityId: String, hoursBack: Int): List<HistoryPoint> {
+        val end = Clock.System.now()
+        val start = end.minus(hoursBack.hours)
+        val text = client.request { id ->
+            HaProtocol.encodeHistory(id, entityId, start.toString(), end.toString())
+        }
+        return HaProtocol.parseHistory(text, entityId)
+    }
 }

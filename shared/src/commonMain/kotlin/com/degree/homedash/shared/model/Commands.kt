@@ -40,6 +40,17 @@ data class CallServiceCommand(
     @SerialName("service_data") val serviceData: JsonObject? = null,
 )
 
+@Serializable
+data class HistoryCommand(
+    val id: Long,
+    val type: String = "history/history_during_period",
+    @SerialName("start_time") val startTime: String,
+    @SerialName("end_time") val endTime: String,
+    @SerialName("entity_ids") val entityIds: List<String>,
+    @SerialName("minimal_response") val minimalResponse: Boolean = true,
+    @SerialName("no_attributes") val noAttributes: Boolean = true,
+)
+
 /** Result of a `state_changed` event: a removed entity has a null [newState]. */
 data class StateChanged(
     val entityId: String,

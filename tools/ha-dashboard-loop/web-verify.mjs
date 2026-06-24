@@ -30,8 +30,13 @@ if (mode === 'badseed') {
 }
 
 await page.goto(url, { waitUntil: 'load' });
-await page.waitForTimeout(9000); // wasm init + WS connect + state seed
+await page.waitForTimeout(11000); // wasm init + WS connect + state seed + history fetch
 await page.screenshot({ path: 'web_office.png' });
+// scroll down (Compose canvas handles wheel) to reveal the power graph
+await page.mouse.move(250, 500);
+await page.mouse.wheel(0, 1400);
+await page.waitForTimeout(1500);
+await page.screenshot({ path: 'web_graph.png' });
 
 console.log('=== browser console (last 40) ===');
 console.log(logs.slice(-40).join('\n') || '(no console output)');
