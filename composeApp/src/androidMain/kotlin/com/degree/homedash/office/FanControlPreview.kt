@@ -7,6 +7,7 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 private fun FanControlPreview() = ControlPreview {
     FanControl("On", previewEntity("on")) {}
+    FanControl("With speed", previewFan(percentage = 75), onSetSpeed = {}) {}
     FanControl("Off", previewEntity("off")) {}
     FanControl("Offline", previewEntity("unavailable")) {}
 }

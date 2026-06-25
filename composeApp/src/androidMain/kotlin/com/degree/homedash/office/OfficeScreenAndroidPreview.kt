@@ -19,6 +19,7 @@ private fun OfficeScreenPreview() {
                 powerHistory = previewHistory,
                 onOpenSettings = {},
                 onToggle = {},
+                onSetFanSpeed = { _, _ -> },
                 onSignal = {},
             )
         }

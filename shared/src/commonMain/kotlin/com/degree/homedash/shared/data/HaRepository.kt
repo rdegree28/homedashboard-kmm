@@ -7,6 +7,8 @@ import com.degree.homedash.shared.network.HaProtocol
 import com.degree.homedash.shared.network.HaWebSocketClient
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
@@ -37,6 +39,10 @@ class HaRepository(private val client: HaWebSocketClient) {
     /** Run a `script.*` entity. */
     suspend fun runScript(scriptEntityId: String) =
         client.callService("script", "turn_on", scriptEntityId)
+
+    /** Set a fan's speed (0–100%). The value arrives back via the entity's `percentage` attribute. */
+    suspend fun setFanPercentage(entityId: String, percentage: Int) =
+        client.callService("fan", "set_percentage", entityId, buildJsonObject { put("percentage", percentage) })
 
     suspend fun callService(
         domain: String,

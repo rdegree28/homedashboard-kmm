@@ -65,6 +65,7 @@ fun OfficeScreen(repository: HaRepository, onOpenSettings: () -> Unit) {
         powerHistory = powerHistory,
         onOpenSettings = onOpenSettings,
         onToggle = { entityId -> scope.launch { repository.toggle(entityId) } },
+        onSetFanSpeed = { id, pct -> scope.launch { repository.setFanPercentage(id, pct) } },
         onSignal = { mode ->
             scope.launch {
                 when (mode) {
@@ -86,6 +87,7 @@ fun OfficeContent(
     powerHistory: List<HistoryPoint>,
     onOpenSettings: () -> Unit,
     onToggle: (String) -> Unit,
+    onSetFanSpeed: (String, Int) -> Unit,
     onSignal: (SignalMode) -> Unit,
 ) {
     Column(
@@ -119,7 +121,11 @@ fun OfficeContent(
         }
 
         SectionCard("Fans") {
-            FanControl("Office Fan", states[OfficeEntities.OFFICE_FAN]) {
+            FanControl(
+                "Office Fan",
+                states[OfficeEntities.OFFICE_FAN],
+                onSetSpeed = { pct -> onSetFanSpeed(OfficeEntities.OFFICE_FAN, pct) },
+            ) {
                 onToggle(OfficeEntities.OFFICE_FAN)
             }
             FanControl("Box Fan", states[OfficeEntities.BOX_FAN]) {

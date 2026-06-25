@@ -2,11 +2,25 @@ package com.degree.homedash.office
 
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlin.math.sin
 
 // Sample data for the Office preview (the @Preview lives in androidMain so Android Studio renders it).
 
 internal fun previewEntity(state: String) = EntityState(entityId = "preview", state = state)
+
+/** A sample fan entity carrying speed attributes so the speed slider renders in previews. */
+internal fun previewFan(percentage: Int, stepPercent: Double = 8.333) = EntityState(
+    entityId = "preview",
+    state = "on",
+    attributes = JsonObject(
+        mapOf(
+            "percentage" to JsonPrimitive(percentage),
+            "percentage_step" to JsonPrimitive(stepPercent),
+        ),
+    ),
+)
 
 internal val previewStates: Map<String, EntityState> = mapOf(
     OfficeEntities.OFFICE_LIGHT to previewEntity("on"),
