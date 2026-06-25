@@ -6,21 +6,21 @@ import kotlin.math.sin
 
 // Sample data for the Office preview (the @Preview lives in androidMain so Android Studio renders it).
 
-private fun previewState(state: String) = EntityState(entityId = "preview", state = state)
+internal fun previewEntity(state: String) = EntityState(entityId = "preview", state = state)
 
 internal val previewStates: Map<String, EntityState> = mapOf(
-    OfficeEntities.OFFICE_LIGHT to previewState("on"),
-    OfficeEntities.SMALL_LIGHT to previewState("off"),
-    OfficeEntities.OFFICE_FAN to previewState("on"),
-    OfficeEntities.BOX_FAN to previewState("off"),
-    OfficeEntities.SIGNAL_MODE to previewState("green"),
-    OfficeEntities.TEMPERATURE to previewState("75.6"),
-    OfficeEntities.HUMIDITY to previewState("48.5"),
-    OfficeEntities.DOOR to previewState("on"),
-    OfficeEntities.WORKSTATION to previewState("on"),
-    OfficeEntities.HEXAGON to previewState("off"),
-    OfficeEntities.POWER to previewState("61.1"),
-    OfficeEntities.ENERGY to previewState("34.8"),
+    OfficeEntities.OFFICE_LIGHT to previewEntity("on"),
+    OfficeEntities.SMALL_LIGHT to previewEntity("off"),
+    OfficeEntities.OFFICE_FAN to previewEntity("on"),
+    OfficeEntities.BOX_FAN to previewEntity("off"),
+    OfficeEntities.SIGNAL_MODE to previewEntity("green"),
+    OfficeEntities.TEMPERATURE to previewEntity("75.6"),
+    OfficeEntities.HUMIDITY to previewEntity("48.5"),
+    OfficeEntities.DOOR to previewEntity("on"),
+    OfficeEntities.WORKSTATION to previewEntity("on"),
+    OfficeEntities.HEXAGON to previewEntity("off"),
+    OfficeEntities.POWER to previewEntity("61.1"),
+    OfficeEntities.ENERGY to previewEntity("34.8"),
 )
 
 internal val previewHistory: List<HistoryPoint> =
