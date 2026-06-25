@@ -1,0 +1,11 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- White house: overhanging roof + body, with a doorway cut out (evenOdd). -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M54,32 L78,54 L71,54 L71,78 L37,78 L37,54 L30,54 Z M49,78 L49,64 L59,64 L59,78 Z" />
+</vector>
