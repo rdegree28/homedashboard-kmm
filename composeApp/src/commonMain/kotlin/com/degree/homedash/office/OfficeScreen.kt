@@ -111,7 +111,7 @@ fun OfficeScreen(repository: HaRepository, onOpenSettings: () -> Unit) {
         }
 
         SectionCard("Workstation") {
-            ControlRow("Workstation", states[OfficeEntities.WORKSTATION]) {
+            WorkstationControl("Workstation", states[OfficeEntities.WORKSTATION]) {
                 scope.launch { repository.toggle(OfficeEntities.WORKSTATION) }
             }
             ControlRow("Hexagon Lights", states[OfficeEntities.HEXAGON]) {
