@@ -33,10 +33,12 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.EntityState
 import kotlin.math.PI
 import kotlin.math.cos
+import kotlin.math.round
 import kotlin.math.sin
 
 private val AmberOn = Color(0xFFFFC107)
@@ -94,6 +96,38 @@ fun FanControl(
     onToggle: () -> Unit,
 ) = EntityToggleRow(name, entity, FanOn, onToggle) { tint ->
     FanIcon(spinning = entity?.isOn == true, tint = tint, modifier = Modifier.size(26.dp))
+}
+
+/** A read-only sensor readout: icon + label + formatted value (e.g. "76.3 °F"). */
+@Composable
+fun ClimateRow(label: String, entity: EntityState?, icon: ImageVector, tint: Color) {
+    val unit = entity?.attrString("unit_of_measurement").orEmpty()
+    val value = when {
+        entity == null || entity.isUnavailable -> "—"
+        else -> {
+            val v = entity.state.toDoubleOrNull()
+            val num = if (v != null) {
+                val r = round(v * 10.0) / 10.0
+                if (r == r.toLong().toDouble()) r.toLong().toString() else r.toString()
+            } else {
+                entity.state
+            }
+            if (unit.isNotEmpty()) "$num $unit" else num
+        }
+    }
+    Row(
+        modifier = Modifier.fillMaxWidth().height(52.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(26.dp))
+        Spacer(Modifier.width(16.dp))
+        Text(text = label, modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+        )
+    }
 }
 
 /** Custom fan icon: static outer ring + three swept blades (rotating while [spinning]) + hub. */

@@ -19,6 +19,9 @@ object OfficeEntities {
 
     const val POWER = "sensor.office_workstation_power"
     const val ENERGY = "sensor.office_workstation_summation_delivered"
+
+    const val TEMPERATURE = "sensor.sonoff_snzb_02d_temperature"
+    const val HUMIDITY = "sensor.sonoff_snzb_02d_humidity"
 }
 
 /** The four office "signal" states; [stateValue] matches `sensor.office_signal_mode`. */

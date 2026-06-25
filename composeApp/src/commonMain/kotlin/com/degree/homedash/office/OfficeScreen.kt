@@ -18,6 +18,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Thermostat
+import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -107,6 +109,21 @@ fun OfficeScreen(repository: HaRepository, onOpenSettings: () -> Unit) {
                     }
                 }
             }
+        }
+
+        SectionCard("Climate") {
+            ClimateRow(
+                "Temperature",
+                states[OfficeEntities.TEMPERATURE],
+                Icons.Filled.Thermostat,
+                Color(0xFFFF8A65),
+            )
+            ClimateRow(
+                "Humidity",
+                states[OfficeEntities.HUMIDITY],
+                Icons.Filled.WaterDrop,
+                Color(0xFF4FC3F7),
+            )
         }
 
         SectionCard("Workstation") {
