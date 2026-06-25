@@ -59,6 +59,35 @@ fun OfficeScreen(repository: HaRepository, onOpenSettings: () -> Unit) {
         }
     }
 
+    OfficeContent(
+        states = states,
+        connection = connection,
+        powerHistory = powerHistory,
+        onOpenSettings = onOpenSettings,
+        onToggle = { entityId -> scope.launch { repository.toggle(entityId) } },
+        onSignal = { mode ->
+            scope.launch {
+                when (mode) {
+                    SignalMode.OFF -> repository.turnOff(OfficeEntities.TRAFFIC_SIGNAL)
+                    SignalMode.AVAILABLE -> repository.runScript(OfficeEntities.SCRIPT_GREEN)
+                    SignalMode.FOCUSED -> repository.runScript(OfficeEntities.SCRIPT_AMBER)
+                    SignalMode.MEETING -> repository.runScript(OfficeEntities.SCRIPT_RED)
+                }
+            }
+        },
+    )
+}
+
+/** Stateless Office UI — all data in, all actions out. Rendered by [OfficeScreen] and previews. */
+@Composable
+fun OfficeContent(
+    states: Map<String, EntityState>,
+    connection: ConnectionStatus,
+    powerHistory: List<HistoryPoint>,
+    onOpenSettings: () -> Unit,
+    onToggle: (String) -> Unit,
+    onSignal: (SignalMode) -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -82,33 +111,24 @@ fun OfficeScreen(repository: HaRepository, onOpenSettings: () -> Unit) {
 
         SectionCard("Lights") {
             LightControl("Office", states[OfficeEntities.OFFICE_LIGHT], Icons.Filled.Lightbulb) {
-                scope.launch { repository.toggle(OfficeEntities.OFFICE_LIGHT) }
+                onToggle(OfficeEntities.OFFICE_LIGHT)
             }
             LightControl("Small", states[OfficeEntities.SMALL_LIGHT], Icons.Filled.Lightbulb) {
-                scope.launch { repository.toggle(OfficeEntities.SMALL_LIGHT) }
+                onToggle(OfficeEntities.SMALL_LIGHT)
             }
         }
 
         SectionCard("Fans") {
             FanControl("Office Fan", states[OfficeEntities.OFFICE_FAN]) {
-                scope.launch { repository.toggle(OfficeEntities.OFFICE_FAN) }
+                onToggle(OfficeEntities.OFFICE_FAN)
             }
             FanControl("Box Fan", states[OfficeEntities.BOX_FAN]) {
-                scope.launch { repository.toggle(OfficeEntities.BOX_FAN) }
+                onToggle(OfficeEntities.BOX_FAN)
             }
         }
 
         SectionCard("Status") {
-            SignalSelector(states[OfficeEntities.SIGNAL_MODE]?.state) { mode ->
-                scope.launch {
-                    when (mode) {
-                        SignalMode.OFF -> repository.turnOff(OfficeEntities.TRAFFIC_SIGNAL)
-                        SignalMode.AVAILABLE -> repository.runScript(OfficeEntities.SCRIPT_GREEN)
-                        SignalMode.FOCUSED -> repository.runScript(OfficeEntities.SCRIPT_AMBER)
-                        SignalMode.MEETING -> repository.runScript(OfficeEntities.SCRIPT_RED)
-                    }
-                }
-            }
+            SignalSelector(states[OfficeEntities.SIGNAL_MODE]?.state, onSignal)
         }
 
         SectionCard("Climate") {
@@ -126,12 +146,16 @@ fun OfficeScreen(repository: HaRepository, onOpenSettings: () -> Unit) {
             )
         }
 
+        SectionCard("Doors") {
+            DoorRow("Office Door", states[OfficeEntities.DOOR])
+        }
+
         SectionCard("Workstation") {
             WorkstationControl("Workstation", states[OfficeEntities.WORKSTATION]) {
-                scope.launch { repository.toggle(OfficeEntities.WORKSTATION) }
+                onToggle(OfficeEntities.WORKSTATION)
             }
             HexagonControl("Hexagon Lights", states[OfficeEntities.HEXAGON]) {
-                scope.launch { repository.toggle(OfficeEntities.HEXAGON) }
+                onToggle(OfficeEntities.HEXAGON)
             }
             Spacer(Modifier.height(8.dp))
             Text("Power Usage", style = MaterialTheme.typography.titleMedium)

@@ -22,6 +22,9 @@ object OfficeEntities {
 
     const val TEMPERATURE = "sensor.sonoff_snzb_02d_temperature"
     const val HUMIDITY = "sensor.sonoff_snzb_02d_humidity"
+
+    // binary_sensor (device_class opening): state "on" = open, "off" = closed.
+    const val DOOR = "binary_sensor.office_door_sensor"
 }
 
 /** The four office "signal" states; [stateValue] matches `sensor.office_signal_mode`. */
