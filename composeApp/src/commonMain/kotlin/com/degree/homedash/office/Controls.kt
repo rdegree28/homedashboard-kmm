@@ -35,6 +35,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.EntityState
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 private val AmberOn = Color(0xFFFFC107)
 private val FanOn = Color(0xFF4C8DFF)
@@ -226,6 +229,70 @@ private fun WorkstationIcon(on: Boolean, tint: Color, modifier: Modifier = Modif
             style = Stroke(width = stroke),
         )
     }
+}
+
+/** A hexagon-lights row: three hexagons (two on top, one below); white + faint glow while on. */
+@Composable
+fun HexagonControl(
+    name: String,
+    entity: EntityState?,
+    onToggle: () -> Unit,
+) = EntityToggleRow(name, entity, Color.White, onToggle) { tint ->
+    HexagonIcon(on = entity?.isOn == true, tint = tint, modifier = Modifier.size(26.dp))
+}
+
+/** Three stacked hexagons with the same breathing glow the lights use (white). */
+@Composable
+private fun HexagonIcon(on: Boolean, tint: Color, modifier: Modifier = Modifier) {
+    val transition = rememberInfiniteTransition(label = "hex")
+    val glow by transition.animateFloat(
+        initialValue = if (on) 0.18f else 0f,
+        targetValue = if (on) 0.5f else 0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1600, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "hexGlow",
+    )
+    Canvas(modifier) {
+        val w = size.width
+        val h = size.height
+        val cx = w / 2f
+        val cy = h / 2f
+
+        if (on) {
+            val rad = minOf(w, h) / 2f
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(Color.White.copy(alpha = glow), Color.Transparent),
+                    center = Offset(cx, cy),
+                    radius = rad,
+                ),
+                radius = rad,
+                center = Offset(cx, cy),
+            )
+        }
+
+        val r = w * 0.18f
+        val stroke = w * 0.05f
+        // Two on top, one centered below.
+        drawPath(hexagonPath(cx - r * 0.95f, cy - r * 0.52f, r), color = tint, style = Stroke(stroke))
+        drawPath(hexagonPath(cx + r * 0.95f, cy - r * 0.52f, r), color = tint, style = Stroke(stroke))
+        drawPath(hexagonPath(cx, cy + r * 0.90f, r), color = tint, style = Stroke(stroke))
+    }
+}
+
+/** Flat-top regular hexagon path centered at ([cx], [cy]) with circumradius [r]. */
+private fun hexagonPath(cx: Float, cy: Float, r: Float): Path {
+    val path = Path()
+    for (k in 0 until 6) {
+        val angle = (PI / 3.0 * k).toFloat()
+        val x = cx + r * cos(angle)
+        val y = cy + r * sin(angle)
+        if (k == 0) path.moveTo(x, y) else path.lineTo(x, y)
+    }
+    path.close()
+    return path
 }
 
 @Composable

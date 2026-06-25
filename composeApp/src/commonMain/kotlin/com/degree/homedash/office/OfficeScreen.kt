@@ -22,7 +22,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -114,7 +113,7 @@ fun OfficeScreen(repository: HaRepository, onOpenSettings: () -> Unit) {
             WorkstationControl("Workstation", states[OfficeEntities.WORKSTATION]) {
                 scope.launch { repository.toggle(OfficeEntities.WORKSTATION) }
             }
-            ControlRow("Hexagon Lights", states[OfficeEntities.HEXAGON]) {
+            HexagonControl("Hexagon Lights", states[OfficeEntities.HEXAGON]) {
                 scope.launch { repository.toggle(OfficeEntities.HEXAGON) }
             }
             Spacer(Modifier.height(8.dp))
@@ -141,27 +140,6 @@ private fun SectionCard(title: String, content: @Composable ColumnScope.() -> Un
             )
             content()
         }
-    }
-}
-
-@Composable
-private fun ControlRow(name: String, entity: EntityState?, onToggle: () -> Unit) {
-    val isOn = entity?.isOn == true
-    val available = entity != null && !entity.isUnavailable
-    Row(
-        modifier = Modifier.fillMaxWidth().height(52.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = name,
-            modifier = Modifier.weight(1f),
-            style = MaterialTheme.typography.titleMedium,
-        )
-        Switch(
-            checked = isOn,
-            enabled = available,
-            onCheckedChange = { onToggle() },
-        )
     }
 }
 
