@@ -19,8 +19,5 @@ private fun previewPlant(id: String, name: String, moisture: String) = EntitySta
 )
 
 internal val previewPlants: List<EntityState> = listOf(
-    previewPlant("sensor.monstera_soil_moisture", "Monstera Soil Moisture", "58"),
-    previewPlant("sensor.fiddle_leaf_soil_moisture", "Fiddle Leaf Fig Soil Moisture", "18"),
-    previewPlant("sensor.snake_plant_soil_moisture", "Snake Plant Soil Moisture", "29"),
-    previewPlant("sensor.pothos_soil_moisture", "Pothos Soil Moisture", "88"),
+    previewPlant("sensor.louie_moisture_sensor_soil_moisture", "Louie Soil Moisture", "58"),
 )

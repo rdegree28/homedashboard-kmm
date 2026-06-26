@@ -21,10 +21,18 @@ import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.ui.DashboardHeader
 import com.degree.homedash.ui.SectionCard
 
+/** Soil-moisture sensor entity ids shown on the Plants dashboard, in display order. */
+object PlantEntities {
+    val SOIL_MOISTURE = listOf(
+        "sensor.louie_moisture_sensor_soil_moisture",
+    )
+}
+
 @Composable
 fun PlantsScreen(repository: HaRepository, onBack: () -> Unit, onOpenSettings: () -> Unit) {
     val states by repository.states.collectAsState()
-    PlantsContent(plants = moistureSensors(states), onBack = onBack, onOpenSettings = onOpenSettings)
+    val plants = PlantEntities.SOIL_MOISTURE.mapNotNull { states[it] }
+    PlantsContent(plants = plants, onBack = onBack, onOpenSettings = onOpenSettings)
 }
 
 /** Stateless Plants UI — soil-moisture readings in, navigation actions out. */
@@ -56,17 +64,6 @@ fun PlantsContent(
         }
     }
 }
-
-/** Pick soil-moisture sensors out of the live entity map (device_class or name match). */
-internal fun moistureSensors(states: Map<String, EntityState>): List<EntityState> =
-    states.values
-        .filter { it.domain == "sensor" }
-        .filter { e ->
-            e.attrString("device_class") == "moisture" ||
-                "moisture" in e.entityId.lowercase() ||
-                e.friendlyName?.lowercase()?.contains("moisture") == true
-        }
-        .sortedBy { (it.friendlyName ?: it.entityId).lowercase() }
 
 @Preview(widthDp = 380, heightDp = 600)
 @Composable
