@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.EntityState
 
@@ -99,4 +100,12 @@ private fun WorkstationIcon(on: Boolean, tint: Color, modifier: Modifier = Modif
             style = Stroke(width = stroke),
         )
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
+@Composable
+private fun WorkstationControlPreview() = ControlPreview {
+    WorkstationControl("On", previewEntity("on")) {}
+    WorkstationControl("Off", previewEntity("off")) {}
+    WorkstationControl("Offline", previewEntity("unavailable")) {}
 }

@@ -4,7 +4,7 @@ import com.degree.homedash.shared.model.EntityState
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 
-// Sample data for the Plants preview (the @Preview lives in androidMain so Android Studio renders it).
+// Sample data for the Plants @Preview (which lives next to PlantsContent in PlantsScreen.kt).
 
 private fun previewPlant(id: String, name: String, moisture: String) = EntityState(
     entityId = id,

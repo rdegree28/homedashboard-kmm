@@ -22,7 +22,9 @@ import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -36,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.data.HaRepository
 import com.degree.homedash.shared.model.EntityState
@@ -237,4 +240,23 @@ private fun signalColor(mode: SignalMode): Color = when (mode) {
     SignalMode.AVAILABLE -> Color(0xFF2EA043)
     SignalMode.FOCUSED -> Color(0xFFD9A406)
     SignalMode.MEETING -> Color(0xFFD83A3A)
+}
+
+@Preview(widthDp = 380, heightDp = 1700)
+@Composable
+private fun OfficeScreenPreview() {
+    MaterialTheme(colorScheme = darkColorScheme()) {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            OfficeContent(
+                states = previewStates,
+                connection = ConnectionStatus.Connected,
+                powerHistory = previewHistory,
+                onBack = {},
+                onOpenSettings = {},
+                onToggle = {},
+                onSetFanSpeed = { _, _ -> },
+                onSignal = {},
+            )
+        }
+    }
 }

@@ -17,14 +17,17 @@ import androidx.compose.material.icons.filled.LocalFlorist
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 /** App launcher: a title plus one tappable card per dashboard. */
@@ -82,6 +85,16 @@ private fun DashboardCard(
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.size(28.dp),
             )
+        }
+    }
+}
+
+@Preview(widthDp = 380, heightDp = 400)
+@Composable
+private fun HomeScreenPreview() {
+    MaterialTheme(colorScheme = darkColorScheme()) {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            HomeScreen(onOpenOffice = {}, onOpenPlants = {}, onOpenSettings = {})
         }
     }
 }

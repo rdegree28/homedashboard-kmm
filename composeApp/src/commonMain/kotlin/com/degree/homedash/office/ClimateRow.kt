@@ -9,12 +9,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Thermostat
+import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.EntityState
 import kotlin.math.round
@@ -49,4 +53,12 @@ fun ClimateRow(label: String, entity: EntityState?, icon: ImageVector, tint: Col
             fontWeight = FontWeight.SemiBold,
         )
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
+@Composable
+private fun ClimateRowPreview() = ControlPreview {
+    ClimateRow("Temperature", previewEntity("72.5"), Icons.Filled.Thermostat, Color(0xFFFF8A65))
+    ClimateRow("Humidity", previewEntity("48"), Icons.Filled.WaterDrop, Color(0xFF4FC3F7))
+    ClimateRow("Unavailable", previewEntity("unavailable"), Icons.Filled.Thermostat, Color(0xFFFF8A65))
 }

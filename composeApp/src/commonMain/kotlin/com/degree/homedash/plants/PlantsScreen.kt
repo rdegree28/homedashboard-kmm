@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.data.HaRepository
 import com.degree.homedash.shared.model.EntityState
@@ -64,3 +67,13 @@ internal fun moistureSensors(states: Map<String, EntityState>): List<EntityState
                 e.friendlyName?.lowercase()?.contains("moisture") == true
         }
         .sortedBy { (it.friendlyName ?: it.entityId).lowercase() }
+
+@Preview(widthDp = 380, heightDp = 600)
+@Composable
+private fun PlantsScreenPreview() {
+    MaterialTheme(colorScheme = darkColorScheme()) {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            PlantsContent(plants = previewPlants, onBack = {}, onOpenSettings = {})
+        }
+    }
+}

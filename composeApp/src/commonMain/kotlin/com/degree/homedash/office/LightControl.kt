@@ -9,6 +9,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.EntityState
+import androidx.compose.ui.tooling.preview.Preview
 
 private val AmberOn = Color(0xFFFFC107)
 
@@ -63,4 +66,12 @@ private fun LightIcon(on: Boolean, icon: ImageVector, tint: Color, modifier: Mod
         }
         Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(21.dp))
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
+@Composable
+private fun LightControlPreview() = ControlPreview {
+    LightControl("On", previewEntity("on"), Icons.Filled.Lightbulb) {}
+    LightControl("Off", previewEntity("off"), Icons.Filled.Lightbulb) {}
+    LightControl("Offline", previewEntity("unavailable"), Icons.Filled.Lightbulb) {}
 }

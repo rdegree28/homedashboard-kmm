@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.EntityState
 import kotlin.math.PI
@@ -83,4 +84,12 @@ private fun hexagonPath(cx: Float, cy: Float, r: Float): Path {
     }
     path.close()
     return path
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
+@Composable
+private fun HexagonControlPreview() = ControlPreview {
+    HexagonControl("On", previewEntity("on")) {}
+    HexagonControl("Off", previewEntity("off")) {}
+    HexagonControl("Offline", previewEntity("unavailable")) {}
 }

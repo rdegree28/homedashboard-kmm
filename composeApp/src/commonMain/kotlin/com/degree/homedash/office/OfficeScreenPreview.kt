@@ -1,12 +1,37 @@
 package com.degree.homedash.office
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlin.math.sin
 
-// Sample data for the Office preview (the @Preview lives in androidMain so Android Studio renders it).
+// Shared sample data + scaffolding for the Office previews (which now live next to each composable).
+
+/** Wraps control previews in the app's dark theme + a padded column. */
+@Composable
+internal fun ControlPreview(content: @Composable ColumnScope.() -> Unit) {
+    MaterialTheme(colorScheme = darkColorScheme()) {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                content = content,
+            )
+        }
+    }
+}
 
 internal fun previewEntity(state: String) = EntityState(entityId = "preview", state = state)
 

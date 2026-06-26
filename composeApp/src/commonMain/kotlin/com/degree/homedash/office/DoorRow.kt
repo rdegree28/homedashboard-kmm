@@ -18,6 +18,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.EntityState
 
@@ -81,4 +82,12 @@ private fun DoorIcon(open: Boolean, tint: Color, modifier: Modifier = Modifier) 
             drawCircle(color = Color.Black.copy(alpha = 0.4f), radius = knobR, center = knob)
         }
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
+@Composable
+private fun DoorRowPreview() = ControlPreview {
+    DoorRow("Open", previewEntity("on"))
+    DoorRow("Closed", previewEntity("off"))
+    DoorRow("Unavailable", previewEntity("unavailable"))
 }

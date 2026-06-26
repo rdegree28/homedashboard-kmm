@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.EntityState
 import kotlin.math.roundToInt
@@ -174,4 +175,13 @@ private fun FanIcon(spinning: Boolean, durationMs: Int, tint: Color, modifier: M
 
         drawCircle(color = tint, radius = w * 0.08f, center = Offset(cx, cy))
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
+@Composable
+private fun FanControlPreview() = ControlPreview {
+    FanControl("On", previewEntity("on")) {}
+    FanControl("With speed", previewFan(percentage = 75), onSetSpeed = {}) {}
+    FanControl("Off", previewEntity("off")) {}
+    FanControl("Offline", previewEntity("unavailable")) {}
 }
