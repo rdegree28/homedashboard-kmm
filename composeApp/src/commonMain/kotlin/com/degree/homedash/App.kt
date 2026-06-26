@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.degree.homedash.office.OfficeScreen
+import com.degree.homedash.plants.PlantsScreen
 import com.degree.homedash.shared.data.ConfigStore
 import com.degree.homedash.shared.data.HaConfig
 import com.degree.homedash.shared.data.HaRepository
@@ -24,6 +25,7 @@ fun App(defaultConfig: HaConfig? = null) {
 
     var config by remember { mutableStateOf(configStore.load() ?: defaultConfig) }
     var showSettings by remember { mutableStateOf(config == null) }
+    var screen by remember { mutableStateOf(Screen.Home) }
 
     LaunchedEffect(config) {
         config?.let { repository.connect(it) }
@@ -43,8 +45,29 @@ fun App(defaultConfig: HaConfig? = null) {
                     onCancel = if (current != null) ({ showSettings = false }) else null,
                 )
             } else {
-                OfficeScreen(repository = repository, onOpenSettings = { showSettings = true })
+                when (screen) {
+                    Screen.Home -> HomeScreen(
+                        onOpenOffice = { screen = Screen.Office },
+                        onOpenPlants = { screen = Screen.Plants },
+                        onOpenSettings = { showSettings = true },
+                    )
+
+                    Screen.Office -> OfficeScreen(
+                        repository = repository,
+                        onBack = { screen = Screen.Home },
+                        onOpenSettings = { showSettings = true },
+                    )
+
+                    Screen.Plants -> PlantsScreen(
+                        repository = repository,
+                        onBack = { screen = Screen.Home },
+                        onOpenSettings = { showSettings = true },
+                    )
+                }
             }
         }
     }
 }
+
+/** Top-level destinations reachable from the home launcher. */
+private enum class Screen { Home, Office, Plants }

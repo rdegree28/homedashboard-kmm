@@ -17,6 +17,7 @@ private fun OfficeScreenPreview() {
                 states = previewStates,
                 connection = ConnectionStatus.Connected,
                 powerHistory = previewHistory,
+                onBack = {},
                 onOpenSettings = {},
                 onToggle = {},
                 onSetFanSpeed = { _, _ -> },

@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,10 +21,8 @@ import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -44,10 +41,12 @@ import com.degree.homedash.shared.data.HaRepository
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.network.ConnectionStatus
+import com.degree.homedash.ui.DashboardHeader
+import com.degree.homedash.ui.SectionCard
 import kotlinx.coroutines.launch
 
 @Composable
-fun OfficeScreen(repository: HaRepository, onOpenSettings: () -> Unit) {
+fun OfficeScreen(repository: HaRepository, onBack: () -> Unit, onOpenSettings: () -> Unit) {
     val states by repository.states.collectAsState()
     val connection by repository.connection.collectAsState()
     val scope = rememberCoroutineScope()
@@ -63,6 +62,7 @@ fun OfficeScreen(repository: HaRepository, onOpenSettings: () -> Unit) {
         states = states,
         connection = connection,
         powerHistory = powerHistory,
+        onBack = onBack,
         onOpenSettings = onOpenSettings,
         onToggle = { entityId -> scope.launch { repository.toggle(entityId) } },
         onSetFanSpeed = { id, pct -> scope.launch { repository.setFanPercentage(id, pct) } },
@@ -85,6 +85,7 @@ fun OfficeContent(
     states: Map<String, EntityState>,
     connection: ConnectionStatus,
     powerHistory: List<HistoryPoint>,
+    onBack: () -> Unit,
     onOpenSettings: () -> Unit,
     onToggle: (String) -> Unit,
     onSetFanSpeed: (String, Int) -> Unit,
@@ -97,18 +98,7 @@ fun OfficeContent(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = "Office",
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-            )
-            TextButton(onClick = onOpenSettings) { Text("Settings") }
-        }
+        DashboardHeader("Office", onBack = onBack, onOpenSettings = onOpenSettings)
         ConnectionBanner(connection)
 
         SectionCard("Lights") {
@@ -169,23 +159,6 @@ fun OfficeContent(
             Spacer(Modifier.height(4.dp))
             StatRow("Power", states[OfficeEntities.POWER])
             StatRow("Total Power Used", states[OfficeEntities.ENERGY])
-        }
-    }
-}
-
-@Composable
-private fun SectionCard(title: String, content: @Composable ColumnScope.() -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-            )
-            content()
         }
     }
 }
