@@ -54,7 +54,8 @@ fun HomeScreen(
             TextButton(onClick = onOpenSettings) { Text("Settings") }
         }
 
-        DashboardCard("Office", Icons.Filled.Chair, Color(0xFF4FC3F7), onOpenOffice)
+        // Office dashboard hidden from the launcher for now.
+//        DashboardCard("Office", Icons.Filled.Chair, Color(0xFF4FC3F7), onOpenOffice)
         DashboardCard("Plants", Icons.Filled.LocalFlorist, Color(0xFF66BB6A), onOpenPlants)
     }
 }
