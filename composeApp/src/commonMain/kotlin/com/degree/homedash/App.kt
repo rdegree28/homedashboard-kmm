@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.degree.homedash.office.OfficeScreen
+import com.degree.homedash.plants.PlantGraphScreen
 import com.degree.homedash.plants.PlantsScreen
 import com.degree.homedash.shared.data.ConfigStore
 import com.degree.homedash.shared.data.HaConfig
@@ -25,6 +26,8 @@ fun App(defaultConfig: HaConfig? = null) {
     val repository = remember { HaRepository(HaWebSocketClient()) }
 
     var config by remember { mutableStateOf(configStore.load() ?: defaultConfig) }
+    // Entity id whose history is shown on the PlantGraph destination.
+    var graphEntityId by remember { mutableStateOf<String?>(null) }
 
     // Navigation back stack; the last entry is the visible screen. Start on Settings when
     // unconfigured (it then acts as the un-poppable root), otherwise on Home.
@@ -68,6 +71,16 @@ fun App(defaultConfig: HaConfig? = null) {
                     repository = repository,
                     onBack = ::goBack,
                     onOpenSettings = { navigate(Screen.Settings) },
+                    onOpenGraph = { id ->
+                        graphEntityId = id
+                        navigate(Screen.PlantGraph)
+                    },
+                )
+
+                Screen.PlantGraph -> PlantGraphScreen(
+                    repository = repository,
+                    entityId = graphEntityId.orEmpty(),
+                    onBack = ::goBack,
                 )
             }
         }
@@ -75,4 +88,4 @@ fun App(defaultConfig: HaConfig? = null) {
 }
 
 /** Top-level destinations; the launcher (Home) is the root of the back stack. */
-private enum class Screen { Home, Office, Plants, Settings }
+private enum class Screen { Home, Office, Plants, Settings, PlantGraph }

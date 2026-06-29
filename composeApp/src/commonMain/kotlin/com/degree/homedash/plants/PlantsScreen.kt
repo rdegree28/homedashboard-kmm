@@ -29,10 +29,15 @@ object PlantEntities {
 }
 
 @Composable
-fun PlantsScreen(repository: HaRepository, onBack: () -> Unit, onOpenSettings: () -> Unit) {
+fun PlantsScreen(
+    repository: HaRepository,
+    onBack: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenGraph: (String) -> Unit,
+) {
     val states by repository.states.collectAsState()
     val plants = PlantEntities.SOIL_MOISTURE.mapNotNull { states[it] }
-    PlantsContent(plants = plants, onBack = onBack, onOpenSettings = onOpenSettings)
+    PlantsContent(plants = plants, onBack = onBack, onOpenSettings = onOpenSettings, onOpenGraph = onOpenGraph)
 }
 
 /** Stateless Plants UI — soil-moisture readings in, navigation actions out. */
@@ -41,6 +46,7 @@ fun PlantsContent(
     plants: List<EntityState>,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenGraph: (String) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -59,7 +65,9 @@ fun PlantsContent(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
-                plants.forEach { SoilMoistureControl(it) }
+                plants.forEach { plant ->
+                    SoilMoistureControl(plant, onClick = { onOpenGraph(plant.entityId) })
+                }
             }
         }
     }
@@ -70,7 +78,7 @@ fun PlantsContent(
 private fun PlantsScreenPreview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
-            PlantsContent(plants = previewPlants, onBack = {}, onOpenSettings = {})
+            PlantsContent(plants = previewPlants, onBack = {}, onOpenSettings = {}, onOpenGraph = {})
         }
     }
 }
