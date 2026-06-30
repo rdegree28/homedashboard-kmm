@@ -1,0 +1,15 @@
+# Caddy config for serving the homedashboard web build on the LAN over plain HTTP.
+# Copy this to /etc/caddy/Caddyfile inside the LXC, then: systemctl reload caddy
+#
+# Static-only site. The *.wasm header is set explicitly so the content-hashed wasm assets
+# (e.g. 6e23e54...wasm, skiko's f31817...wasm) are always served as application/wasm.
+:80 {
+    root * /var/www/homedash
+    encode gzip
+
+    @wasm path *.wasm
+    header @wasm Content-Type application/wasm
+
+    try_files {path} /index.html
+    file_server
+}
