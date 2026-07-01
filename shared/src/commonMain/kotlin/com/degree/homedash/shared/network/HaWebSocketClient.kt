@@ -163,7 +163,10 @@ class HaWebSocketClient(
         }
     }
 
-    private fun handleMessage(text: String, statesId: Long) {
+    private fun handleMessage(
+        text: String,
+        statesId: Long,
+    ) {
         when (HaProtocol.messageType(text)) {
             "result" -> {
                 results.tryEmit(text) // let any pending request() match by id

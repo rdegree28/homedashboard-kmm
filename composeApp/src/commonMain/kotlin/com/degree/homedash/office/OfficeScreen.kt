@@ -40,7 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.shared.data.HaRepository
+import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.network.ConnectionStatus
@@ -52,7 +52,7 @@ import com.degree.homedash.ui.formatNumberOrSelf
 import kotlinx.coroutines.launch
 
 @Composable
-fun OfficeScreen(repository: HaRepository, onBack: () -> Unit, onOpenSettings: () -> Unit) {
+fun OfficeScreen(repository: HomeAssistantRepo, onBack: () -> Unit, onOpenSettings: () -> Unit) {
     val states by repository.states.collectAsState()
     val connection by repository.connection.collectAsState()
     val scope = rememberCoroutineScope()

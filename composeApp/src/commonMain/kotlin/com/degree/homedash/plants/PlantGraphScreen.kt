@@ -27,7 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.shared.data.HaRepository
+import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.network.ConnectionStatus
@@ -46,7 +46,7 @@ enum class TimeRange(val label: String, val hoursBack: Int) {
 }
 
 @Composable
-fun PlantGraphScreen(repository: HaRepository, entityId: String, onBack: () -> Unit) {
+fun PlantGraphScreen(repository: HomeAssistantRepo, entityId: String, onBack: () -> Unit) {
     val states by repository.states.collectAsState()
     val connection by repository.connection.collectAsState()
 

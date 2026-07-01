@@ -3,7 +3,9 @@ package com.degree.homedash.shared.data
 import com.russhwolf.settings.Settings
 
 /** Persists the [HaConfig] (base URL + token) across launches. */
-class ConfigStore(private val settings: Settings = createSettings()) {
+class ConfigStore(
+    private val settings: Settings = createSettings(),
+) {
 
     fun load(): HaConfig? {
         val url = settings.getStringOrNull(KEY_URL)

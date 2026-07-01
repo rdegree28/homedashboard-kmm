@@ -17,7 +17,9 @@ import kotlin.time.ExperimentalTime
  * High-level entry point for the UI: live entity states + connection status, plus typed actions.
  * Office-specific orchestration lives a layer above (the UI/state-holder).
  */
-class HaRepository(private val client: HaWebSocketClient) {
+class HomeAssistantRepo(
+    private val client: HaWebSocketClient,
+) {
 
     val states: StateFlow<Map<String, EntityState>> = client.states
     val connection: StateFlow<ConnectionStatus> = client.connection
@@ -41,8 +43,10 @@ class HaRepository(private val client: HaWebSocketClient) {
         client.callService("script", "turn_on", scriptEntityId)
 
     /** Set a fan's speed (0–100%). The value arrives back via the entity's `percentage` attribute. */
-    suspend fun setFanPercentage(entityId: String, percentage: Int) =
-        client.callService("fan", "set_percentage", entityId, buildJsonObject { put("percentage", percentage) })
+    suspend fun setFanPercentage(
+        entityId: String,
+        percentage: Int,
+    ) = client.callService("fan", "set_percentage", entityId, buildJsonObject { put("percentage", percentage) })
 
     suspend fun callService(
         domain: String,
@@ -53,7 +57,10 @@ class HaRepository(private val client: HaWebSocketClient) {
 
     /** Fetch [hoursBack] hours of numeric history for [entityId] over the WebSocket. */
     @OptIn(ExperimentalTime::class)
-    suspend fun powerHistory(entityId: String, hoursBack: Int): List<HistoryPoint> {
+    suspend fun powerHistory(
+        entityId: String,
+        hoursBack: Int,
+    ): List<HistoryPoint> {
         val end = Clock.System.now()
         val start = end.minus(hoursBack.hours)
         val text = client.request { id ->

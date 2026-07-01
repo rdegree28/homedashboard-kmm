@@ -16,7 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.shared.data.HaRepository
+import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.ui.DashboardHeader
 import com.degree.homedash.ui.Dimens
@@ -31,7 +31,7 @@ object PlantEntities {
 
 @Composable
 fun PlantsScreen(
-    repository: HaRepository,
+    repository: HomeAssistantRepo,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenGraph: (String) -> Unit,

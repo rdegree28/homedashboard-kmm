@@ -93,7 +93,12 @@ object HaProtocol {
         ),
     )
 
-    fun encodeHistory(id: Long, entityId: String, startTimeIso: String, endTimeIso: String): String =
+    fun encodeHistory(
+        id: Long,
+        entityId: String,
+        startTimeIso: String,
+        endTimeIso: String,
+    ): String =
         json.encodeToString(
             HistoryCommand.serializer(),
             HistoryCommand(
@@ -109,7 +114,10 @@ object HaProtocol {
      * Entries use the compressed form: `s` = state value, `lu`/`lc` = last updated/changed (epoch s).
      * Non-numeric states (e.g. "unavailable") are skipped.
      */
-    fun parseHistory(resultText: String, entityId: String): List<HistoryPoint> = runCatching {
+    fun parseHistory(
+        resultText: String,
+        entityId: String,
+    ): List<HistoryPoint> = runCatching {
         val arr = json.parseToJsonElement(resultText).jsonObject["result"]
             ?.jsonObject?.get(entityId)?.jsonArray ?: return emptyList()
         arr.mapNotNull { el ->

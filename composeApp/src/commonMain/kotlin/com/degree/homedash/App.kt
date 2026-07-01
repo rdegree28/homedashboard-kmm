@@ -17,13 +17,13 @@ import com.degree.homedash.plants.PlantGraphScreen
 import com.degree.homedash.plants.PlantsScreen
 import com.degree.homedash.shared.data.ConfigStore
 import com.degree.homedash.shared.data.HaConfig
-import com.degree.homedash.shared.data.HaRepository
+import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.shared.network.HaWebSocketClient
 
 @Composable
 fun App(defaultConfig: HaConfig? = null) {
     val configStore = remember { ConfigStore() }
-    val repository = remember { HaRepository(HaWebSocketClient()) }
+    val repository = remember { HomeAssistantRepo(HaWebSocketClient()) }
 
     var config by remember { mutableStateOf(configStore.load() ?: defaultConfig) }
     // Entity id whose history is shown on the PlantGraph destination.
