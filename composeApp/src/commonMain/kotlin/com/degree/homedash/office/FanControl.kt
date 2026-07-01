@@ -28,9 +28,9 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.EntityState
+import com.degree.homedash.ui.AppColors
+import com.degree.homedash.ui.Dimens
 import kotlin.math.roundToInt
-
-private val FanOn = Color(0xFF4C8DFF)
 
 /**
  * A fan entity row (spinning fan icon + toggle). If [onSetSpeed] is provided and the fan is on,
@@ -45,12 +45,12 @@ fun FanControl(
 ) {
     val spinDurationMs = fanSpinDurationMs(entity, hasSpeedControl = onSetSpeed != null)
     Column {
-        EntityToggleRow(name, entity, FanOn, onToggle) { tint ->
+        EntityToggleRow(name, entity, AppColors.Accent, onToggle) { tint ->
             FanIcon(
                 spinning = entity?.isOn == true,
                 durationMs = spinDurationMs,
                 tint = tint,
-                modifier = Modifier.size(26.dp),
+                modifier = Modifier.size(Dimens.RowIconSize),
             )
         }
         if (onSetSpeed != null && entity?.isOn == true) {

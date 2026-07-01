@@ -26,7 +26,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.EntityState
-import kotlin.math.round
+import com.degree.homedash.ui.AppColors
+import com.degree.homedash.ui.formatNumber
 
 /**
  * A plant's soil-moisture readout: name, a colored fill bar, and the percentage. When [onClick] is
@@ -52,7 +53,7 @@ fun SoilMoistureControl(entity: EntityState, onClick: (() -> Unit)? = null) {
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
-                text = pct?.let { "${formatPercent(it)} %" } ?: "—",
+                text = pct?.let { "${formatNumber(it, decimals = 1)} %" } ?: "—",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = barColor,
@@ -97,14 +98,9 @@ internal fun plantName(entity: EntityState): String {
 
 /** Soil-moisture status color: red (dry) → amber → green (healthy) → blue (very wet). */
 internal fun moistureColor(pct: Double?): Color = when {
-    pct == null -> Color(0xFF888888)
-    pct < 20 -> Color(0xFFD83A3A) // too dry
-    pct < 30 -> Color(0xFFD9A406) // getting dry
-    pct > 80 -> Color(0xFF4FC3F7) // very wet
-    else -> Color(0xFF66BB6A) // healthy
-}
-
-private fun formatPercent(v: Double): String {
-    val r = round(v * 10.0) / 10.0
-    return if (r == r.toLong().toDouble()) r.toLong().toString() else r.toString()
+    pct == null -> AppColors.StatusGray
+    pct < 20 -> AppColors.StatusRed // too dry
+    pct < 30 -> AppColors.StatusAmber // getting dry
+    pct > 80 -> AppColors.Wet // very wet
+    else -> AppColors.Healthy // healthy
 }

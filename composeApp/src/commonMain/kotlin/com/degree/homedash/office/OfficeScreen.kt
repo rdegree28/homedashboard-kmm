@@ -44,8 +44,11 @@ import com.degree.homedash.shared.data.HaRepository
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.network.ConnectionStatus
+import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.DashboardHeader
+import com.degree.homedash.ui.Dimens
 import com.degree.homedash.ui.SectionCard
+import com.degree.homedash.ui.formatNumberOrSelf
 import kotlinx.coroutines.launch
 
 @Composable
@@ -99,7 +102,7 @@ fun OfficeContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(Dimens.SectionSpacing),
     ) {
         DashboardHeader("Office", onBack = onBack, onOpenSettings = onOpenSettings)
         ConnectionBanner(connection)
@@ -135,13 +138,13 @@ fun OfficeContent(
                 "Temperature",
                 states[OfficeEntities.TEMPERATURE],
                 Icons.Filled.Thermostat,
-                Color(0xFFFF8A65),
+                AppColors.TempWarm,
             )
             ClimateRow(
                 "Humidity",
                 states[OfficeEntities.HUMIDITY],
                 Icons.Filled.WaterDrop,
-                Color(0xFF4FC3F7),
+                AppColors.Wet,
             )
         }
 
@@ -197,7 +200,7 @@ private fun SignalSelector(currentState: String?, onSelect: (SignalMode) -> Unit
 @Composable
 private fun StatRow(label: String, entity: EntityState?) {
     val unit = entity?.attrString("unit_of_measurement").orEmpty()
-    val value = entity?.state?.let { "${formatNumeric(it)} $unit".trim() } ?: "—"
+    val value = entity?.state?.let { "${formatNumberOrSelf(it, decimals = 2)} $unit".trim() } ?: "—"
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -210,10 +213,10 @@ private fun StatRow(label: String, entity: EntityState?) {
 @Composable
 private fun ConnectionBanner(status: ConnectionStatus) {
     val (text, color) = when (status) {
-        ConnectionStatus.Connected -> "Connected" to Color(0xFF2EA043)
-        ConnectionStatus.Connecting -> "Connecting…" to Color(0xFFD9A406)
-        ConnectionStatus.Disconnected -> "Disconnected" to Color(0xFF888888)
-        is ConnectionStatus.Error -> "Error: ${status.message ?: "unknown"}" to Color(0xFFD83A3A)
+        ConnectionStatus.Connected -> "Connected" to AppColors.StatusGreen
+        ConnectionStatus.Connecting -> "Connecting…" to AppColors.StatusAmber
+        ConnectionStatus.Disconnected -> "Disconnected" to AppColors.StatusGray
+        is ConnectionStatus.Error -> "Error: ${status.message ?: "unknown"}" to AppColors.StatusRed
     }
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -228,18 +231,11 @@ private fun ConnectionBanner(status: ConnectionStatus) {
     }
 }
 
-/** Round numeric sensor values to 2 decimals (dropping trailing zeros); pass through non-numbers. */
-private fun formatNumeric(raw: String): String {
-    val d = raw.toDoubleOrNull() ?: return raw
-    val rounded = kotlin.math.round(d * 100.0) / 100.0
-    return if (rounded == rounded.toLong().toDouble()) rounded.toLong().toString() else rounded.toString()
-}
-
 private fun signalColor(mode: SignalMode): Color = when (mode) {
-    SignalMode.OFF -> Color(0xFFB6B6B6)
-    SignalMode.AVAILABLE -> Color(0xFF2EA043)
-    SignalMode.FOCUSED -> Color(0xFFD9A406)
-    SignalMode.MEETING -> Color(0xFFD83A3A)
+    SignalMode.OFF -> AppColors.SignalOff
+    SignalMode.AVAILABLE -> AppColors.StatusGreen
+    SignalMode.FOCUSED -> AppColors.StatusAmber
+    SignalMode.MEETING -> AppColors.StatusRed
 }
 
 @Preview(widthDp = 380, heightDp = 1700)

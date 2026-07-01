@@ -19,10 +19,9 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.EntityState
-
-private val BananaOn = Color(0xFFFFE135)
+import com.degree.homedash.ui.AppColors
+import com.degree.homedash.ui.Dimens
 
 /** A workstation row: a laptop icon with code scrolling on its screen while on (banana yellow). */
 @Composable
@@ -30,8 +29,8 @@ fun WorkstationControl(
     name: String,
     entity: EntityState?,
     onToggle: () -> Unit,
-) = EntityToggleRow(name, entity, BananaOn, onToggle) { tint ->
-    WorkstationIcon(on = entity?.isOn == true, tint = tint, modifier = Modifier.size(26.dp))
+) = EntityToggleRow(name, entity, AppColors.WorkstationOn, onToggle) { tint ->
+    WorkstationIcon(on = entity?.isOn == true, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
 }
 
 /** Custom laptop: screen + keyboard deck, with "code" lines scrolling up the screen while [on]. */

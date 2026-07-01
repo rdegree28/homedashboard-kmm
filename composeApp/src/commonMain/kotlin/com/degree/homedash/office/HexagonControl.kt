@@ -17,8 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.EntityState
+import com.degree.homedash.ui.Dimens
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -30,7 +30,7 @@ fun HexagonControl(
     entity: EntityState?,
     onToggle: () -> Unit,
 ) = EntityToggleRow(name, entity, Color.White, onToggle) { tint ->
-    HexagonIcon(on = entity?.isOn == true, tint = tint, modifier = Modifier.size(26.dp))
+    HexagonIcon(on = entity?.isOn == true, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
 }
 
 /** Three stacked hexagons with the same breathing glow the lights use (white). */

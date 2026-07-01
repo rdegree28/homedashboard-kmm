@@ -11,21 +11,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.HistoryPoint
+import com.degree.homedash.ui.AppColors
+import com.degree.homedash.ui.Dimens
 import kotlin.math.roundToInt
 
 /** A compact area/line chart of numeric history, echoing the old HA Power Usage graph. */
 @Composable
 fun PowerGraph(points: List<HistoryPoint>, modifier: Modifier = Modifier) {
-    val lineColor = Color(0xFF4C8DFF)
-    val fillColor = Color(0x334C8DFF)
-    val gridColor = Color(0x22FFFFFF)
+    val lineColor = AppColors.Accent
+    val fillColor = AppColors.Accent.copy(alpha = 0.2f)
+    val gridColor = AppColors.GridLine
 
-    Box(modifier.fillMaxWidth().height(150.dp)) {
+    Box(modifier.fillMaxWidth().height(Dimens.ChartHeight)) {
         if (points.size < 2) {
             Text(
                 text = if (points.isEmpty()) "Loading…" else "Not enough data",

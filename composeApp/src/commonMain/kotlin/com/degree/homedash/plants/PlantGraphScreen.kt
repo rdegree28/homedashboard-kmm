@@ -32,6 +32,7 @@ import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.network.ConnectionStatus
 import com.degree.homedash.ui.DashboardHeader
+import com.degree.homedash.ui.Dimens
 import com.degree.homedash.ui.HistoryGraph
 import com.degree.homedash.ui.SectionCard
 import kotlin.math.roundToInt
@@ -80,7 +81,7 @@ fun PlantGraphContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(Dimens.SectionSpacing),
     ) {
         DashboardHeader(entity?.let { plantName(it) } ?: "Plant", onBack = onBack)
 

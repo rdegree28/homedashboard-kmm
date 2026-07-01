@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.data.HaRepository
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.ui.DashboardHeader
+import com.degree.homedash.ui.Dimens
 import com.degree.homedash.ui.SectionCard
 
 /** Soil-moisture sensor entity ids shown on the Plants dashboard, in display order. */
@@ -53,7 +54,7 @@ fun PlantsContent(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(Dimens.SectionSpacing),
     ) {
         DashboardHeader("Plants", onBack = onBack, onOpenSettings = onOpenSettings)
 

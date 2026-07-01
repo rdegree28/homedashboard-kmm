@@ -35,9 +35,9 @@ import kotlin.math.roundToInt
 fun HistoryGraph(
     points: List<HistoryPoint>,
     modifier: Modifier = Modifier,
-    lineColor: Color = Color(0xFF4C8DFF),
+    lineColor: Color = AppColors.Accent,
     fillColor: Color = lineColor.copy(alpha = 0.2f),
-    height: Dp = 150.dp,
+    height: Dp = Dimens.ChartHeight,
     /** Fixed top of the value axis; when null the chart auto-scales to the data's max. */
     maxValue: Double? = null,
     maxLabel: (Double) -> String = { it.roundToInt().toString() },
@@ -46,7 +46,7 @@ fun HistoryGraph(
     /** When true, time labels (hour/weekday/date/month, chosen by span) are drawn under the chart. */
     showTimeAxis: Boolean = false,
 ) {
-    val gridColor = Color(0x22FFFFFF)
+    val gridColor = AppColors.GridLine
     val axisColor = MaterialTheme.colorScheme.onSurfaceVariant
 
     Column(modifier.fillMaxWidth()) {

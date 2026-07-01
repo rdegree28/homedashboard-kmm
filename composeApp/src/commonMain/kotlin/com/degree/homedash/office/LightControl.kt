@@ -21,9 +21,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.EntityState
+import com.degree.homedash.ui.AppColors
+import com.degree.homedash.ui.Dimens
 import androidx.compose.ui.tooling.preview.Preview
-
-private val AmberOn = Color(0xFFFFC107)
 
 /** A light entity row: a bulb icon (amber when on) + name + toggle. */
 @Composable
@@ -32,8 +32,8 @@ fun LightControl(
     entity: EntityState?,
     icon: ImageVector,
     onToggle: () -> Unit,
-) = EntityToggleRow(name, entity, AmberOn, onToggle) { tint ->
-    LightIcon(on = entity?.isOn == true, icon = icon, tint = tint, modifier = Modifier.size(26.dp))
+) = EntityToggleRow(name, entity, AppColors.LightOn, onToggle) { tint ->
+    LightIcon(on = entity?.isOn == true, icon = icon, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
 }
 
 /** Bulb icon with a soft amber glow that gently breathes while [on]. */
@@ -55,7 +55,7 @@ private fun LightIcon(on: Boolean, icon: ImageVector, tint: Color, modifier: Mod
                 val rad = size.minDimension / 2f
                 drawCircle(
                     brush = Brush.radialGradient(
-                        colors = listOf(AmberOn.copy(alpha = glow), Color.Transparent),
+                        colors = listOf(AppColors.LightOn.copy(alpha = glow), Color.Transparent),
                         center = center,
                         radius = rad,
                     ),

@@ -29,6 +29,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.degree.homedash.ui.AppColors
+import com.degree.homedash.ui.Dimens
 
 /** App launcher: a title plus one tappable card per dashboard. */
 @Composable
@@ -39,7 +41,7 @@ fun HomeScreen(
 ) {
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(Dimens.SectionSpacing),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -56,7 +58,7 @@ fun HomeScreen(
 
         // Office dashboard hidden from the launcher for now.
 //        DashboardCard("Office", Icons.Filled.Chair, Color(0xFF4FC3F7), onOpenOffice)
-        DashboardCard("Plants", Icons.Filled.LocalFlorist, Color(0xFF66BB6A), onOpenPlants)
+        DashboardCard("Plants", Icons.Filled.LocalFlorist, AppColors.Healthy, onOpenPlants)
     }
 }
 
