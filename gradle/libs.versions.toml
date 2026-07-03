@@ -3,7 +3,7 @@ agp = "8.7.3"
 kotlin = "2.4.0"
 compose = "1.11.1"
 androidx-activityCompose = "1.9.3"
-androidx-lifecycle = "2.8.4"            # org.jetbrains.androidx.lifecycle (Compose Multiplatform)
+androidx-lifecycle = "2.9.6"            # org.jetbrains.androidx.lifecycle (Compose Multiplatform); keep aligned with the version Compose pulls transitively
 ktor = "3.4.0"
 coroutines = "1.10.1"
 serialization = "1.8.0"
@@ -44,8 +44,10 @@ multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-sett
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 # Android
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
-# Lifecycle ViewModel (Compose Multiplatform)
+# Lifecycle ViewModel + runtime (Compose Multiplatform)
+androidx-lifecycle-viewmodel = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

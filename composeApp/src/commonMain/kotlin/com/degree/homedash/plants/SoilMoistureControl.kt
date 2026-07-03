@@ -27,17 +27,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.ui.AppColors
-import com.degree.homedash.ui.formatNumber
 
 /**
  * A plant's soil-moisture readout: name, a colored fill bar, and the percentage. When [onClick] is
  * provided the whole row is tappable (and shows a chevron) — used to open the history graph.
  */
 @Composable
-fun SoilMoistureControl(entity: EntityState, onClick: (() -> Unit)? = null) {
-    val pct = entity.state.toDoubleOrNull()?.takeUnless { entity.isUnavailable }
-    val fraction = pct?.let { (it / 100.0).coerceIn(0.0, 1.0) } ?: 0.0
-    val barColor = moistureColor(pct)
+fun SoilMoistureControl(ui: PlantUi, onClick: (() -> Unit)? = null) {
+    val fraction = ui.pct?.let { (it / 100.0).coerceIn(0.0, 1.0) } ?: 0.0
+    val barColor = moistureColor(ui.pct)
 
     Column(
         modifier = Modifier
@@ -48,12 +46,12 @@ fun SoilMoistureControl(entity: EntityState, onClick: (() -> Unit)? = null) {
     ) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = plantName(entity),
+                text = ui.name,
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
-                text = pct?.let { "${formatNumber(it, decimals = 1)} %" } ?: "—",
+                text = ui.valueText,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = barColor,

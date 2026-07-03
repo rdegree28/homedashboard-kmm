@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
-import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.ui.Dimens
 import kotlin.math.PI
 import kotlin.math.cos
@@ -25,13 +24,10 @@ import kotlin.math.sin
 
 /** A hexagon-lights row: three hexagons (two on top, one below); white + faint glow while on. */
 @Composable
-fun HexagonControl(
-    name: String,
-    entity: EntityState?,
-    onToggle: () -> Unit,
-) = EntityToggleRow(name, entity, Color.White, onToggle) { tint ->
-    HexagonIcon(on = entity?.isOn == true, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
-}
+fun HexagonControl(ui: ToggleUi, onToggle: () -> Unit) =
+    EntityToggleRow(ui, Color.White, onToggle) { tint ->
+        HexagonIcon(on = ui.isOn, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
+    }
 
 /** Three stacked hexagons with the same breathing glow the lights use (white). */
 @Composable
@@ -89,7 +85,7 @@ private fun hexagonPath(cx: Float, cy: Float, r: Float): Path {
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
 @Composable
 private fun HexagonControlPreview() = ControlPreview {
-    HexagonControl("On", previewEntity("on")) {}
-    HexagonControl("Off", previewEntity("off")) {}
-    HexagonControl("Offline", previewEntity("unavailable")) {}
+    HexagonControl(previewToggle("On", isOn = true)) {}
+    HexagonControl(previewToggle("Off", isOn = false)) {}
+    HexagonControl(previewToggle("Offline", offline = true)) {}
 }

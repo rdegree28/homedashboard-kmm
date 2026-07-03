@@ -4,35 +4,30 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.degree.homedash.shared.model.EntityState
 
 /**
  * Shared row for toggleable entities: a custom [iconContent] + name + Switch.
- * Offline (entity missing or unavailable): faded icon, italic muted label, disabled toggle.
+ * Offline ([ToggleUi.offline]): faded icon, italic muted label, disabled toggle.
  */
 @Composable
 internal fun EntityToggleRow(
-    name: String,
-    entity: EntityState?,
+    ui: ToggleUi,
     onTint: Color,
     onToggle: () -> Unit,
     iconContent: @Composable (tint: Color) -> Unit,
 ) {
-    val isOn = entity?.isOn == true
-    val offline = entity == null || entity.isUnavailable
-
-    val baseTint = if (isOn) onTint else MaterialTheme.colorScheme.onSurfaceVariant
-    val iconTint = if (offline) baseTint.copy(alpha = 0.3f) else baseTint
+    val baseTint = if (ui.isOn) onTint else MaterialTheme.colorScheme.onSurfaceVariant
+    val iconTint = if (ui.offline) baseTint.copy(alpha = 0.3f) else baseTint
 
     EntityRow(
-        label = name,
-        labelItalic = offline,
-        labelMuted = offline,
+        label = ui.name,
+        labelItalic = ui.offline,
+        labelMuted = ui.offline,
         leading = { iconContent(iconTint) },
         trailing = {
             Switch(
-                checked = isOn,
-                enabled = !offline,
+                checked = ui.isOn,
+                enabled = !ui.offline,
                 onCheckedChange = { onToggle() },
             )
         },

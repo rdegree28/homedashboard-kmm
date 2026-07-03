@@ -13,27 +13,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.ui.Dimens
 
 /** A read-only door row: white door icon (hollow when open, solid when closed) + Open/Closed. */
 @Composable
-fun DoorRow(label: String, entity: EntityState?) {
-    val unavailable = entity == null || entity.isUnavailable
-    val open = entity?.state == "on" // device_class opening: on = open
-    val status = when {
-        unavailable -> "—"
-        open -> "Open"
-        else -> "Closed"
-    }
-    val tint = if (unavailable) Color.White.copy(alpha = 0.3f) else Color.White
+fun DoorRow(ui: DoorUi) {
+    val tint = if (ui.unavailable) Color.White.copy(alpha = 0.3f) else Color.White
 
     EntityRow(
-        label = label,
-        leading = { DoorIcon(open = open, tint = tint, modifier = Modifier.size(Dimens.RowIconSize)) },
+        label = ui.label,
+        leading = { DoorIcon(open = ui.open, tint = tint, modifier = Modifier.size(Dimens.RowIconSize)) },
         trailing = {
             Text(
-                text = status,
+                text = ui.statusText,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -79,7 +71,7 @@ private fun DoorIcon(open: Boolean, tint: Color, modifier: Modifier = Modifier) 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
 @Composable
 private fun DoorRowPreview() = ControlPreview {
-    DoorRow("Open", previewEntity("on"))
-    DoorRow("Closed", previewEntity("off"))
-    DoorRow("Unavailable", previewEntity("unavailable"))
+    DoorRow(DoorUi("Open", "Open", open = true, unavailable = false))
+    DoorRow(DoorUi("Closed", "Closed", open = false, unavailable = false))
+    DoorRow(DoorUi("Unavailable", "—", open = false, unavailable = true))
 }

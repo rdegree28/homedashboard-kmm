@@ -27,43 +27,36 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 import kotlin.math.roundToInt
 
 /**
- * A fan entity row (spinning fan icon + toggle). If [onSetSpeed] is provided and the fan is on,
- * a stepped speed slider is shown beneath it (reads the `percentage` attribute).
+ * A fan entity row (spinning fan icon + toggle). If [onSetSpeed] is provided and the fan is on with a
+ * multi-level speed, a stepped speed slider is shown beneath it.
  */
 @Composable
 fun FanControl(
-    name: String,
-    entity: EntityState?,
+    ui: FanUi,
     onSetSpeed: ((Int) -> Unit)? = null,
     onToggle: () -> Unit,
 ) {
-    val spinDurationMs = fanSpinDurationMs(entity, hasSpeedControl = onSetSpeed != null)
+    val spinDurationMs = fanSpinDurationMs(ui.percentage, ui.levelCount, hasSpeedControl = onSetSpeed != null)
     Column {
-        EntityToggleRow(name, entity, AppColors.Accent, onToggle) { tint ->
+        EntityToggleRow(ToggleUi(ui.name, ui.isOn, ui.offline), AppColors.Accent, onToggle) { tint ->
             FanIcon(
-                spinning = entity?.isOn == true,
+                spinning = ui.isOn,
                 durationMs = spinDurationMs,
                 tint = tint,
                 modifier = Modifier.size(Dimens.RowIconSize),
             )
         }
-        if (onSetSpeed != null && entity?.isOn == true) {
-            // Number of speed levels from the fan's reported percentage_step (e.g. 8.33% -> 12).
-            val stepPct = entity.attrDouble("percentage_step")
-            val levelCount = if (stepPct != null && stepPct > 0.0) (100.0 / stepPct).roundToInt() else 0
-            if (levelCount >= 2) {
-                FanSpeedSlider(
-                    percentage = entity.attrDouble("percentage")?.roundToInt() ?: 0,
-                    levelCount = levelCount,
-                    onSet = onSetSpeed,
-                )
-            }
+        if (onSetSpeed != null && ui.isOn && ui.levelCount >= 2) {
+            FanSpeedSlider(
+                percentage = ui.percentage,
+                levelCount = ui.levelCount,
+                onSet = onSetSpeed,
+            )
         }
     }
 }
@@ -109,13 +102,9 @@ private fun FanSpeedSlider(percentage: Int, levelCount: Int, onSet: (Int) -> Uni
  * Spin duration (ms per revolution) scaled by fan speed: 750 ms at top level, 2500 ms at level 1,
  * linear in between. Fans with no speed control (or no reported speed) spin at a steady 1000 ms.
  */
-private fun fanSpinDurationMs(entity: EntityState?, hasSpeedControl: Boolean): Int {
-    val stepPct = entity?.attrDouble("percentage_step")
-    val pct = entity?.attrDouble("percentage")
-    if (!hasSpeedControl || stepPct == null || stepPct <= 0.0 || pct == null) return 1000
-    val levelCount = (100.0 / stepPct).roundToInt()
-    if (levelCount < 2) return 1000
-    val level = (pct / 100.0 * levelCount).roundToInt().coerceIn(1, levelCount)
+private fun fanSpinDurationMs(percentage: Int, levelCount: Int, hasSpeedControl: Boolean): Int {
+    if (!hasSpeedControl || levelCount < 2) return 1000
+    val level = (percentage / 100.0 * levelCount).roundToInt().coerceIn(1, levelCount)
     val fraction = (level - 1).toFloat() / (levelCount - 1) // 0 at level 1, 1 at top level
     return (2500f + (750f - 2500f) * fraction).roundToInt()
 }
@@ -180,8 +169,8 @@ private fun FanIcon(spinning: Boolean, durationMs: Int, tint: Color, modifier: M
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
 @Composable
 private fun FanControlPreview() = ControlPreview {
-    FanControl("On", previewEntity("on")) {}
-    FanControl("With speed", previewFan(percentage = 75), onSetSpeed = {}) {}
-    FanControl("Off", previewEntity("off")) {}
-    FanControl("Offline", previewEntity("unavailable")) {}
+    FanControl(previewFan("On", isOn = true)) {}
+    FanControl(previewFan("With speed", isOn = true, percentage = 75, levelCount = 12), onSetSpeed = {}) {}
+    FanControl(previewFan("Off", isOn = false)) {}
+    FanControl(previewFan("Offline", offline = true)) {}
 }

@@ -19,19 +19,15 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.tooling.preview.Preview
-import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 
 /** A workstation row: a laptop icon with code scrolling on its screen while on (banana yellow). */
 @Composable
-fun WorkstationControl(
-    name: String,
-    entity: EntityState?,
-    onToggle: () -> Unit,
-) = EntityToggleRow(name, entity, AppColors.WorkstationOn, onToggle) { tint ->
-    WorkstationIcon(on = entity?.isOn == true, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
-}
+fun WorkstationControl(ui: ToggleUi, onToggle: () -> Unit) =
+    EntityToggleRow(ui, AppColors.WorkstationOn, onToggle) { tint ->
+        WorkstationIcon(on = ui.isOn, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
+    }
 
 /** Custom laptop: screen + keyboard deck, with "code" lines scrolling up the screen while [on]. */
 @Composable
@@ -104,7 +100,7 @@ private fun WorkstationIcon(on: Boolean, tint: Color, modifier: Modifier = Modif
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
 @Composable
 private fun WorkstationControlPreview() = ControlPreview {
-    WorkstationControl("On", previewEntity("on")) {}
-    WorkstationControl("Off", previewEntity("off")) {}
-    WorkstationControl("Offline", previewEntity("unavailable")) {}
+    WorkstationControl(previewToggle("On", isOn = true)) {}
+    WorkstationControl(previewToggle("Off", isOn = false)) {}
+    WorkstationControl(previewToggle("Offline", offline = true)) {}
 }

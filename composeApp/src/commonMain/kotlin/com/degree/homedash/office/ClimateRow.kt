@@ -13,30 +13,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
-import com.degree.homedash.ui.formatNumberOrSelf
 
-/** A read-only sensor readout: icon + label + formatted value (e.g. "76.3 °F"). */
+/** A read-only sensor readout: icon + label + preformatted value (e.g. "76.3 °F"). */
 @Composable
-fun ClimateRow(label: String, entity: EntityState?, icon: ImageVector, tint: Color) {
-    val unit = entity?.attrString("unit_of_measurement").orEmpty()
-    val value = when {
-        entity == null || entity.isUnavailable -> "—"
-        else -> {
-            val num = formatNumberOrSelf(entity.state, decimals = 1)
-            if (unit.isNotEmpty()) "$num $unit" else num
-        }
-    }
+fun ClimateRow(ui: SensorUi, icon: ImageVector, tint: Color) {
     EntityRow(
-        label = label,
+        label = ui.label,
         leading = {
             Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
         },
         trailing = {
             Text(
-                text = value,
+                text = ui.valueText,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -47,7 +37,7 @@ fun ClimateRow(label: String, entity: EntityState?, icon: ImageVector, tint: Col
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
 @Composable
 private fun ClimateRowPreview() = ControlPreview {
-    ClimateRow("Temperature", previewEntity("72.5"), Icons.Filled.Thermostat, AppColors.TempWarm)
-    ClimateRow("Humidity", previewEntity("48"), Icons.Filled.WaterDrop, AppColors.Wet)
-    ClimateRow("Unavailable", previewEntity("unavailable"), Icons.Filled.Thermostat, AppColors.TempWarm)
+    ClimateRow(SensorUi("Temperature", "72.5 °F"), Icons.Filled.Thermostat, AppColors.TempWarm)
+    ClimateRow(SensorUi("Humidity", "48 %"), Icons.Filled.WaterDrop, AppColors.Wet)
+    ClimateRow(SensorUi("Unavailable", "—"), Icons.Filled.Thermostat, AppColors.TempWarm)
 }

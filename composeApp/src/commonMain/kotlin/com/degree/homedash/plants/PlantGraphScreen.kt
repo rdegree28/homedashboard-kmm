@@ -18,19 +18,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.degree.homedash.shared.data.HomeAssistantRepo
-import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.shared.model.HistoryPoint
-import com.degree.homedash.shared.network.ConnectionStatus
 import com.degree.homedash.ui.DashboardHeader
 import com.degree.homedash.ui.Dimens
 import com.degree.homedash.ui.HistoryGraph
@@ -47,32 +41,15 @@ enum class TimeRange(val label: String, val hoursBack: Int) {
 
 @Composable
 fun PlantGraphScreen(repository: HomeAssistantRepo, entityId: String, onBack: () -> Unit) {
-    val states by repository.states.collectAsState()
-    val connection by repository.connection.collectAsState()
-
-    var range by remember { mutableStateOf(TimeRange.WEEK) }
-    var history by remember(entityId, range) { mutableStateOf<List<HistoryPoint>>(emptyList()) }
-    LaunchedEffect(entityId, connection, range) {
-        if (connection == ConnectionStatus.Connected) {
-            runCatching { history = repository.powerHistory(entityId, hoursBack = range.hoursBack) }
-        }
-    }
-
-    PlantGraphContent(
-        entity = states[entityId],
-        history = history,
-        range = range,
-        onRangeChange = { range = it },
-        onBack = onBack,
-    )
+    val vm: PlantGraphViewModel = viewModel(key = entityId) { PlantGraphViewModel(repository, entityId) }
+    val ui by vm.uiState.collectAsStateWithLifecycle()
+    PlantGraphContent(ui = ui, onRangeChange = vm::setRange, onBack = onBack)
 }
 
 /** Stateless moisture graph view: current reading, a range selector, and the history chart. */
 @Composable
 fun PlantGraphContent(
-    entity: EntityState?,
-    history: List<HistoryPoint>,
-    range: TimeRange,
+    ui: PlantGraphUiState,
     onRangeChange: (TimeRange) -> Unit,
     onBack: () -> Unit,
 ) {
@@ -83,15 +60,15 @@ fun PlantGraphContent(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(Dimens.SectionSpacing),
     ) {
-        DashboardHeader(entity?.let { plantName(it) } ?: "Plant", onBack = onBack)
+        DashboardHeader(ui.plant?.name ?: "Plant", onBack = onBack)
 
         SectionCard("Soil Moisture") {
-            entity?.let { SoilMoistureControl(it) }
+            ui.plant?.let { SoilMoistureControl(it) }
             Spacer(Modifier.height(8.dp))
-            RangeSelector(selected = range, onSelect = onRangeChange)
+            RangeSelector(selected = ui.range, onSelect = onRangeChange)
             Spacer(Modifier.height(8.dp))
             HistoryGraph(
-                points = history,
+                points = ui.history,
                 maxValue = 100.0,
                 maxLabel = { "${it.roundToInt()} %" },
                 colorForValue = { moistureColor(it) },
@@ -127,9 +104,7 @@ private fun PlantGraphScreenPreview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
             PlantGraphContent(
-                entity = previewPlants.first(),
-                history = previewMoistureHistory,
-                range = TimeRange.WEEK,
+                ui = PlantGraphUiState(previewPlants.first(), previewMoistureHistory, TimeRange.WEEK),
                 onRangeChange = {},
                 onBack = {},
             )

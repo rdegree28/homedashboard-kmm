@@ -11,13 +11,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.degree.homedash.shared.data.HomeAssistantRepo
-import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.ui.DashboardHeader
 import com.degree.homedash.ui.Dimens
 import com.degree.homedash.ui.SectionCard
@@ -36,15 +36,15 @@ fun PlantsScreen(
     onOpenSettings: () -> Unit,
     onOpenGraph: (String) -> Unit,
 ) {
-    val states by repository.states.collectAsState()
-    val plants = PlantEntities.SOIL_MOISTURE.mapNotNull { states[it] }
-    PlantsContent(plants = plants, onBack = onBack, onOpenSettings = onOpenSettings, onOpenGraph = onOpenGraph)
+    val vm: PlantsViewModel = viewModel { PlantsViewModel(repository) }
+    val ui by vm.uiState.collectAsStateWithLifecycle()
+    PlantsContent(ui = ui, onBack = onBack, onOpenSettings = onOpenSettings, onOpenGraph = onOpenGraph)
 }
 
-/** Stateless Plants UI — soil-moisture readings in, navigation actions out. */
+/** Stateless Plants UI — projected soil-moisture readings in, navigation actions out. */
 @Composable
 fun PlantsContent(
-    plants: List<EntityState>,
+    ui: PlantsUiState,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenGraph: (String) -> Unit,
@@ -59,14 +59,14 @@ fun PlantsContent(
         DashboardHeader("Plants", onBack = onBack, onOpenSettings = onOpenSettings)
 
         SectionCard("Soil Moisture") {
-            if (plants.isEmpty()) {
+            if (ui.plants.isEmpty()) {
                 Text(
                     "No moisture sensors found.",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
-                plants.forEach { plant ->
+                ui.plants.forEach { plant ->
                     SoilMoistureControl(plant, onClick = { onOpenGraph(plant.entityId) })
                 }
             }
@@ -79,7 +79,7 @@ fun PlantsContent(
 private fun PlantsScreenPreview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
-            PlantsContent(plants = previewPlants, onBack = {}, onOpenSettings = {}, onOpenGraph = {})
+            PlantsContent(ui = PlantsUiState(previewPlants), onBack = {}, onOpenSettings = {}, onOpenGraph = {})
         }
     }
 }

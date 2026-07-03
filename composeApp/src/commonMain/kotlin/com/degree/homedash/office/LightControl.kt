@@ -18,27 +18,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.shared.model.EntityState
+import androidx.compose.ui.tooling.preview.Preview
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
-import androidx.compose.ui.tooling.preview.Preview
 
 /** A light entity row: a bulb icon (amber when on) + name + toggle. */
 @Composable
-fun LightControl(
-    name: String,
-    entity: EntityState?,
-    icon: ImageVector,
-    onToggle: () -> Unit,
-) = EntityToggleRow(name, entity, AppColors.LightOn, onToggle) { tint ->
-    LightIcon(on = entity?.isOn == true, icon = icon, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
-}
+fun LightControl(ui: ToggleUi, onToggle: () -> Unit) =
+    EntityToggleRow(ui, AppColors.LightOn, onToggle) { tint ->
+        LightIcon(on = ui.isOn, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
+    }
 
 /** Bulb icon with a soft amber glow that gently breathes while [on]. */
 @Composable
-private fun LightIcon(on: Boolean, icon: ImageVector, tint: Color, modifier: Modifier = Modifier) {
+private fun LightIcon(on: Boolean, tint: Color, modifier: Modifier = Modifier) {
     val transition = rememberInfiniteTransition(label = "bulb")
     val glow by transition.animateFloat(
         initialValue = if (on) 0.18f else 0f,
@@ -64,14 +58,14 @@ private fun LightIcon(on: Boolean, icon: ImageVector, tint: Color, modifier: Mod
                 )
             }
         }
-        Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(21.dp))
+        Icon(imageVector = Icons.Filled.Lightbulb, contentDescription = null, tint = tint, modifier = Modifier.size(21.dp))
     }
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
 @Composable
 private fun LightControlPreview() = ControlPreview {
-    LightControl("On", previewEntity("on"), Icons.Filled.Lightbulb) {}
-    LightControl("Off", previewEntity("off"), Icons.Filled.Lightbulb) {}
-    LightControl("Offline", previewEntity("unavailable"), Icons.Filled.Lightbulb) {}
+    LightControl(previewToggle("On", isOn = true)) {}
+    LightControl(previewToggle("Off", isOn = false)) {}
+    LightControl(previewToggle("Offline", offline = true)) {}
 }
