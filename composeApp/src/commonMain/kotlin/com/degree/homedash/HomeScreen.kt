@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Chair
 import androidx.compose.material.icons.filled.LocalFlorist
+import androidx.compose.material.icons.filled.Weekend
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +38,7 @@ import com.degree.homedash.ui.Dimens
 fun HomeScreen(
     onOpenOffice: () -> Unit,
     onOpenPlants: () -> Unit,
+    onOpenLivingRoom: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
     Column(
@@ -59,6 +61,7 @@ fun HomeScreen(
         // Office dashboard hidden from the launcher for now.
 //        DashboardCard("Office", Icons.Filled.Chair, Color(0xFF4FC3F7), onOpenOffice)
         DashboardCard("Plants", Icons.Filled.LocalFlorist, AppColors.Healthy, onOpenPlants)
+        DashboardCard("Living Room", Icons.Filled.Weekend, AppColors.Accent, onOpenLivingRoom)
     }
 }
 
@@ -97,7 +100,7 @@ private fun DashboardCard(
 private fun HomeScreenPreview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
-            HomeScreen(onOpenOffice = {}, onOpenPlants = {}, onOpenSettings = {})
+            HomeScreen(onOpenOffice = {}, onOpenPlants = {}, onOpenLivingRoom = {}, onOpenSettings = {})
         }
     }
 }

@@ -17,6 +17,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.degree.homedash.livingroom.LivingRoomScreen
+import com.degree.homedash.livingroom.WaterGraphScreen
 import com.degree.homedash.office.OfficeScreen
 import com.degree.homedash.plants.PlantGraphScreen
 import com.degree.homedash.plants.PlantsScreen
@@ -56,6 +58,7 @@ fun App(defaultConfig: HaConfig? = null) {
                     Screen.Home -> HomeScreen(
                         onOpenOffice = { navigate(Screen.Office) },
                         onOpenPlants = { navigate(Screen.Plants) },
+                        onOpenLivingRoom = { navigate(Screen.LivingRoom) },
                         onOpenSettings = { navigate(Screen.Settings) },
                     )
 
@@ -80,6 +83,22 @@ fun App(defaultConfig: HaConfig? = null) {
                         entityId = graphEntityId.orEmpty(),
                         onBack = ::goBack,
                     )
+
+                    Screen.LivingRoom -> LivingRoomScreen(
+                        repository = repository,
+                        onBack = ::goBack,
+                        onOpenSettings = { navigate(Screen.Settings) },
+                        onOpenGraph = { id ->
+                            graphEntityId = id
+                            navigate(Screen.WaterGraph)
+                        },
+                    )
+
+                    Screen.WaterGraph -> WaterGraphScreen(
+                        repository = repository,
+                        entityId = graphEntityId.orEmpty(),
+                        onBack = ::goBack,
+                    )
                 }
             }
         }
@@ -87,4 +106,4 @@ fun App(defaultConfig: HaConfig? = null) {
 }
 
 /** Top-level destinations; the launcher (Home) is the root of the back stack. */
-private enum class Screen { Home, Office, Plants, Settings, PlantGraph }
+private enum class Screen { Home, Office, Plants, LivingRoom, Settings, PlantGraph, WaterGraph }
