@@ -3,12 +3,23 @@
 #
 # Static-only site. The *.wasm header is set explicitly so the content-hashed wasm assets
 # (e.g. 6e23e54...wasm, skiko's f31817...wasm) are always served as application/wasm.
+#
+# Cache-Control matters here: the entry files (index.html, composeApp.js) have stable names and
+# reference content-hashed *.wasm files. A redeploy rsyncs with --delete, removing the old hashes,
+# so a browser holding a cached composeApp.js would fetch wasm that no longer exists -> blank page.
+# Fix: never-stale the stable entry files (revalidate), cache the immutable hashed wasm forever.
 :80 {
     root * /var/www/homedash
     encode gzip
 
+    # Content-hashed, immutable assets: correct MIME + cache forever (filename changes on rebuild).
     @wasm path *.wasm
     header @wasm Content-Type application/wasm
+    header @wasm Cache-Control "public, max-age=31536000, immutable"
+
+    # Stable-named entry files: must always revalidate so a redeploy is picked up immediately.
+    @entry path /index.html /composeApp.js /composeApp.js.map /styles.css
+    header @entry Cache-Control "no-cache"
 
     try_files {path} /index.html
     file_server
