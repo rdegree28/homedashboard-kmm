@@ -1,9 +1,10 @@
-package com.degree.homedash.office
+package com.degree.homedash.controls
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.degree.homedash.office.ToggleUi
 
 /**
  * Shared row for toggleable entities: a custom [iconContent] + name + Switch.

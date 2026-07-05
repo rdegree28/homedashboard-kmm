@@ -35,6 +35,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.degree.homedash.controls.ClimateRow
+import com.degree.homedash.controls.DoorRow
+import com.degree.homedash.controls.FanControl
+import com.degree.homedash.controls.HexagonControl
+import com.degree.homedash.controls.LightControl
+import com.degree.homedash.controls.WorkstationControl
 import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.shared.network.ConnectionStatus
 import com.degree.homedash.ui.AppColors

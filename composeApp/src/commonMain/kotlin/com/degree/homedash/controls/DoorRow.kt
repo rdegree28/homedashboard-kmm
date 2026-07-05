@@ -1,4 +1,4 @@
-package com.degree.homedash.office
+package com.degree.homedash.controls
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import com.degree.homedash.office.DoorUi
 import com.degree.homedash.ui.Dimens
 
 /** A read-only door row: white door icon (hollow when open, solid when closed) + Open/Closed. */
@@ -35,7 +36,11 @@ fun DoorRow(ui: DoorUi) {
 
 /** Door icon: hollow outline when [open], solid slab when closed. */
 @Composable
-private fun DoorIcon(open: Boolean, tint: Color, modifier: Modifier = Modifier) {
+private fun DoorIcon(
+    open: Boolean,
+    tint: Color,
+    modifier: Modifier = Modifier,
+) {
     Canvas(modifier) {
         val w = size.width
         val h = size.height

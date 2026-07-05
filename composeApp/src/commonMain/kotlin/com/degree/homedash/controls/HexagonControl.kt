@@ -1,4 +1,4 @@
-package com.degree.homedash.office
+package com.degree.homedash.controls
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
+import com.degree.homedash.office.ToggleUi
 import com.degree.homedash.ui.Dimens
 import kotlin.math.PI
 import kotlin.math.cos
@@ -24,14 +25,21 @@ import kotlin.math.sin
 
 /** A hexagon-lights row: three hexagons (two on top, one below); white + faint glow while on. */
 @Composable
-fun HexagonControl(ui: ToggleUi, onToggle: () -> Unit) =
+fun HexagonControl(
+    ui: ToggleUi,
+    onToggle: () -> Unit,
+) =
     EntityToggleRow(ui, Color.White, onToggle) { tint ->
         HexagonIcon(on = ui.isOn, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
     }
 
 /** Three stacked hexagons with the same breathing glow the lights use (white). */
 @Composable
-private fun HexagonIcon(on: Boolean, tint: Color, modifier: Modifier = Modifier) {
+private fun HexagonIcon(
+    on: Boolean,
+    tint: Color,
+    modifier: Modifier = Modifier,
+) {
     val transition = rememberInfiniteTransition(label = "hex")
     val glow by transition.animateFloat(
         initialValue = if (on) 0.18f else 0f,
@@ -70,7 +78,11 @@ private fun HexagonIcon(on: Boolean, tint: Color, modifier: Modifier = Modifier)
 }
 
 /** Flat-top regular hexagon path centered at ([cx], [cy]) with circumradius [r]. */
-private fun hexagonPath(cx: Float, cy: Float, r: Float): Path {
+private fun hexagonPath(
+    cx: Float,
+    cy: Float,
+    r: Float,
+): Path {
     val path = Path()
     for (k in 0 until 6) {
         val angle = (PI / 3.0 * k).toFloat()

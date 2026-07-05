@@ -1,4 +1,4 @@
-package com.degree.homedash.office
+package com.degree.homedash.controls
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -20,19 +20,27 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import com.degree.homedash.office.ToggleUi
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 
 /** A light entity row: a bulb icon (amber when on) + name + toggle. */
 @Composable
-fun LightControl(ui: ToggleUi, onToggle: () -> Unit) =
+fun LightControl(
+    ui: ToggleUi,
+    onToggle: () -> Unit,
+) =
     EntityToggleRow(ui, AppColors.LightOn, onToggle) { tint ->
         LightIcon(on = ui.isOn, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
     }
 
 /** Bulb icon with a soft amber glow that gently breathes while [on]. */
 @Composable
-private fun LightIcon(on: Boolean, tint: Color, modifier: Modifier = Modifier) {
+private fun LightIcon(
+    on: Boolean,
+    tint: Color,
+    modifier: Modifier = Modifier,
+) {
     val transition = rememberInfiniteTransition(label = "bulb")
     val glow by transition.animateFloat(
         initialValue = if (on) 0.18f else 0f,

@@ -1,4 +1,4 @@
-package com.degree.homedash.office
+package com.degree.homedash.controls
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -19,19 +19,27 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.tooling.preview.Preview
+import com.degree.homedash.office.ToggleUi
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 
 /** A workstation row: a laptop icon with code scrolling on its screen while on (banana yellow). */
 @Composable
-fun WorkstationControl(ui: ToggleUi, onToggle: () -> Unit) =
+fun WorkstationControl(
+    ui: ToggleUi,
+    onToggle: () -> Unit,
+) =
     EntityToggleRow(ui, AppColors.WorkstationOn, onToggle) { tint ->
         WorkstationIcon(on = ui.isOn, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
     }
 
 /** Custom laptop: screen + keyboard deck, with "code" lines scrolling up the screen while [on]. */
 @Composable
-private fun WorkstationIcon(on: Boolean, tint: Color, modifier: Modifier = Modifier) {
+private fun WorkstationIcon(
+    on: Boolean,
+    tint: Color,
+    modifier: Modifier = Modifier,
+) {
     val transition = rememberInfiniteTransition(label = "ws")
     val scroll by transition.animateFloat(
         initialValue = 0f,

@@ -1,4 +1,4 @@
-package com.degree.homedash.office
+package com.degree.homedash.controls
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -13,12 +13,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import com.degree.homedash.office.SensorUi
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 
 /** A read-only sensor readout: icon + label + preformatted value (e.g. "76.3 °F"). */
 @Composable
-fun ClimateRow(ui: SensorUi, icon: ImageVector, tint: Color) {
+fun ClimateRow(
+    ui: SensorUi,
+    icon: ImageVector,
+    tint: Color,
+) {
     EntityRow(
         label = ui.label,
         leading = {

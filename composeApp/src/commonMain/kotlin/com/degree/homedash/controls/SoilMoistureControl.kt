@@ -1,4 +1,4 @@
-package com.degree.homedash.plants
+package com.degree.homedash.controls
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.degree.homedash.plants.PlantUi
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.ui.AppColors
 
@@ -33,7 +34,10 @@ import com.degree.homedash.ui.AppColors
  * provided the whole row is tappable (and shows a chevron) — used to open the history graph.
  */
 @Composable
-fun SoilMoistureControl(ui: PlantUi, onClick: (() -> Unit)? = null) {
+fun SoilMoistureControl(
+    ui: PlantUi,
+    onClick: (() -> Unit)? = null,
+) {
     val fraction = ui.pct?.let { (it / 100.0).coerceIn(0.0, 1.0) } ?: 0.0
     val barColor = moistureColor(ui.pct)
 

@@ -1,4 +1,4 @@
-package com.degree.homedash.office
+package com.degree.homedash.controls
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +27,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.degree.homedash.office.FanUi
+import com.degree.homedash.office.ToggleUi
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 import kotlin.math.roundToInt
@@ -67,7 +69,11 @@ fun FanControl(
  * onto that level under HA's ceil-based percentage→speed conversion (no dead/duplicate steps).
  */
 @Composable
-private fun FanSpeedSlider(percentage: Int, levelCount: Int, onSet: (Int) -> Unit) {
+private fun FanSpeedSlider(
+    percentage: Int,
+    levelCount: Int,
+    onSet: (Int) -> Unit,
+) {
     val currentLevel = (percentage / 100f * levelCount).roundToInt().coerceIn(0, levelCount)
     var level by remember(currentLevel) { mutableStateOf(currentLevel.toFloat()) }
     Row(
@@ -102,7 +108,11 @@ private fun FanSpeedSlider(percentage: Int, levelCount: Int, onSet: (Int) -> Uni
  * Spin duration (ms per revolution) scaled by fan speed: 750 ms at top level, 2500 ms at level 1,
  * linear in between. Fans with no speed control (or no reported speed) spin at a steady 1000 ms.
  */
-private fun fanSpinDurationMs(percentage: Int, levelCount: Int, hasSpeedControl: Boolean): Int {
+private fun fanSpinDurationMs(
+    percentage: Int,
+    levelCount: Int,
+    hasSpeedControl: Boolean,
+): Int {
     if (!hasSpeedControl || levelCount < 2) return 1000
     val level = (percentage / 100.0 * levelCount).roundToInt().coerceIn(1, levelCount)
     val fraction = (level - 1).toFloat() / (levelCount - 1) // 0 at level 1, 1 at top level
@@ -115,7 +125,12 @@ private fun fanSpinDurationMs(percentage: Int, levelCount: Int, hasSpeedControl:
  * speed changes apply smoothly — an InfiniteTransition would ignore duration-only changes.
  */
 @Composable
-private fun FanIcon(spinning: Boolean, durationMs: Int, tint: Color, modifier: Modifier = Modifier) {
+private fun FanIcon(
+    spinning: Boolean,
+    durationMs: Int,
+    tint: Color,
+    modifier: Modifier = Modifier,
+) {
     val duration by rememberUpdatedState(durationMs.coerceAtLeast(1))
     val on by rememberUpdatedState(spinning)
     var angle by remember { mutableStateOf(0f) }
