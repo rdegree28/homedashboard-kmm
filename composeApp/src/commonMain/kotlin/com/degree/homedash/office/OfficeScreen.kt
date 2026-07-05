@@ -105,8 +105,8 @@ fun OfficeContent(
         }
 
         SectionCard("Climate") {
-            ClimateRow(ui.temperature, Icons.Filled.Thermostat, AppColors.TempWarm)
-            ClimateRow(ui.humidity, Icons.Filled.WaterDrop, AppColors.Wet)
+            ClimateRow(ui = ui.temperature, icon = Icons.Filled.Thermostat, tint = AppColors.TempWarm)
+            ClimateRow(ui = ui.humidity, icon = Icons.Filled.WaterDrop, tint = AppColors.Wet)
         }
 
         SectionCard("Doors") {

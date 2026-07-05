@@ -27,11 +27,23 @@ import com.degree.homedash.ui.Dimens
 @Composable
 fun WorkstationControl(
     ui: ToggleUi,
+    workstationControlType: WorkstationControlType = WorkstationControlType.Row,
     onToggle: () -> Unit,
-) =
-    EntityToggleRow(ui, AppColors.WorkstationOn, onToggle) { tint ->
-        WorkstationIcon(on = ui.isOn, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
+) {
+    when (workstationControlType) {
+        is WorkstationControlType.Row -> EntityToggleRow(
+            ui = ui,
+            onTint = AppColors.WorkstationOn,
+            onToggle = onToggle
+        ) { tint ->
+            WorkstationIcon(
+                on = ui.isOn,
+                tint = tint,
+                modifier = Modifier.size(Dimens.RowIconSize)
+            )
+        }
     }
+}
 
 /** Custom laptop: screen + keyboard deck, with "code" lines scrolling up the screen while [on]. */
 @Composable
@@ -103,6 +115,11 @@ private fun WorkstationIcon(
             style = Stroke(width = stroke),
         )
     }
+}
+
+sealed interface WorkstationControlType {
+
+    object Row : WorkstationControlType
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)

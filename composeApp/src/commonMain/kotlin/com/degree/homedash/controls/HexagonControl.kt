@@ -27,11 +27,23 @@ import kotlin.math.sin
 @Composable
 fun HexagonControl(
     ui: ToggleUi,
+    hexagonControlType: HexagonControlType = HexagonControlType.Row,
     onToggle: () -> Unit,
-) =
-    EntityToggleRow(ui, Color.White, onToggle) { tint ->
-        HexagonIcon(on = ui.isOn, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
+) {
+    when (hexagonControlType) {
+        is HexagonControlType.Row -> EntityToggleRow(
+            ui = ui,
+            onTint = Color.White,
+            onToggle = onToggle
+        ) { tint ->
+            HexagonIcon(
+                on = ui.isOn,
+                tint = tint,
+                modifier = Modifier.size(Dimens.RowIconSize)
+            )
+        }
     }
+}
 
 /** Three stacked hexagons with the same breathing glow the lights use (white). */
 @Composable
@@ -92,6 +104,11 @@ private fun hexagonPath(
     }
     path.close()
     return path
+}
+
+sealed interface HexagonControlType {
+
+    object Row : HexagonControlType
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)

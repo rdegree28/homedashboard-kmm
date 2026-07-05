@@ -35,56 +35,66 @@ import com.degree.homedash.ui.AppColors
 @Composable
 fun WaterLevelControl(
     ui: WaterLevelUi,
+    waterLevelControlType: WaterLevelControlType = WaterLevelControlType.Row,
     onClick: (() -> Unit)? = null,
 ) {
-    val fraction = ui.pct?.let { (it / 100.0).coerceIn(0.0, 1.0) } ?: 0.0
-    val barColor = waterLevelColor(ui.pct)
+    when (waterLevelControlType) {
+        is WaterLevelControlType.Row -> {
+            val fraction = ui.pct?.let { (it / 100.0).coerceIn(0.0, 1.0) } ?: 0.0
+            val barColor = waterLevelColor(ui.pct)
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
-            .padding(vertical = 4.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = ui.name,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                text = ui.valueText,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = barColor,
-            )
-            if (onClick != null) {
-                Spacer(Modifier.width(4.dp))
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp),
-                )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
+                    .padding(vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = ui.name,
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        text = ui.valueText,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = barColor,
+                    )
+                    if (onClick != null) {
+                        Spacer(Modifier.width(4.dp))
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(20.dp),
+                        )
+                    }
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(10.dp)
+                        .clip(RoundedCornerShape(5.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(fraction.toFloat())
+                            .height(10.dp)
+                            .clip(RoundedCornerShape(5.dp))
+                            .background(barColor),
+                    )
+                }
             }
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(10.dp)
-                .clip(RoundedCornerShape(5.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(fraction.toFloat())
-                    .height(10.dp)
-                    .clip(RoundedCornerShape(5.dp))
-                    .background(barColor),
-            )
-        }
     }
+}
+
+sealed interface WaterLevelControlType {
+
+    object Row : WaterLevelControlType
 }
 
 /** Water-level status color: red (<10, refill) → yellow (10–35) → blue (>35, full). */

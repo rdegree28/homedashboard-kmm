@@ -21,28 +21,36 @@ import com.degree.homedash.ui.Dimens
 @Composable
 fun ClimateRow(
     ui: SensorUi,
+    climateRowType: ClimateRowType = ClimateRowType.Row,
     icon: ImageVector,
     tint: Color,
 ) {
-    EntityRow(
-        label = ui.label,
-        leading = {
-            Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
-        },
-        trailing = {
-            Text(
-                text = ui.valueText,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-            )
-        },
-    )
+    when (climateRowType) {
+        is ClimateRowType.Row -> EntityRow(
+            label = ui.label,
+            leading = {
+                Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
+            },
+            trailing = {
+                Text(
+                    text = ui.valueText,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            },
+        )
+    }
+}
+
+sealed interface ClimateRowType {
+
+    object Row : ClimateRowType
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
 @Composable
 private fun ClimateRowPreview() = ControlPreview {
-    ClimateRow(SensorUi("Temperature", "72.5 °F"), Icons.Filled.Thermostat, AppColors.TempWarm)
-    ClimateRow(SensorUi("Humidity", "48 %"), Icons.Filled.WaterDrop, AppColors.Wet)
-    ClimateRow(SensorUi("Unavailable", "—"), Icons.Filled.Thermostat, AppColors.TempWarm)
+    ClimateRow(ui = SensorUi("Temperature", "72.5 °F"), icon = Icons.Filled.Thermostat, tint = AppColors.TempWarm)
+    ClimateRow(ui = SensorUi("Humidity", "48 %"), icon = Icons.Filled.WaterDrop, tint = AppColors.Wet)
+    ClimateRow(ui = SensorUi("Unavailable", "—"), icon = Icons.Filled.Thermostat, tint = AppColors.TempWarm)
 }
