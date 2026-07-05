@@ -29,6 +29,7 @@ import com.degree.homedash.ui.Dimens
 fun LightControl(
     ui: ToggleUi,
     lightControlType: LightControlType = LightControlType.Row,
+    modifier: Modifier = Modifier,
     onToggle: () -> Unit,
 ) {
     when (lightControlType) {
@@ -43,12 +44,25 @@ fun LightControl(
                 modifier = Modifier.size(Dimens.RowIconSize)
             )
         }
+        is LightControlType.Card -> EntityToggleCard(
+            modifier = modifier,
+            ui = ui,
+            onTint = AppColors.LightOn,
+            onToggle = onToggle,
+            iconContent = { tint ->
+                LightIcon(
+                    on = ui.isOn,
+                    tint = tint,
+                    modifier = Modifier.size(Dimens.RowIconSize)
+                )
+            }
+        )
     }
 }
 
 /** Bulb icon with a soft amber glow that gently breathes while [on]. */
 @Composable
-private fun LightIcon(
+fun LightIcon(
     on: Boolean,
     tint: Color,
     modifier: Modifier = Modifier,
@@ -85,11 +99,12 @@ private fun LightIcon(
 sealed interface LightControlType {
 
     object Row : LightControlType
+    object Card : LightControlType
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
 @Composable
-private fun LightControlPreview() = ControlPreview {
+private fun LightControlRowPreview() = ControlPreview {
     LightControl(previewToggle("On", isOn = true)) {}
     LightControl(previewToggle("Off", isOn = false)) {}
     LightControl(previewToggle("Offline", offline = true)) {}
