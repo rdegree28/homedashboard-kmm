@@ -7,7 +7,9 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lightbulb
@@ -108,4 +110,16 @@ private fun LightControlRowPreview() = ControlPreview {
     LightControl(previewToggle("On", isOn = true)) {}
     LightControl(previewToggle("Off", isOn = false)) {}
     LightControl(previewToggle("Offline", offline = true)) {}
+    LightControl(previewToggle("Entity with a very long name that might wrap", isOn = true)) {}
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
+@Composable
+private fun LightControlCardPreview() = ControlPreview {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        LightControl(previewToggle("On", isOn = true), LightControlType.Card, Modifier.weight(1f)) {}
+        LightControl(previewToggle("Off", isOn = false), LightControlType.Card, Modifier.weight(1f)) {}
+        LightControl(previewToggle("Offline", offline = true), LightControlType.Card, Modifier.weight(1f)) {}
+        LightControl(previewToggle("Entity with a very long name", isOn = true), LightControlType.Card, Modifier.weight(1f)) {}
+    }
 }

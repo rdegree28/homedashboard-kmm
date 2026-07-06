@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,8 +19,9 @@ import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 
 /**
- * Shared row for toggleable entities: a custom [iconContent] + name + Switch.
- * Offline ([ToggleUi.offline]): faded icon, italic muted label, disabled toggle.
+ * Shared card tile for toggleable entities: a custom [iconContent] top-left + centered name.
+ * The whole tile is tappable to toggle. Offline ([ToggleUi.offline]): faded icon, italic muted
+ * label, non-interactive.
  */
 @Composable
 internal fun EntityToggleCard(
@@ -37,16 +37,11 @@ internal fun EntityToggleCard(
     EntityCard(
         modifier = modifier,
         label = ui.name,
+        onClick = onToggle,
+        enabled = !ui.offline,
         labelItalic = ui.offline,
         labelMuted = ui.offline,
         leading = { iconContent(iconTint) },
-        trailing = {
-            Switch(
-                checked = ui.isOn,
-                enabled = !ui.offline,
-                onCheckedChange = { onToggle() },
-            )
-        },
     )
 }
 
