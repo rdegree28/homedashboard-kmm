@@ -1,36 +1,24 @@
 package com.degree.homedash.office
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material.icons.filled.WaterDrop
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -40,20 +28,24 @@ import com.degree.homedash.controls.DoorRow
 import com.degree.homedash.controls.FanControl
 import com.degree.homedash.controls.HexagonControl
 import com.degree.homedash.controls.LightControl
+import com.degree.homedash.controls.LightControlType
 import com.degree.homedash.controls.WorkstationControl
 import com.degree.homedash.shared.data.HomeAssistantRepo
-import com.degree.homedash.shared.network.ConnectionStatus
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.DashboardHeader
 import com.degree.homedash.ui.Dimens
 import com.degree.homedash.ui.SectionCard
 
+/**
+ * Variant of [OfficeScreen] that renders the Lights section as a grid of tappable cards
+ * (see [LightCardGrid]) instead of rows. All other sections match [OfficeContent].
+ */
 @Composable
-fun OfficeScreen(repository: HomeAssistantRepo, onBack: () -> Unit, onOpenSettings: () -> Unit) {
+fun OfficeScreen2(repository: HomeAssistantRepo, onBack: () -> Unit, onOpenSettings: () -> Unit) {
     val vm: OfficeViewModel = viewModel { OfficeViewModel(repository) }
     val ui by vm.uiState.collectAsStateWithLifecycle()
 
-    OfficeContent(
+    OfficeContent2(
         ui = ui,
         onBack = onBack,
         onOpenSettings = onOpenSettings,
@@ -63,9 +55,9 @@ fun OfficeScreen(repository: HomeAssistantRepo, onBack: () -> Unit, onOpenSettin
     )
 }
 
-/** Stateless Office UI — a projected [OfficeUiState] in, all actions out. Rendered by [OfficeScreen] and previews. */
+/** Stateless Office UI with card-grid lights — mirrors [OfficeContent] except for the Lights section. */
 @Composable
-fun OfficeContent(
+fun OfficeContent2(
     ui: OfficeUiState,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
@@ -84,8 +76,13 @@ fun OfficeContent(
         ConnectionBanner(ui.connection)
 
         SectionCard("Lights") {
-            LightControl(ui.officeLight) { onToggle(OfficeEntities.OFFICE_LIGHT) }
-            LightControl(ui.smallLight) { onToggle(OfficeEntities.SMALL_LIGHT) }
+            LightCardGrid(
+                lights = listOf(
+                    OfficeEntities.OFFICE_LIGHT to ui.officeLight,
+                    OfficeEntities.SMALL_LIGHT to ui.smallLight,
+                ),
+                onToggle = onToggle,
+            )
         }
 
         SectionCard("Fans") {
@@ -126,79 +123,34 @@ fun OfficeContent(
     }
 }
 
+/**
+ * Lays out [lights] (entity id → [ToggleUi]) as equal-width [LightControlType.Card] tiles in a grid
+ * of [columns]. Incomplete final rows are padded so cards keep a uniform width.
+ */
 @Composable
-internal fun SignalSelector(activeSignal: String?, onSelect: (SignalMode) -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        SignalMode.entries.forEach { mode ->
-            val active = activeSignal == mode.stateValue
-            val color = signalColor(mode)
-            Button(
-                onClick = { onSelect(mode) },
-                modifier = Modifier.weight(1f).height(52.dp),
-                contentPadding = PaddingValues(horizontal = 4.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (active) color else MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = if (active) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant,
-                ),
-            ) {
-                Text(
-                    text = mode.label,
-                    maxLines = 1,
-                    style = MaterialTheme.typography.labelLarge,
-                )
+private fun LightCardGrid(
+    lights: List<Pair<String, ToggleUi>>,
+    onToggle: (String) -> Unit,
+    columns: Int = 2,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        lights.chunked(columns).forEach { rowLights ->
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                rowLights.forEach { (id, lightUi) ->
+                    LightControl(lightUi, LightControlType.Card, Modifier.weight(1f)) { onToggle(id) }
+                }
+                repeat(columns - rowLights.size) { Spacer(Modifier.weight(1f)) }
             }
         }
     }
 }
 
-@Composable
-internal fun StatRow(ui: SensorUi) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Text(ui.label, style = MaterialTheme.typography.bodyLarge)
-        Text(ui.valueText, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-    }
-}
-
-@Composable
-internal fun ConnectionBanner(status: ConnectionStatus) {
-    val (text, color) = when (status) {
-        ConnectionStatus.Connected -> "Connected" to AppColors.StatusGreen
-        ConnectionStatus.Connecting -> "Connecting…" to AppColors.StatusAmber
-        ConnectionStatus.Disconnected -> "Disconnected" to AppColors.StatusGray
-        is ConnectionStatus.Error -> "Error: ${status.message ?: "unknown"}" to AppColors.StatusRed
-    }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Box(Modifier.size(10.dp).clip(CircleShape).background(color))
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-}
-
-private fun signalColor(mode: SignalMode): Color = when (mode) {
-    SignalMode.OFF -> AppColors.SignalOff
-    SignalMode.AVAILABLE -> AppColors.StatusGreen
-    SignalMode.FOCUSED -> AppColors.StatusAmber
-    SignalMode.MEETING -> AppColors.StatusRed
-}
-
 @Preview(widthDp = 380, heightDp = 1700)
 @Composable
-private fun OfficeScreenPreview() {
+private fun OfficeScreen2Preview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
-            OfficeContent(
+            OfficeContent2(
                 ui = previewOfficeUiState,
                 onBack = {},
                 onOpenSettings = {},
