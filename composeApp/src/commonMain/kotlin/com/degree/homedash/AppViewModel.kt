@@ -1,16 +1,22 @@
 package com.degree.homedash
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.degree.homedash.shared.data.AuthDao
 import com.degree.homedash.shared.data.AuthUser
 import com.degree.homedash.shared.data.ConfigStore
+import com.degree.homedash.shared.data.FeatureFlag
+import com.degree.homedash.shared.data.FeatureFlagDao
 import com.degree.homedash.shared.data.HaConfig
 import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.shared.data.Users
 import com.degree.homedash.shared.network.HaWebSocketClient
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 /**
  * App-scoped holder for the single Home Assistant connection and the persisted config. Owning these
@@ -21,6 +27,7 @@ class AppViewModel(
     defaultConfig: HaConfig? = null,
     private val configStore: ConfigStore = ConfigStore(),
     private val authDao: AuthDao = AuthDao(),
+    private val featureFlagDao: FeatureFlagDao = FeatureFlagDao(),
     val repository: HomeAssistantRepo = HomeAssistantRepo(HaWebSocketClient()),
 ) : ViewModel() {
 
@@ -29,6 +36,12 @@ class AppViewModel(
 
     private val _currentUser = MutableStateFlow(authDao.load())
     val currentUser: StateFlow<AuthUser?> = _currentUser.asStateFlow()
+
+    /** Feature flags enabled for the current user; recomputed on login/logout. */
+    val featureFlags: StateFlow<Set<FeatureFlag>> =
+        currentUser
+            .map { featureFlagDao.flagsFor(it) }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, featureFlagDao.flagsFor(_currentUser.value))
 
     init {
         _config.value?.let { repository.connect(it) }

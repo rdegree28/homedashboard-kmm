@@ -25,6 +25,7 @@ import com.degree.homedash.livingroom.WaterGraphScreen
 import com.degree.homedash.office.OfficeScreen
 import com.degree.homedash.plants.PlantGraphScreen
 import com.degree.homedash.plants.PlantsScreen
+import com.degree.homedash.shared.data.FeatureFlag
 import com.degree.homedash.shared.data.HaConfig
 import com.degree.homedash.shared.data.Users
 import com.degree.homedash.ui.LocalConnectionStatus
@@ -34,6 +35,7 @@ fun App(defaultConfig: HaConfig? = null) {
     val appVm: AppViewModel = viewModel { AppViewModel(defaultConfig) }
     val config by appVm.config.collectAsStateWithLifecycle()
     val currentUser by appVm.currentUser.collectAsStateWithLifecycle()
+    val featureFlags by appVm.featureFlags.collectAsStateWithLifecycle()
     val repository = appVm.repository
     val connection by repository.connection.collectAsStateWithLifecycle()
 
@@ -100,6 +102,7 @@ fun App(defaultConfig: HaConfig? = null) {
                         )
 
                         Screen.Home -> HomeScreen(
+                            showOffice = FeatureFlag.ViewOfficeScreen in featureFlags,
                             onOpenOffice = { navigate(Screen.Office) },
                             onOpenPlants = { navigate(Screen.Plants) },
                             onOpenLivingRoom = { navigate(Screen.LivingRoom) },
