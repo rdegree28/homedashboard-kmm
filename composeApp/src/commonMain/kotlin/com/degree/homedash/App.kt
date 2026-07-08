@@ -26,21 +26,31 @@ import com.degree.homedash.office.OfficeScreen
 import com.degree.homedash.plants.PlantGraphScreen
 import com.degree.homedash.plants.PlantsScreen
 import com.degree.homedash.shared.data.HaConfig
+import com.degree.homedash.shared.data.Users
 import com.degree.homedash.ui.LocalConnectionStatus
 
 @Composable
 fun App(defaultConfig: HaConfig? = null) {
     val appVm: AppViewModel = viewModel { AppViewModel(defaultConfig) }
     val config by appVm.config.collectAsStateWithLifecycle()
+    val currentUser by appVm.currentUser.collectAsStateWithLifecycle()
     val repository = appVm.repository
     val connection by repository.connection.collectAsStateWithLifecycle()
 
     // Entity id whose history is shown on the PlantGraph destination.
     var graphEntityId by remember { mutableStateOf<String?>(null) }
 
-    // Navigation back stack; the last entry is the visible screen. Start on Settings when
-    // unconfigured (it then acts as the un-poppable root), otherwise on Home.
-    val backStack = remember { mutableStateListOf(if (config == null) Screen.Settings else Screen.Home) }
+    // Navigation back stack; the last entry is the visible screen. Gate on config (Settings) then
+    // login (Login) — each acts as an un-poppable root until satisfied — otherwise start on Home.
+    val backStack = remember {
+        mutableStateListOf(
+            when {
+                config == null -> Screen.Settings
+                currentUser == null -> Screen.Login
+                else -> Screen.Home
+            }
+        )
+    }
     fun navigate(screen: Screen) = backStack.add(screen)
     fun goBack() { if (backStack.size > 1) backStack.removeAt(backStack.lastIndex) }
 
@@ -58,11 +68,35 @@ fun App(defaultConfig: HaConfig? = null) {
                     when (backStack.last()) {
                         Screen.Settings -> SettingsScreen(
                             initial = config,
+                            currentUser = currentUser,
                             onSave = { cfg ->
                                 appVm.save(cfg)
-                                if (backStack.size > 1) goBack() else backStack[0] = Screen.Home
+                                if (backStack.size > 1) {
+                                    goBack()
+                                } else {
+                                    backStack[0] = if (currentUser == null) Screen.Login else Screen.Home
+                                }
                             },
                             onCancel = if (backStack.size > 1) ({ goBack() }) else null,
+                            onLogout = currentUser?.let {
+                                {
+                                    appVm.logout()
+                                    backStack.clear()
+                                    backStack.add(Screen.Login)
+                                }
+                            },
+                        )
+
+                        Screen.Login -> LoginScreen(
+                            users = Users.all,
+                            onLogin = { user, pin ->
+                                appVm.login(user, pin).also { ok ->
+                                    if (ok) {
+                                        backStack.clear()
+                                        backStack.add(Screen.Home)
+                                    }
+                                }
+                            },
                         )
 
                         Screen.Home -> HomeScreen(
@@ -117,4 +151,4 @@ fun App(defaultConfig: HaConfig? = null) {
 }
 
 /** Top-level destinations; the launcher (Home) is the root of the back stack. */
-private enum class Screen { Home, Office, Plants, LivingRoom, Settings, PlantGraph, WaterGraph }
+private enum class Screen { Home, Office, Plants, LivingRoom, Settings, Login, PlantGraph, WaterGraph }

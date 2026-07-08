@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import com.degree.homedash.shared.data.AuthUser
 import com.degree.homedash.shared.data.HaConfig
 
 @Composable
@@ -30,6 +31,8 @@ fun SettingsScreen(
     initial: HaConfig?,
     onSave: (HaConfig) -> Unit,
     onCancel: (() -> Unit)?,
+    currentUser: AuthUser? = null,
+    onLogout: (() -> Unit)? = null,
 ) {
     var url by remember { mutableStateOf(initial?.baseUrl ?: "http://") }
     var token by remember { mutableStateOf(initial?.token ?: "") }
@@ -76,6 +79,15 @@ fun SettingsScreen(
             if (onCancel != null) {
                 OutlinedButton(onClick = onCancel) { Text("Cancel") }
             }
+        }
+
+        if (currentUser != null && onLogout != null) {
+            Text(
+                text = "Logged in as ${currentUser.name}",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+            OutlinedButton(onClick = onLogout) { Text("Log out") }
         }
     }
 }
