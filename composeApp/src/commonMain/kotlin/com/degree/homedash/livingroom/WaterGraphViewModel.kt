@@ -3,6 +3,7 @@ package com.degree.homedash.livingroom
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.plants.TimeRange
 import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.shared.model.HistoryPoint
@@ -17,7 +18,7 @@ import kotlinx.coroutines.launch
 
 @Immutable
 data class WaterGraphUiState(
-    val item: WaterLevelUi?,
+    val item: EntityUi.WaterLevel?,
     val history: List<HistoryPoint>,
     val range: TimeRange,
 )
@@ -33,7 +34,7 @@ class WaterGraphViewModel(
 
     val uiState: StateFlow<WaterGraphUiState> =
         combine(repo.states, range, history) { states, range, history ->
-            WaterGraphUiState(item = states[entityId]?.toLevelUi(), history = history, range = range)
+            WaterGraphUiState(item = states[entityId]?.toWaterLevel(), history = history, range = range)
         }
             .distinctUntilChanged()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), WaterGraphUiState(null, emptyList(), TimeRange.DAY))

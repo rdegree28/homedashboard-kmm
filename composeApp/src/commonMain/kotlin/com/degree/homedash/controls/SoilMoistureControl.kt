@@ -25,7 +25,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.plants.PlantUi
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.ui.AppColors
 
@@ -35,67 +34,57 @@ import com.degree.homedash.ui.AppColors
  */
 @Composable
 fun SoilMoistureControl(
-    ui: PlantUi,
-    soilMoistureControlType: SoilMoistureControlType = SoilMoistureControlType.Row,
+    ui: EntityUi.SoilMoisture,
     onClick: (() -> Unit)? = null,
 ) {
-    when (soilMoistureControlType) {
-        is SoilMoistureControlType.Row -> {
-            val fraction = ui.pct?.let { (it / 100.0).coerceIn(0.0, 1.0) } ?: 0.0
-            val barColor = moistureColor(ui.pct)
+    val fraction = ui.pct?.let { (it / 100.0).coerceIn(0.0, 1.0) } ?: 0.0
+    val barColor = moistureColor(ui.pct)
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
-                    .padding(vertical = 4.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = ui.name,
-                        modifier = Modifier.weight(1f),
-                        style = MaterialTheme.typography.titleMedium,
-                    )
-                    Text(
-                        text = ui.valueText,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = barColor,
-                    )
-                    if (onClick != null) {
-                        Spacer(Modifier.width(4.dp))
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(10.dp)
-                        .clip(RoundedCornerShape(5.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(fraction.toFloat())
-                            .height(10.dp)
-                            .clip(RoundedCornerShape(5.dp))
-                            .background(barColor),
-                    )
-                }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(if (onClick != null) Modifier.clickable { onClick() } else Modifier)
+            .padding(vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = ui.name,
+                modifier = Modifier.weight(1f),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Text(
+                text = ui.valueText,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = barColor,
+            )
+            if (onClick != null) {
+                Spacer(Modifier.width(4.dp))
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp),
+                )
             }
         }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(10.dp)
+                .clip(RoundedCornerShape(5.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(fraction.toFloat())
+                    .height(10.dp)
+                    .clip(RoundedCornerShape(5.dp))
+                    .background(barColor),
+            )
+        }
     }
-}
-
-sealed interface SoilMoistureControlType {
-
-    object Row : SoilMoistureControlType
 }
 
 /** Friendly name with a trailing "… moisture" / "… soil moisture" stripped so just the plant shows. */

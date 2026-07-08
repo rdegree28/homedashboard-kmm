@@ -1,12 +1,19 @@
 package com.degree.homedash.plants
 
+import com.degree.homedash.controls.EntityMetadata
+import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.shared.model.HistoryPoint
 import kotlin.math.sin
 
 // Sample data for the Plants @Previews (which live next to their composables in this package).
 
-internal val previewPlants: List<PlantUi> = listOf(
-    PlantUi(entityId = "sensor.louie_moisture_sensor_soil_moisture", name = "Louie", pct = 58.0, valueText = "58 %"),
+internal val previewPlants: List<EntityUi.SoilMoisture> = listOf(
+    EntityUi.SoilMoisture(
+        metadata = EntityMetadata.SoilMoisture("sensor.louie_moisture_sensor_soil_moisture"),
+        name = "Louie",
+        pct = 58.0,
+        valueText = "58 %",
+    ),
 )
 
 // One week of hourly samples so the day axis shows several labels in the preview.

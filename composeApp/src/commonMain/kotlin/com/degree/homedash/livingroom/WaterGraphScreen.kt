@@ -31,7 +31,7 @@ import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.ui.DashboardHeader
 import com.degree.homedash.ui.Dimens
 import com.degree.homedash.ui.HistoryGraph
-import com.degree.homedash.ui.SectionCard
+import com.degree.homedash.ui.ControlGroup
 import kotlin.math.roundToInt
 
 @Composable
@@ -57,7 +57,7 @@ fun WaterGraphContent(
     ) {
         DashboardHeader(ui.item?.name ?: "Water Level", onBack = onBack)
 
-        SectionCard("Water Level") {
+        ControlGroup("Water Level") {
             ui.item?.let { WaterLevelControl(it) }
             Spacer(Modifier.height(8.dp))
             RangeSelector(selected = ui.range, onSelect = onRangeChange)

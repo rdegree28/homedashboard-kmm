@@ -3,6 +3,9 @@ package com.degree.homedash.office
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.degree.homedash.controls.ClimateKind
+import com.degree.homedash.controls.EntityMetadata
+import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
@@ -40,14 +43,14 @@ data class DoorUi(val label: String, val statusText: String, val open: Boolean, 
 @Immutable
 data class OfficeUiState(
     val connection: ConnectionStatus,
-    val officeLight: ToggleUi,
-    val smallLight: ToggleUi,
-    val officeFan: FanUi,
-    val boxFan: FanUi,
+    val officeLight: EntityUi.Light,
+    val smallLight: EntityUi.Light,
+    val officeFan: EntityUi.Fan,
+    val boxFan: EntityUi.Fan,
     val activeSignal: String?,
-    val temperature: SensorUi,
-    val humidity: SensorUi,
-    val door: DoorUi,
+    val temperature: EntityUi.Climate,
+    val humidity: EntityUi.Climate,
+    val door: EntityUi.Door,
     val workstation: ToggleUi,
     val hexagon: ToggleUi,
     val power: SensorUi,
@@ -116,14 +119,14 @@ private fun buildOfficeUiState(
     powerHistory: List<HistoryPoint>,
 ) = OfficeUiState(
     connection = connection,
-    officeLight = states[OfficeEntities.OFFICE_LIGHT].toToggleUi("Office"),
-    smallLight = states[OfficeEntities.SMALL_LIGHT].toToggleUi("Small"),
-    officeFan = states[OfficeEntities.OFFICE_FAN].toFanUi("Office Fan"),
-    boxFan = states[OfficeEntities.BOX_FAN].toFanUi("Box Fan"),
+    officeLight = states[OfficeEntities.OFFICE_LIGHT].toLight(OfficeEntities.OFFICE_LIGHT, "Office"),
+    smallLight = states[OfficeEntities.SMALL_LIGHT].toLight(OfficeEntities.SMALL_LIGHT, "Small"),
+    officeFan = states[OfficeEntities.OFFICE_FAN].toFan(OfficeEntities.OFFICE_FAN, "Office Fan"),
+    boxFan = states[OfficeEntities.BOX_FAN].toFan(OfficeEntities.BOX_FAN, "Box Fan"),
     activeSignal = states[OfficeEntities.SIGNAL_MODE]?.state,
-    temperature = states[OfficeEntities.TEMPERATURE].toSensorUi("Temperature", decimals = 1, dashWhenUnavailable = true),
-    humidity = states[OfficeEntities.HUMIDITY].toSensorUi("Humidity", decimals = 1, dashWhenUnavailable = true),
-    door = states[OfficeEntities.DOOR].toDoorUi("Office Door"),
+    temperature = states[OfficeEntities.TEMPERATURE].toClimate(OfficeEntities.TEMPERATURE, "Temperature", ClimateKind.Temperature),
+    humidity = states[OfficeEntities.HUMIDITY].toClimate(OfficeEntities.HUMIDITY, "Humidity", ClimateKind.Humidity),
+    door = states[OfficeEntities.DOOR].toDoor(OfficeEntities.DOOR, "Office Door"),
     workstation = states[OfficeEntities.WORKSTATION].toToggleUi("Workstation"),
     hexagon = states[OfficeEntities.HEXAGON].toToggleUi("Hexagon Lights"),
     power = states[OfficeEntities.POWER].toSensorUi("Power", decimals = 2, dashWhenUnavailable = false),
@@ -137,19 +140,36 @@ private fun EntityState?.toToggleUi(name: String) = ToggleUi(
     offline = this == null || this.isUnavailable,
 )
 
-private fun EntityState?.toFanUi(name: String): FanUi {
+private fun EntityState?.toLight(entityId: String, name: String) = EntityUi.Light(
+    metadata = EntityMetadata.Light(entityId),
+    name = name,
+    isOn = this?.isOn == true,
+    offline = this == null || this.isUnavailable,
+)
+
+private fun EntityState?.toFan(entityId: String, name: String): EntityUi.Fan {
     val stepPct = this?.attrDouble("percentage_step")
     val levelCount = if (stepPct != null && stepPct > 0.0) (100.0 / stepPct).roundToInt() else 0
-    return FanUi(
+    return EntityUi.Fan(
+        metadata = EntityMetadata.Fan(entityId, levelCount),
         name = name,
         isOn = this?.isOn == true,
         offline = this == null || this.isUnavailable,
-        levelCount = levelCount,
         percentage = this?.attrDouble("percentage")?.roundToInt() ?: 0,
     )
 }
 
-/** Formatted sensor readout. [dashWhenUnavailable] shows "—" for unavailable states (climate rows). */
+/** Formatted climate readout — always shows "—" when unavailable. */
+private fun EntityState?.toClimate(entityId: String, label: String, kind: ClimateKind): EntityUi.Climate {
+    val unit = this?.attrString("unit_of_measurement").orEmpty()
+    val value = when {
+        this == null || this.isUnavailable -> "—"
+        else -> "${formatNumberOrSelf(state, decimals = 1)} $unit".trim()
+    }
+    return EntityUi.Climate(EntityMetadata.Climate(entityId, kind), label = label, valueText = value)
+}
+
+/** Formatted sensor readout. [dashWhenUnavailable] shows "—" for unavailable states. */
 private fun EntityState?.toSensorUi(label: String, decimals: Int, dashWhenUnavailable: Boolean): SensorUi {
     val unit = this?.attrString("unit_of_measurement").orEmpty()
     val value = when {
@@ -160,7 +180,7 @@ private fun EntityState?.toSensorUi(label: String, decimals: Int, dashWhenUnavai
     return SensorUi(label, value)
 }
 
-private fun EntityState?.toDoorUi(label: String): DoorUi {
+private fun EntityState?.toDoor(entityId: String, label: String): EntityUi.Door {
     val unavailable = this == null || this.isUnavailable
     val open = this?.state == "on" // device_class opening: on = open
     val status = when {
@@ -168,5 +188,5 @@ private fun EntityState?.toDoorUi(label: String): DoorUi {
         open -> "Open"
         else -> "Closed"
     }
-    return DoorUi(label = label, statusText = status, open = open, unavailable = unavailable)
+    return EntityUi.Door(EntityMetadata.Door(entityId), label = label, statusText = status, open = open, unavailable = unavailable)
 }

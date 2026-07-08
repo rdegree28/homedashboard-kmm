@@ -1,5 +1,8 @@
 package com.degree.homedash.office
 
+import com.degree.homedash.controls.ClimateKind
+import com.degree.homedash.controls.EntityMetadata
+import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.network.ConnectionStatus
 import kotlin.math.sin
@@ -11,14 +14,14 @@ internal val previewHistory: List<HistoryPoint> =
 
 internal val previewOfficeUiState = OfficeUiState(
     connection = ConnectionStatus.Connected,
-    officeLight = ToggleUi("Office", isOn = true, offline = false),
-    smallLight = ToggleUi("Small", isOn = false, offline = false),
-    officeFan = FanUi("Office Fan", isOn = true, offline = false, levelCount = 12, percentage = 75),
-    boxFan = FanUi("Box Fan", isOn = false, offline = false, levelCount = 0, percentage = 0),
+    officeLight = EntityUi.Light(EntityMetadata.Light("light.office"), "Office", isOn = true, offline = false),
+    smallLight = EntityUi.Light(EntityMetadata.Light("light.small"), "Small", isOn = false, offline = false),
+    officeFan = EntityUi.Fan(EntityMetadata.Fan("fan.office", levelCount = 12), "Office Fan", isOn = true, offline = false, percentage = 75),
+    boxFan = EntityUi.Fan(EntityMetadata.Fan("fan.box", levelCount = 0), "Box Fan", isOn = false, offline = false, percentage = 0),
     activeSignal = "green",
-    temperature = SensorUi("Temperature", "75.6 °F"),
-    humidity = SensorUi("Humidity", "48.5 %"),
-    door = DoorUi("Office Door", "Open", open = true, unavailable = false),
+    temperature = EntityUi.Climate(EntityMetadata.Climate("sensor.temp", ClimateKind.Temperature), "Temperature", "75.6 °F"),
+    humidity = EntityUi.Climate(EntityMetadata.Climate("sensor.humidity", ClimateKind.Humidity), "Humidity", "48.5 %"),
+    door = EntityUi.Door(EntityMetadata.Door("binary_sensor.office_door"), "Office Door", "Open", open = true, unavailable = false),
     workstation = ToggleUi("Workstation", isOn = true, offline = false),
     hexagon = ToggleUi("Hexagon Lights", isOn = false, offline = false),
     power = SensorUi("Power", "61.1 W"),

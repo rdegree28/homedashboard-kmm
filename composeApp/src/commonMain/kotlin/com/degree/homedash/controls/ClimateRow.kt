@@ -21,30 +21,22 @@ import com.degree.homedash.ui.Dimens
 @Composable
 fun ClimateRow(
     ui: SensorUi,
-    climateRowType: ClimateRowType = ClimateRowType.Row,
     icon: ImageVector,
     tint: Color,
 ) {
-    when (climateRowType) {
-        is ClimateRowType.Row -> EntityRow(
-            label = ui.label,
-            leading = {
-                Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
-            },
-            trailing = {
-                Text(
-                    text = ui.valueText,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            },
-        )
-    }
-}
-
-sealed interface ClimateRowType {
-
-    object Row : ClimateRowType
+    EntityRow(
+        label = ui.label,
+        leading = {
+            Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
+        },
+        trailing = {
+            Text(
+                text = ui.valueText,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+            )
+        },
+    )
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)

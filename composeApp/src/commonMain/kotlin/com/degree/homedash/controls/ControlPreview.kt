@@ -36,6 +36,17 @@ internal fun previewToggle(
     offline: Boolean = false,
 ) = ToggleUi(name = name, isOn = isOn, offline = offline)
 
+internal fun previewLight(
+    name: String,
+    isOn: Boolean = false,
+    offline: Boolean = false,
+) = EntityUi.Light(
+    metadata = EntityMetadata.Light("light.${name.lowercase()}"),
+    name = name,
+    isOn = isOn,
+    offline = offline,
+)
+
 internal fun previewFan(
     name: String,
     isOn: Boolean = false,

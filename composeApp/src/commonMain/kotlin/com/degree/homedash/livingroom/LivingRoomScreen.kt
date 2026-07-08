@@ -17,11 +17,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.degree.homedash.controls.WaterLevelControl
+import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.ui.DashboardHeader
 import com.degree.homedash.ui.Dimens
-import com.degree.homedash.ui.SectionCard
+import com.degree.homedash.ui.ControlGroup
 
 @Composable
 fun LivingRoomScreen(
@@ -52,19 +52,20 @@ fun LivingRoomContent(
     ) {
         DashboardHeader("Living Room", onBack = onBack, onOpenSettings = onOpenSettings)
 
-        SectionCard("Cat Water Fountain") {
-            if (ui.items.isEmpty()) {
+        ControlGroup(
+            title = "Cat Water Fountain",
+            entities = ui.items,
+            onAction = { action ->
+                if (action is EntityAction.OpenGraph) onOpenGraph(action.entityId)
+            },
+            empty = {
                 Text(
                     "No water level sensor found.",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-            } else {
-                ui.items.forEach { item ->
-                    WaterLevelControl(item, onClick = { onOpenGraph(item.entityId) })
-                }
-            }
-        }
+            },
+        )
     }
 }
 

@@ -3,6 +3,8 @@ package com.degree.homedash.livingroom
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.degree.homedash.controls.EntityMetadata
+import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.ui.formatNumber
@@ -12,18 +14,9 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-/** A single percentage-level readout (e.g. the cat water feeder). */
-@Immutable
-data class WaterLevelUi(
-    val entityId: String,
-    val name: String,
-    val pct: Double?,
-    val valueText: String
-)
-
 @Immutable
 data class LivingRoomUiState(
-    val items: List<WaterLevelUi>
+    val items: List<EntityUi.WaterLevel>
 )
 
 /** Projects the configured Living Room sensors into [LivingRoomUiState]. */
@@ -34,17 +27,17 @@ class LivingRoomViewModel(
     val uiState: StateFlow<LivingRoomUiState> =
         repo.states
             .map { states ->
-                LivingRoomUiState(listOfNotNull(states[LivingRoomEntities.CAT_WATER_LEVEL]?.toLevelUi()))
+                LivingRoomUiState(listOfNotNull(states[LivingRoomEntities.CAT_WATER_LEVEL]?.toWaterLevel()))
             }
             .distinctUntilChanged()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LivingRoomUiState(emptyList()))
 }
 
 /** Projects a percentage-level entity into its UI model (shared by the list and the graph screen). */
-internal fun EntityState.toLevelUi(): WaterLevelUi {
+internal fun EntityState.toWaterLevel(): EntityUi.WaterLevel {
     val pct = state.toDoubleOrNull()?.takeUnless { isUnavailable }
-    return WaterLevelUi(
-        entityId = entityId,
+    return EntityUi.WaterLevel(
+        metadata = EntityMetadata.WaterLevel(entityId),
         name = feederName(this),
         pct = pct,
         valueText = pct?.let { "${formatNumber(it, decimals = 0)} %" } ?: "—",

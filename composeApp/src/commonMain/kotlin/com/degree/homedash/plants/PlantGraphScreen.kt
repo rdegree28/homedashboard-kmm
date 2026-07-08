@@ -30,7 +30,7 @@ import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.ui.DashboardHeader
 import com.degree.homedash.ui.Dimens
 import com.degree.homedash.ui.HistoryGraph
-import com.degree.homedash.ui.SectionCard
+import com.degree.homedash.ui.ControlGroup
 import kotlin.math.roundToInt
 
 /** Selectable history windows for the moisture graph. */
@@ -64,7 +64,7 @@ fun PlantGraphContent(
     ) {
         DashboardHeader(ui.plant?.name ?: "Plant", onBack = onBack)
 
-        SectionCard("Soil Moisture") {
+        ControlGroup("Soil Moisture") {
             ui.plant?.let { SoilMoistureControl(it) }
             Spacer(Modifier.height(8.dp))
             RangeSelector(selected = ui.range, onSelect = onRangeChange)

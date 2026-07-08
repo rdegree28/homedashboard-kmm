@@ -40,38 +40,33 @@ import kotlin.math.roundToInt
 @Composable
 fun FanControl(
     ui: FanUi,
-    fanControlType: FanControlType = FanControlType.Row,
     onSetSpeed: ((Int) -> Unit)? = null,
     onToggle: () -> Unit,
 ) {
-    when (fanControlType) {
-        is FanControlType.Row -> {
-            val spinDurationMs = fanSpinDurationMs(
+    val spinDurationMs = fanSpinDurationMs(
+        percentage = ui.percentage,
+        levelCount = ui.levelCount,
+        hasSpeedControl = onSetSpeed != null
+    )
+    Column {
+        EntityToggleRow(
+            ui = ToggleUi(ui.name, ui.isOn, ui.offline),
+            onTint = AppColors.Accent,
+            onToggle = onToggle
+        ) { tint ->
+            FanIcon(
+                spinning = ui.isOn,
+                durationMs = spinDurationMs,
+                tint = tint,
+                modifier = Modifier.size(Dimens.RowIconSize)
+            )
+        }
+        if (onSetSpeed != null && ui.isOn && ui.levelCount >= 2) {
+            FanSpeedSlider(
                 percentage = ui.percentage,
                 levelCount = ui.levelCount,
-                hasSpeedControl = onSetSpeed != null
+                onSet = onSetSpeed
             )
-            Column {
-                EntityToggleRow(
-                    ui = ToggleUi(ui.name, ui.isOn, ui.offline),
-                    onTint = AppColors.Accent,
-                    onToggle = onToggle
-                ) { tint ->
-                    FanIcon(
-                        spinning = ui.isOn,
-                        durationMs = spinDurationMs,
-                        tint = tint,
-                        modifier = Modifier.size(Dimens.RowIconSize)
-                    )
-                }
-                if (onSetSpeed != null && ui.isOn && ui.levelCount >= 2) {
-                    FanSpeedSlider(
-                        percentage = ui.percentage,
-                        levelCount = ui.levelCount,
-                        onSet = onSetSpeed
-                    )
-                }
-            }
         }
     }
 }
@@ -192,11 +187,6 @@ private fun FanIcon(
 
         drawCircle(color = tint, radius = w * 0.08f, center = Offset(cx, cy))
     }
-}
-
-sealed interface FanControlType {
-
-    object Row : FanControlType
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)

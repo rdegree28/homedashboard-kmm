@@ -17,11 +17,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.degree.homedash.controls.SoilMoistureControl
+import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.ui.DashboardHeader
 import com.degree.homedash.ui.Dimens
-import com.degree.homedash.ui.SectionCard
+import com.degree.homedash.ui.ControlGroup
 
 /** Soil-moisture sensor entity ids shown on the Plants dashboard, in display order. */
 object PlantEntities {
@@ -59,19 +59,20 @@ fun PlantsContent(
     ) {
         DashboardHeader("Plants", onBack = onBack, onOpenSettings = onOpenSettings)
 
-        SectionCard("Soil Moisture") {
-            if (ui.plants.isEmpty()) {
+        ControlGroup(
+            title = "Soil Moisture",
+            entities = ui.plants,
+            onAction = { action ->
+                if (action is EntityAction.OpenGraph) onOpenGraph(action.entityId)
+            },
+            empty = {
                 Text(
                     "No moisture sensors found.",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-            } else {
-                ui.plants.forEach { plant ->
-                    SoilMoistureControl(plant, onClick = { onOpenGraph(plant.entityId) })
-                }
-            }
-        }
+            },
+        )
     }
 }
 

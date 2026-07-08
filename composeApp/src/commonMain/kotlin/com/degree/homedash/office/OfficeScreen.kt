@@ -15,9 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Thermostat
-import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -32,24 +29,28 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.degree.homedash.controls.ClimateRow
-import com.degree.homedash.controls.DoorRow
-import com.degree.homedash.controls.FanControl
+import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.HexagonControl
-import com.degree.homedash.controls.LightControl
 import com.degree.homedash.controls.WorkstationControl
 import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.shared.network.ConnectionStatus
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.DashboardHeader
 import com.degree.homedash.ui.Dimens
-import com.degree.homedash.ui.SectionCard
+import com.degree.homedash.ui.ControlGroup
 
 @Composable
-fun OfficeScreen(repository: HomeAssistantRepo, onBack: () -> Unit, onOpenSettings: () -> Unit) {
+fun OfficeScreen(
+    repository: HomeAssistantRepo,
+    onBack: () -> Unit,
+    onOpenSettings: () -> Unit,
+    useCardUis: Boolean = false,
+) {
     val vm: OfficeViewModel = viewModel { OfficeViewModel(repository) }
     val ui by vm.uiState.collectAsStateWithLifecycle()
 
@@ -60,10 +61,15 @@ fun OfficeScreen(repository: HomeAssistantRepo, onBack: () -> Unit, onOpenSettin
         onToggle = vm::toggle,
         onSetFanSpeed = vm::setFanSpeed,
         onSignal = vm::signal,
+        useCardUis = useCardUis,
     )
 }
 
-/** Stateless Office UI — a projected [OfficeUiState] in, all actions out. Rendered by [OfficeScreen] and previews. */
+/**
+ * Stateless Office UI — a projected [OfficeUiState] in, all actions out. Rendered by [OfficeScreen]
+ * and previews. When [useCardUis] is true, sections that support it (currently Lights) render as
+ * a grid of tappable cards instead of rows.
+ */
 @Composable
 fun OfficeContent(
     ui: OfficeUiState,
@@ -72,7 +78,16 @@ fun OfficeContent(
     onToggle: (String) -> Unit,
     onSetFanSpeed: (String, Int) -> Unit,
     onSignal: (SignalMode) -> Unit,
+    useCardUis: Boolean = false,
 ) {
+    val onAction: (EntityAction) -> Unit = { action ->
+        when (action) {
+            is EntityAction.Toggle -> onToggle(action.entityId)
+            is EntityAction.SetSpeed -> onSetFanSpeed(action.entityId, action.percentage)
+            is EntityAction.OpenGraph -> Unit // Office has no graph navigation
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -83,37 +98,36 @@ fun OfficeContent(
         DashboardHeader("Office", onBack = onBack, onOpenSettings = onOpenSettings)
         ConnectionBanner(ui.connection)
 
-        SectionCard("Lights") {
-            LightControl(ui.officeLight) { onToggle(OfficeEntities.OFFICE_LIGHT) }
-            LightControl(ui.smallLight) { onToggle(OfficeEntities.SMALL_LIGHT) }
-        }
+        ControlGroup(
+            title = "Lights",
+            entities = listOf(ui.officeLight, ui.smallLight),
+            useCardUis = useCardUis,
+            onAction = onAction,
+        )
 
-        SectionCard("Fans") {
-            FanControl(
-                ui.officeFan,
-                onSetSpeed = { pct -> onSetFanSpeed(OfficeEntities.OFFICE_FAN, pct) },
-            ) {
-                onToggle(OfficeEntities.OFFICE_FAN)
-            }
-            FanControl(ui.boxFan) {
-                onToggle(OfficeEntities.BOX_FAN)
-            }
-        }
+        ControlGroup(
+            title = "Fans",
+            entities = listOf(ui.officeFan, ui.boxFan),
+            onAction = onAction,
+        )
 
-        SectionCard("Status") {
+        ControlGroup("Status") {
             SignalSelector(ui.activeSignal, onSignal)
         }
 
-        SectionCard("Climate") {
-            ClimateRow(ui = ui.temperature, icon = Icons.Filled.Thermostat, tint = AppColors.TempWarm)
-            ClimateRow(ui = ui.humidity, icon = Icons.Filled.WaterDrop, tint = AppColors.Wet)
-        }
+        ControlGroup(
+            title = "Climate",
+            entities = listOf(ui.temperature, ui.humidity),
+            onAction = onAction,
+        )
 
-        SectionCard("Doors") {
-            DoorRow(ui.door)
-        }
+        ControlGroup(
+            title = "Doors",
+            entities = listOf(ui.door),
+            onAction = onAction,
+        )
 
-        SectionCard("Workstation") {
+        ControlGroup("Workstation") {
             WorkstationControl(ui.workstation) { onToggle(OfficeEntities.WORKSTATION) }
             HexagonControl(ui.hexagon) { onToggle(OfficeEntities.HEXAGON) }
             Spacer(Modifier.height(8.dp))
@@ -127,7 +141,7 @@ fun OfficeContent(
 }
 
 @Composable
-internal fun SignalSelector(activeSignal: String?, onSelect: (SignalMode) -> Unit) {
+private fun SignalSelector(activeSignal: String?, onSelect: (SignalMode) -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -155,7 +169,7 @@ internal fun SignalSelector(activeSignal: String?, onSelect: (SignalMode) -> Uni
 }
 
 @Composable
-internal fun StatRow(ui: SensorUi) {
+private fun StatRow(ui: SensorUi) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -166,7 +180,7 @@ internal fun StatRow(ui: SensorUi) {
 }
 
 @Composable
-internal fun ConnectionBanner(status: ConnectionStatus) {
+private fun ConnectionBanner(status: ConnectionStatus) {
     val (text, color) = when (status) {
         ConnectionStatus.Connected -> "Connected" to AppColors.StatusGreen
         ConnectionStatus.Connecting -> "Connecting…" to AppColors.StatusAmber
@@ -193,9 +207,16 @@ private fun signalColor(mode: SignalMode): Color = when (mode) {
     SignalMode.MEETING -> AppColors.StatusRed
 }
 
+/** Drives [OfficeScreenPreview] twice: rows (false) and card UIs (true). */
+private class UseCardUisProvider : PreviewParameterProvider<Boolean> {
+    override val values = sequenceOf(false, true)
+}
+
 @Preview(widthDp = 380, heightDp = 1700)
 @Composable
-private fun OfficeScreenPreview() {
+private fun OfficeScreenPreview(
+    @PreviewParameter(UseCardUisProvider::class) useCardUis: Boolean,
+) {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
             OfficeContent(
@@ -205,6 +226,7 @@ private fun OfficeScreenPreview() {
                 onToggle = {},
                 onSetFanSpeed = { _, _ -> },
                 onSignal = {},
+                useCardUis = useCardUis,
             )
         }
     }

@@ -20,24 +20,19 @@ import com.degree.homedash.ui.Dimens
 @Composable
 fun DoorRow(
     ui: DoorUi,
-    doorRowType: DoorRowType = DoorRowType.Row,
 ) {
-    when (doorRowType) {
-        is DoorRowType.Row -> {
-            val tint = if (ui.unavailable) Color.White.copy(alpha = 0.3f) else Color.White
-            EntityRow(
-                label = ui.label,
-                leading = { DoorIcon(open = ui.open, tint = tint, modifier = Modifier.size(Dimens.RowIconSize)) },
-                trailing = {
-                    Text(
-                        text = ui.statusText,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                },
+    val tint = if (ui.unavailable) Color.White.copy(alpha = 0.3f) else Color.White
+    EntityRow(
+        label = ui.label,
+        leading = { DoorIcon(open = ui.open, tint = tint, modifier = Modifier.size(Dimens.RowIconSize)) },
+        trailing = {
+            Text(
+                text = ui.statusText,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
             )
-        }
-    }
+        },
+    )
 }
 
 /** Door icon: hollow outline when [open], solid slab when closed. */
@@ -77,11 +72,6 @@ private fun DoorIcon(
             drawCircle(color = Color.Black.copy(alpha = 0.4f), radius = knobR, center = knob)
         }
     }
-}
-
-sealed interface DoorRowType {
-
-    object Row : DoorRowType
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)

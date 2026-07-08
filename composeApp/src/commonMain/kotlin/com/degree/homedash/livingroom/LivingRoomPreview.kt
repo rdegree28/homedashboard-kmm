@@ -1,15 +1,17 @@
 package com.degree.homedash.livingroom
 
+import com.degree.homedash.controls.EntityMetadata
+import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.shared.model.HistoryPoint
 
 // Sample data for the Living Room @Previews (which live next to their composables in this package).
 
-internal val previewLevels: List<WaterLevelUi> = listOf(
-    WaterLevelUi(
-        entityId = LivingRoomEntities.CAT_WATER_LEVEL,
+internal val previewLevels: List<EntityUi.WaterLevel> = listOf(
+    EntityUi.WaterLevel(
+        metadata = EntityMetadata.WaterLevel(LivingRoomEntities.CAT_WATER_LEVEL),
         name = "Remaining Water",
         pct = 68.0,
-        valueText = "68 %"
+        valueText = "68 %",
     ),
 )
 
