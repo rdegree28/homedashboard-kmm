@@ -1,16 +1,11 @@
 package com.degree.homedash.livingroom
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -28,10 +23,9 @@ import com.degree.homedash.controls.WaterLevelControl
 import com.degree.homedash.controls.waterLevelColor
 import com.degree.homedash.plants.TimeRange
 import com.degree.homedash.shared.data.HomeAssistantRepo
-import com.degree.homedash.ui.DashboardHeader
-import com.degree.homedash.ui.Dimens
-import com.degree.homedash.ui.HistoryGraph
 import com.degree.homedash.ui.ControlGroup
+import com.degree.homedash.ui.DashboardScaffold
+import com.degree.homedash.ui.HistoryGraph
 import kotlin.math.roundToInt
 
 @Composable
@@ -48,15 +42,7 @@ fun WaterGraphContent(
     onRangeChange: (TimeRange) -> Unit,
     onBack: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(Dimens.SectionSpacing),
-    ) {
-        DashboardHeader(ui.item?.name ?: "Water Level", onBack = onBack)
-
+    DashboardScaffold(title = ui.item?.name ?: "Water Level", onBack = onBack) {
         ControlGroup("Water Level") {
             ui.item?.let { WaterLevelControl(it) }
             Spacer(Modifier.height(8.dp))

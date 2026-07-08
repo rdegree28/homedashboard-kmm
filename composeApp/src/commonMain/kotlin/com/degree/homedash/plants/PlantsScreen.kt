@@ -1,27 +1,18 @@
 package com.degree.homedash.plants
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.shared.data.HomeAssistantRepo
-import com.degree.homedash.ui.DashboardHeader
-import com.degree.homedash.ui.Dimens
 import com.degree.homedash.ui.ControlGroup
+import com.degree.homedash.ui.DashboardScaffold
 
 /** Soil-moisture sensor entity ids shown on the Plants dashboard, in display order. */
 object PlantEntities {
@@ -50,15 +41,7 @@ fun PlantsContent(
     onOpenSettings: () -> Unit,
     onOpenGraph: (String) -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(Dimens.SectionSpacing),
-    ) {
-        DashboardHeader("Plants", onBack = onBack, onOpenSettings = onOpenSettings)
-
+    DashboardScaffold(title = "Plants", onBack = onBack, onOpenSettings = onOpenSettings) {
         ControlGroup(
             title = "Soil Moisture",
             entities = ui.plants,

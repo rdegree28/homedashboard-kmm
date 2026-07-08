@@ -1,20 +1,11 @@
 package com.degree.homedash.office
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -23,9 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,11 +27,9 @@ import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.HexagonControl
 import com.degree.homedash.controls.WorkstationControl
 import com.degree.homedash.shared.data.HomeAssistantRepo
-import com.degree.homedash.shared.network.ConnectionStatus
 import com.degree.homedash.ui.AppColors
-import com.degree.homedash.ui.DashboardHeader
-import com.degree.homedash.ui.Dimens
 import com.degree.homedash.ui.ControlGroup
+import com.degree.homedash.ui.DashboardScaffold
 
 @Composable
 fun OfficeScreen(
@@ -88,16 +75,12 @@ fun OfficeContent(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(Dimens.SectionSpacing),
+    DashboardScaffold(
+        title = "Office",
+        onBack = onBack,
+        onOpenSettings = onOpenSettings,
+        connection = ui.connection,
     ) {
-        DashboardHeader("Office", onBack = onBack, onOpenSettings = onOpenSettings)
-        ConnectionBanner(ui.connection)
-
         ControlGroup(
             title = "Lights",
             entities = listOf(ui.officeLight, ui.smallLight),
@@ -176,27 +159,6 @@ private fun StatRow(ui: SensorUi) {
     ) {
         Text(ui.label, style = MaterialTheme.typography.bodyLarge)
         Text(ui.valueText, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-    }
-}
-
-@Composable
-private fun ConnectionBanner(status: ConnectionStatus) {
-    val (text, color) = when (status) {
-        ConnectionStatus.Connected -> "Connected" to AppColors.StatusGreen
-        ConnectionStatus.Connecting -> "Connecting…" to AppColors.StatusAmber
-        ConnectionStatus.Disconnected -> "Disconnected" to AppColors.StatusGray
-        is ConnectionStatus.Error -> "Error: ${status.message ?: "unknown"}" to AppColors.StatusRed
-    }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Box(Modifier.size(10.dp).clip(CircleShape).background(color))
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
     }
 }
 

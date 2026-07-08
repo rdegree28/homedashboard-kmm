@@ -1,16 +1,11 @@
 package com.degree.homedash.plants
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -27,10 +22,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.degree.homedash.controls.SoilMoistureControl
 import com.degree.homedash.controls.moistureColor
 import com.degree.homedash.shared.data.HomeAssistantRepo
-import com.degree.homedash.ui.DashboardHeader
-import com.degree.homedash.ui.Dimens
-import com.degree.homedash.ui.HistoryGraph
 import com.degree.homedash.ui.ControlGroup
+import com.degree.homedash.ui.DashboardScaffold
+import com.degree.homedash.ui.HistoryGraph
 import kotlin.math.roundToInt
 
 /** Selectable history windows for the moisture graph. */
@@ -55,15 +49,7 @@ fun PlantGraphContent(
     onRangeChange: (TimeRange) -> Unit,
     onBack: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(Dimens.SectionSpacing),
-    ) {
-        DashboardHeader(ui.plant?.name ?: "Plant", onBack = onBack)
-
+    DashboardScaffold(title = ui.plant?.name ?: "Plant", onBack = onBack) {
         ControlGroup("Soil Moisture") {
             ui.plant?.let { SoilMoistureControl(it) }
             Spacer(Modifier.height(8.dp))

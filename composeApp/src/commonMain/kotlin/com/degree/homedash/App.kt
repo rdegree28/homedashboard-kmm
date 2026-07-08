@@ -2,13 +2,16 @@ package com.degree.homedash
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -23,12 +26,14 @@ import com.degree.homedash.office.OfficeScreen
 import com.degree.homedash.plants.PlantGraphScreen
 import com.degree.homedash.plants.PlantsScreen
 import com.degree.homedash.shared.data.HaConfig
+import com.degree.homedash.ui.LocalConnectionStatus
 
 @Composable
 fun App(defaultConfig: HaConfig? = null) {
     val appVm: AppViewModel = viewModel { AppViewModel(defaultConfig) }
     val config by appVm.config.collectAsStateWithLifecycle()
     val repository = appVm.repository
+    val connection by repository.connection.collectAsStateWithLifecycle()
 
     // Entity id whose history is shown on the PlantGraph destination.
     var graphEntityId by remember { mutableStateOf<String?>(null) }
@@ -44,61 +49,67 @@ fun App(defaultConfig: HaConfig? = null) {
 
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            Box(Modifier.windowInsetsPadding(WindowInsets.safeDrawing)) {
-                when (backStack.last()) {
-                    Screen.Settings -> SettingsScreen(
-                        initial = config,
-                        onSave = { cfg ->
-                            appVm.save(cfg)
-                            if (backStack.size > 1) goBack() else backStack[0] = Screen.Home
-                        },
-                        onCancel = if (backStack.size > 1) ({ goBack() }) else null,
-                    )
+            CompositionLocalProvider(LocalConnectionStatus provides connection) {
+                Box(
+                    Modifier.windowInsetsPadding(
+                        WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
+                    ),
+                ) {
+                    when (backStack.last()) {
+                        Screen.Settings -> SettingsScreen(
+                            initial = config,
+                            onSave = { cfg ->
+                                appVm.save(cfg)
+                                if (backStack.size > 1) goBack() else backStack[0] = Screen.Home
+                            },
+                            onCancel = if (backStack.size > 1) ({ goBack() }) else null,
+                        )
 
-                    Screen.Home -> HomeScreen(
-                        onOpenOffice = { navigate(Screen.Office) },
-                        onOpenPlants = { navigate(Screen.Plants) },
-                        onOpenLivingRoom = { navigate(Screen.LivingRoom) },
-                        onOpenSettings = { navigate(Screen.Settings) },
-                    )
+                        Screen.Home -> HomeScreen(
+                            onOpenOffice = { navigate(Screen.Office) },
+                            onOpenPlants = { navigate(Screen.Plants) },
+                            onOpenLivingRoom = { navigate(Screen.LivingRoom) },
+                            onOpenSettings = { navigate(Screen.Settings) },
+                        )
 
-                    Screen.Office -> OfficeScreen(
-                        repository = repository,
-                        onBack = ::goBack,
-                        onOpenSettings = { navigate(Screen.Settings) },
-                    )
+                        Screen.Office -> OfficeScreen(
+                            repository = repository,
+                            onBack = ::goBack,
+                            onOpenSettings = { navigate(Screen.Settings) },
+                        )
 
-                    Screen.Plants -> PlantsScreen(
-                        repository = repository,
-                        onBack = ::goBack,
-                        onOpenSettings = { navigate(Screen.Settings) },
-                        onOpenGraph = { id ->
-                            graphEntityId = id
-                            navigate(Screen.PlantGraph)
-                        },
-                    )
+                        Screen.Plants -> PlantsScreen(
+                            repository = repository,
+                            onBack = ::goBack,
+                            onOpenSettings = { navigate(Screen.Settings) },
+                            onOpenGraph = { id ->
+                                graphEntityId = id
+                                navigate(Screen.PlantGraph)
+                            },
+                        )
 
-                    Screen.PlantGraph -> PlantGraphScreen(
-                        repository = repository,
-                        entityId = graphEntityId.orEmpty(),
-                        onBack = ::goBack,
-                    )
+                        Screen.PlantGraph -> PlantGraphScreen(
+                            repository = repository,
+                            entityId = graphEntityId.orEmpty(),
+                            onBack = ::goBack,
+                        )
 
-                    Screen.LivingRoom -> LivingRoomScreen(
-                        repository = repository,
-                        onBack = ::goBack,
-                        onOpenSettings = { navigate(Screen.Settings) },
-                        onOpenGraph = { id ->
-                            graphEntityId = id
-                            navigate(Screen.WaterGraph)
-                        },
-                    )
+                        Screen.LivingRoom -> LivingRoomScreen(
+                            repository = repository,
+                            onBack = ::goBack,
+                            onOpenSettings = { navigate(Screen.Settings) },
+                            onOpenGraph = { id ->
+                                graphEntityId = id
+                                navigate(Screen.WaterGraph)
+                            },
+                        )
 
-                    Screen.WaterGraph -> WaterGraphScreen(
-                        repository = repository,
-                        entityId = graphEntityId.orEmpty(),
-                        onBack = ::goBack,
-                    )
+                        Screen.WaterGraph -> WaterGraphScreen(
+                            repository = repository,
+                            entityId = graphEntityId.orEmpty(),
+                            onBack = ::goBack,
+                        )
+                    }
                 }
             }
         }
