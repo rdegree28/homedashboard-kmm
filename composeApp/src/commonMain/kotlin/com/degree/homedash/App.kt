@@ -102,6 +102,7 @@ fun App(defaultConfig: HaConfig? = null) {
                         )
 
                         Screen.Home -> HomeScreen(
+                            repository = repository,
                             showOffice = FeatureFlag.ViewOfficeScreen in featureFlags,
                             onOpenOffice = { navigate(Screen.Office) },
                             onOpenPlants = { navigate(Screen.Plants) },
