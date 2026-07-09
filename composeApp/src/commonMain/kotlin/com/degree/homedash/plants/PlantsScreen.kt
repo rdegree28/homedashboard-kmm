@@ -14,11 +14,9 @@ import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 
-/** Soil-moisture sensor entity ids shown on the Plants dashboard, in display order. */
+/** The Plants dashboard shows every entity whose id ends with this suffix. */
 object PlantEntities {
-    val SOIL_MOISTURE = listOf(
-        "sensor.louie_moisture_sensor_soil_moisture",
-    )
+    const val SOIL_MOISTURE_SUFFIX = "soil_moisture"
 }
 
 @Composable

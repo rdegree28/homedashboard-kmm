@@ -18,14 +18,21 @@ import kotlinx.coroutines.flow.stateIn
 @Immutable
 data class PlantsUiState(val plants: List<EntityUi.SoilMoisture>)
 
-/** Projects the configured soil-moisture sensors into [PlantsUiState]. */
+/** Projects every soil-moisture sensor (entity id ending in [PlantEntities.SOIL_MOISTURE_SUFFIX]) into [PlantsUiState]. */
 class PlantsViewModel(
     private val repo: HomeAssistantRepo,
 ) : ViewModel() {
 
     val uiState: StateFlow<PlantsUiState> =
         repo.states
-            .map { states -> PlantsUiState(PlantEntities.SOIL_MOISTURE.mapNotNull { states[it]?.toSoilMoisture() }) }
+            .map { states ->
+                PlantsUiState(
+                    states.values
+                        .filter { it.entityId.endsWith(PlantEntities.SOIL_MOISTURE_SUFFIX) }
+                        .map { it.toSoilMoisture() }
+                        .sortedBy { it.name },
+                )
+            }
             .distinctUntilChanged()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PlantsUiState(emptyList()))
 }

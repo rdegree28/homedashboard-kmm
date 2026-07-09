@@ -57,7 +57,8 @@ fun PlantGraphContent(
             Spacer(Modifier.height(8.dp))
             HistoryGraph(
                 points = ui.history,
-                maxValue = 100.0,
+                // Keep a 0–100 axis normally, but expand it so readings above 100% aren't clipped.
+                maxValue = maxOf(100.0, ui.history.maxOfOrNull { it.value } ?: 100.0),
                 maxLabel = { "${it.roundToInt()} %" },
                 colorForValue = { moistureColor(it) },
                 showTimeAxis = true,

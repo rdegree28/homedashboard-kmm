@@ -93,6 +93,7 @@ internal fun plantName(entity: EntityState): String {
     return raw
         .replace(Regex("(?i)\\s*soil\\s*moisture\\s*$"), "")
         .replace(Regex("(?i)\\s*moisture\\s*$"), "")
+        .replace(Regex("(?i)\\s*moisture\\s*sensor\\s*$"), "")
         .trim()
         .ifEmpty { raw }
 }
