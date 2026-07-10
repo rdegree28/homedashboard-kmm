@@ -5,6 +5,7 @@ class FeatureFlagDao {
 
     private val enabledFor: Map<FeatureFlag, Set<String>> = mapOf(
         FeatureFlag.ViewOfficeScreen to setOf("Rob"), // by AuthUser.name
+        FeatureFlag.ViewLivingRoomLights to setOf("Rob"),
     )
 
     fun isEnabled(flag: FeatureFlag, user: AuthUser?): Boolean =

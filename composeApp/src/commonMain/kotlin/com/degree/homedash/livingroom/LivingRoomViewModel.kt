@@ -13,10 +13,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 @Immutable
 data class LivingRoomUiState(
-    val items: List<EntityUi.WaterLevel>
+    val lights: List<EntityUi.Light>,
+    val items: List<EntityUi.WaterLevel>,
 )
 
 /** Projects the configured Living Room sensors into [LivingRoomUiState]. */
@@ -27,11 +29,31 @@ class LivingRoomViewModel(
     val uiState: StateFlow<LivingRoomUiState> =
         repo.states
             .map { states ->
-                LivingRoomUiState(listOfNotNull(states[LivingRoomEntities.CAT_WATER_LEVEL]?.toWaterLevel()))
+                LivingRoomUiState(
+                    lights = listOf(
+                        states[LivingRoomEntities.LIVING_ROOM_LIGHT_WEST].toLight(LivingRoomEntities.LIVING_ROOM_LIGHT_WEST, "West"),
+                        states[LivingRoomEntities.LIVING_ROOM_LIGHT_EAST].toLight(LivingRoomEntities.LIVING_ROOM_LIGHT_EAST, "East"),
+                        states[LivingRoomEntities.HOMEWORK_LIGHT].toLight(LivingRoomEntities.HOMEWORK_LIGHT, "Homework"),
+                        states[LivingRoomEntities.DINING_LIGHT].toLight(LivingRoomEntities.DINING_LIGHT, "Dining Ceiling"),
+                        states[LivingRoomEntities.KITCHEN_STOVE_LIGHT].toLight(LivingRoomEntities.KITCHEN_STOVE_LIGHT, "Kitchen Stove"),
+                    ),
+                    items = listOfNotNull(states[LivingRoomEntities.CAT_WATER_LEVEL]?.toWaterLevel()),
+                )
             }
             .distinctUntilChanged()
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LivingRoomUiState(emptyList()))
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LivingRoomUiState(emptyList(), emptyList()))
+
+    fun toggle(entityId: String) {
+        viewModelScope.launch { repo.toggle(entityId) }
+    }
 }
+
+private fun EntityState?.toLight(entityId: String, name: String) = EntityUi.Light(
+    metadata = EntityMetadata.Light(entityId),
+    name = name,
+    isOn = this?.isOn == true,
+    offline = this == null || this.isUnavailable,
+)
 
 /** Projects a percentage-level entity into its UI model (shared by the list and the graph screen). */
 internal fun EntityState.toWaterLevel(): EntityUi.WaterLevel {

@@ -134,6 +134,7 @@ fun App(defaultConfig: HaConfig? = null) {
 
                         Screen.LivingRoom -> LivingRoomScreen(
                             repository = repository,
+                            showLights = FeatureFlag.ViewLivingRoomLights in featureFlags,
                             onBack = ::goBack,
                             onOpenSettings = { navigate(Screen.Settings) },
                             onOpenGraph = { id ->

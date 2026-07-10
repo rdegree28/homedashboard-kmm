@@ -6,6 +6,27 @@ import com.degree.homedash.shared.model.HistoryPoint
 
 // Sample data for the Living Room @Previews (which live next to their composables in this package).
 
+internal val previewLights: List<EntityUi.Light> = listOf(
+    EntityUi.Light(
+        metadata = EntityMetadata.Light(LivingRoomEntities.LIVING_ROOM_LIGHT_WEST),
+        name = "Ceiling",
+        isOn = true,
+        offline = false,
+    ),
+    EntityUi.Light(
+        metadata = EntityMetadata.Light(LivingRoomEntities.LIVING_ROOM_LIGHT_EAST),
+        name = "Lamp",
+        isOn = false,
+        offline = false,
+    ),
+    EntityUi.Light(
+        metadata = EntityMetadata.Light(LivingRoomEntities.HOMEWORK_LIGHT),
+        name = "Accent",
+        isOn = false,
+        offline = true,
+    ),
+)
+
 internal val previewLevels: List<EntityUi.WaterLevel> = listOf(
     EntityUi.WaterLevel(
         metadata = EntityMetadata.WaterLevel(LivingRoomEntities.CAT_WATER_LEVEL),
