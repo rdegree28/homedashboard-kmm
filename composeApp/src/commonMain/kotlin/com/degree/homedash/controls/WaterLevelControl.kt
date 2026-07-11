@@ -89,7 +89,7 @@ fun WaterLevelControl(
 /** Water-level status color: red (<10, refill) → yellow (10–35) → blue (>35, full). */
 internal fun waterLevelColor(pct: Double?): Color = when {
     pct == null -> AppColors.StatusGray
-    pct < 10 -> AppColors.StatusRed // needs refill
-    pct < 35 -> AppColors.StatusAmber // getting low
+    pct <= 30 -> AppColors.StatusRed // needs refill
+    pct <= 45 -> AppColors.StatusAmber // getting low
     else -> AppColors.Wet // full
 }
