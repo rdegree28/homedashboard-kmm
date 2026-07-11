@@ -68,3 +68,13 @@ internal fun previewFanUi(
     offline = offline,
     percentage = percentage,
 )
+
+internal fun previewClimate(
+    label: String,
+    valueText: String,
+    kind: ClimateKind,
+) = EntityUi.Climate(
+    metadata = EntityMetadata.Climate("sensor.${label.lowercase()}", kind = kind),
+    label = label,
+    valueText = valueText,
+)

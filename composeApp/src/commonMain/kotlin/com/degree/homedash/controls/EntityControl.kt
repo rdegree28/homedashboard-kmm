@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Opacity
 import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.runtime.Composable
@@ -29,14 +30,15 @@ sealed interface EntityAction {
 /** How a control should render. `ControlGroup` picks this per group; individual controls don't. */
 enum class ControlLayout { Row, Card }
 
-/** True for entity types that have a card rendering (currently lights and fans). */
-fun EntityUi.hasCard(): Boolean = this is EntityUi.Light || this is EntityUi.Fan
+/** True for entity types that have a card rendering (currently lights, fans, and climate). */
+fun EntityUi.hasCard(): Boolean =
+    this is EntityUi.Light || this is EntityUi.Fan || this is EntityUi.Climate
 
 /**
  * Central renderer: maps an [EntityUi] to the right control, in the requested [layout], routing user
- * interaction through [onAction]. Lights and fans have a [ControlLayout.Card] form (tap to toggle);
- * every other type renders its row regardless of [layout]. [modifier] applies to the card cell
- * (grid weighting).
+ * interaction through [onAction]. Lights and fans have a [ControlLayout.Card] form (tap to toggle),
+ * climate has a read-only card; every other type renders its row regardless of [layout]. [modifier]
+ * applies to the card cell (grid weighting).
  */
 @Composable
 fun EntityControl(
@@ -96,8 +98,23 @@ fun EntityControl(
             val (icon: ImageVector, tint: Color) = when (entity.metadata.kind) {
                 ClimateKind.Temperature -> Icons.Filled.Thermostat to AppColors.TempWarm
                 ClimateKind.Humidity -> Icons.Filled.WaterDrop to AppColors.Wet
+                ClimateKind.DewPoint -> Icons.Filled.Opacity to AppColors.Wet
             }
-            ClimateRow(ui = SensorUi(entity.label, entity.valueText), icon = icon, tint = tint)
+            when (layout) {
+                ControlLayout.Row -> ClimateRow(
+                    ui = SensorUi(entity.label, entity.valueText),
+                    icon = icon,
+                    tint = tint
+                )
+                ControlLayout.Card -> ClimateCard(
+                    label = entity.label,
+                    valueText = entity.valueText,
+                    subvalueText = entity.subvalueText,
+                    icon = icon,
+                    tint = tint,
+                    modifier = modifier
+                )
+            }
         }
 
         is EntityUi.Door -> DoorRow(
@@ -146,5 +163,15 @@ private fun EntityFanCardPreview() = ControlPreview {
         EntityControl(previewFanUi("On", isOn = true, percentage = 75, levelCount = 12), ControlLayout.Card, {}, Modifier.weight(1f))
         EntityControl(previewFanUi("Off", isOn = false), ControlLayout.Card, {}, Modifier.weight(1f))
         EntityControl(previewFanUi("Offline", offline = true), ControlLayout.Card, {}, Modifier.weight(1f))
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
+@Composable
+private fun EntityClimateCardPreview() = ControlPreview {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        EntityControl(previewClimate("Temperature", "72.5 °F", ClimateKind.Temperature), ControlLayout.Card, {}, Modifier.weight(1f))
+        EntityControl(previewClimate("Humidity", "48 %", ClimateKind.Humidity), ControlLayout.Card, {}, Modifier.weight(1f))
+        EntityControl(previewClimate("Dew Point", "50.9 °F", ClimateKind.DewPoint), ControlLayout.Card, {}, Modifier.weight(1f))
     }
 }

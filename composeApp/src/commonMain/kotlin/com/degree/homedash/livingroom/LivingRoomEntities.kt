@@ -12,4 +12,8 @@ object LivingRoomEntities {
     // Placeholder fan ids — replace with the real Home Assistant entity ids.
     const val LIVING_ROOM_FAN = "fan.living_room_fan"
     const val LIVING_ROOM_BOX_FAN = "switch.living_room_acc_1"
+
+    // Placeholder climate sensor ids — replace with the real Home Assistant entity ids.
+    const val TEMPERATURE = "sensor.living_room_thermostat_temperature"
+    const val HUMIDITY = "sensor.living_room_thermostat_humidity"
 }

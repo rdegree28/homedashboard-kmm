@@ -5,6 +5,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -15,6 +16,7 @@ import com.degree.homedash.ui.DashboardScaffold
 
 @Composable
 fun LivingRoomScreen(
+    modifier: Modifier = Modifier,
     repository: HomeAssistantRepo,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
@@ -23,6 +25,7 @@ fun LivingRoomScreen(
     val vm: LivingRoomViewModel = viewModel { LivingRoomViewModel(repository) }
     val ui by vm.uiState.collectAsStateWithLifecycle()
     LivingRoomContent(
+        modifier = modifier,
         ui = ui,
         onBack = onBack,
         onOpenSettings = onOpenSettings,
@@ -34,6 +37,7 @@ fun LivingRoomScreen(
 /** Stateless Living Room UI — projected light states in, toggle actions out. */
 @Composable
 fun LivingRoomContent(
+    modifier: Modifier = Modifier,
     ui: LivingRoomUiState,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
@@ -48,8 +52,13 @@ fun LivingRoomContent(
         }
     }
 
-    DashboardScaffold(title = "Living Room", onBack = onBack, onOpenSettings = onOpenSettings) {
-        // Lights and fans are gated behind the viewLivingRoomLights feature flag.
+    DashboardScaffold(
+        modifier = modifier,
+        title = "Living Room",
+        onBack = onBack,
+        onOpenSettings = onOpenSettings
+    ) {
+        // Living Room controls are gated behind the viewLivingRoomLights feature flag.
         if (showLights) {
             ControlGroup(
                 title = "Lights",
@@ -64,17 +73,24 @@ fun LivingRoomContent(
                 useCardUis = true,
                 onAction = onAction,
             )
+
+            ControlGroup(
+                title = "Climate",
+                entities = ui.climate,
+                useCardUis = true,
+                onAction = onAction,
+            )
         }
     }
 }
 
-@Preview(widthDp = 380, heightDp = 400)
+@Preview(widthDp = 380)
 @Composable
 private fun LivingRoomScreenPreview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
             LivingRoomContent(
-                ui = LivingRoomUiState(lights = previewLights, fans = previewFans),
+                ui = LivingRoomUiState(lights = previewLights, fans = previewFans, climate = previewClimate),
                 onBack = {},
                 onOpenSettings = {},
                 onToggle = {},

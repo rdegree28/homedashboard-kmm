@@ -1,5 +1,6 @@
 package com.degree.homedash.livingroom
 
+import com.degree.homedash.controls.ClimateKind
 import com.degree.homedash.controls.EntityMetadata
 import com.degree.homedash.controls.EntityUi
 
@@ -40,5 +41,18 @@ internal val previewFans: List<EntityUi.Fan> = listOf(
         isOn = false,
         offline = false,
         percentage = 0,
+    ),
+)
+
+internal val previewClimate: List<EntityUi.Climate> = listOf(
+    EntityUi.Climate(
+        metadata = EntityMetadata.Climate(LivingRoomEntities.TEMPERATURE, ClimateKind.Temperature),
+        label = "Temperature",
+        valueText = "72.5 °F",
+    ),
+    EntityUi.Climate(
+        metadata = EntityMetadata.Climate(LivingRoomEntities.HUMIDITY, ClimateKind.DewPoint),
+        label = "Dew Point",
+        valueText = "50.9 °F (48%)",
     ),
 )
