@@ -137,6 +137,36 @@ fun HistoryGraph(
     }
 }
 
+/**
+ * Downsamples [points] to roughly [maxPoints] while preserving the visual envelope: the series is
+ * split into evenly-sized buckets and each contributes its min- and max-value point (in time order),
+ * so spikes and dips survive. A chart can't render more than ~1 point per horizontal pixel, so this
+ * cuts the per-draw Path cost from thousands of segments to a few hundred with no visible change.
+ * Returns [points] unchanged when it's already small enough. First/last points are always kept.
+ */
+internal fun decimateHistory(points: List<HistoryPoint>, maxPoints: Int = 512): List<HistoryPoint> {
+    if (points.size <= maxPoints) return points
+    val buckets = maxPoints / 2
+    val n = points.size
+    val out = ArrayList<HistoryPoint>(maxPoints + 2)
+    out.add(points.first())
+    for (b in 0 until buckets) {
+        val start = (b.toLong() * n / buckets).toInt()
+        val end = ((b + 1).toLong() * n / buckets).toInt()
+        if (start >= end) continue
+        var lo = points[start]
+        var hi = points[start]
+        for (i in start until end) {
+            val v = points[i].value
+            if (v < lo.value) lo = points[i]
+            if (v > hi.value) hi = points[i]
+        }
+        if (lo.timeSeconds <= hi.timeSeconds) { out.add(lo); out.add(hi) } else { out.add(hi); out.add(lo) }
+    }
+    out.add(points.last())
+    return out
+}
+
 /** Weekday labels positioned under the chart at each local-midnight boundary within the range. */
 @Composable
 private fun TimeAxis(minT: Double, maxT: Double, color: Color) {
