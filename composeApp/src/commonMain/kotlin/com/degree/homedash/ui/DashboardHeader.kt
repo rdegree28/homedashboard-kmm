@@ -52,13 +52,14 @@ val LocalConnectionStatus = compositionLocalOf<ConnectionStatus> { ConnectionSta
  */
 @Composable
 fun DashboardScaffold(
+    modifier: Modifier = Modifier,
     title: String,
     onBack: (() -> Unit)? = null,
     onOpenSettings: (() -> Unit)? = null,
     connection: ConnectionStatus = LocalConnectionStatus.current,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+    Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         DashboardHeader(title, onBack, onOpenSettings, connection)
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),

@@ -54,3 +54,27 @@ internal fun previewFan(
     percentage: Int = 0,
     levelCount: Int = 0,
 ) = FanUi(name = name, isOn = isOn, offline = offline, levelCount = levelCount, percentage = percentage)
+
+internal fun previewFanUi(
+    name: String,
+    isOn: Boolean = false,
+    offline: Boolean = false,
+    percentage: Int = 0,
+    levelCount: Int = 0,
+) = EntityUi.Fan(
+    metadata = EntityMetadata.Fan("fan.${name.lowercase()}", levelCount = levelCount),
+    name = name,
+    isOn = isOn,
+    offline = offline,
+    percentage = percentage,
+)
+
+internal fun previewClimate(
+    label: String,
+    valueText: String,
+    kind: ClimateKind,
+) = EntityUi.Climate(
+    metadata = EntityMetadata.Climate("sensor.${label.lowercase()}", kind = kind),
+    label = label,
+    valueText = valueText,
+)

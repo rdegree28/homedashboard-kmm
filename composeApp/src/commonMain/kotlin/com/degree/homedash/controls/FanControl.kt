@@ -116,7 +116,7 @@ private fun FanSpeedSlider(
  * Spin duration (ms per revolution) scaled by fan speed: 750 ms at top level, 2500 ms at level 1,
  * linear in between. Fans with no speed control (or no reported speed) spin at a steady 1000 ms.
  */
-private fun fanSpinDurationMs(
+internal fun fanSpinDurationMs(
     percentage: Int,
     levelCount: Int,
     hasSpeedControl: Boolean,
@@ -133,7 +133,7 @@ private fun fanSpinDurationMs(
  * speed changes apply smoothly — an InfiniteTransition would ignore duration-only changes.
  */
 @Composable
-private fun FanIcon(
+internal fun FanIcon(
     spinning: Boolean,
     durationMs: Int,
     tint: Color,

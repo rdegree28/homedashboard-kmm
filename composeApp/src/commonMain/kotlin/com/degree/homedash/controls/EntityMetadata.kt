@@ -32,4 +32,4 @@ sealed interface EntityMetadata {
 }
 
 /** Which climate sensor a [EntityMetadata.Climate] is — selects the row's icon + tint. */
-enum class ClimateKind { Temperature, Humidity }
+enum class ClimateKind { Temperature, Humidity, DewPoint }

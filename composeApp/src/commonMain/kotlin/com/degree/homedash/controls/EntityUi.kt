@@ -33,6 +33,7 @@ sealed interface EntityUi {
         override val metadata: EntityMetadata.Climate,
         val label: String,
         val valueText: String,
+        val subvalueText: String? = null,
     ) : EntityUi
 
     @Immutable
