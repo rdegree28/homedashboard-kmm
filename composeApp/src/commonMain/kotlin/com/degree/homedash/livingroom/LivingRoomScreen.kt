@@ -2,7 +2,6 @@ package com.degree.homedash.livingroom
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,7 +18,6 @@ fun LivingRoomScreen(
     repository: HomeAssistantRepo,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
-    onOpenGraph: (String) -> Unit,
     showLights: Boolean = false,
 ) {
     val vm: LivingRoomViewModel = viewModel { LivingRoomViewModel(repository) }
@@ -28,32 +26,30 @@ fun LivingRoomScreen(
         ui = ui,
         onBack = onBack,
         onOpenSettings = onOpenSettings,
-        onOpenGraph = onOpenGraph,
         onToggle = vm::toggle,
         showLights = showLights,
     )
 }
 
-/** Stateless Living Room UI — projected sensor readings in, navigation actions out. */
+/** Stateless Living Room UI — projected light states in, toggle actions out. */
 @Composable
 fun LivingRoomContent(
     ui: LivingRoomUiState,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
-    onOpenGraph: (String) -> Unit,
     onToggle: (String) -> Unit,
     showLights: Boolean = false,
 ) {
     val onAction: (EntityAction) -> Unit = { action ->
         when (action) {
             is EntityAction.Toggle -> onToggle(action.entityId)
-            is EntityAction.OpenGraph -> onOpenGraph(action.entityId)
+            is EntityAction.OpenGraph -> Unit
             is EntityAction.SetSpeed -> Unit
         }
     }
 
     DashboardScaffold(title = "Living Room", onBack = onBack, onOpenSettings = onOpenSettings) {
-        // Lights are gated behind the viewLivingRoomLights feature flag.
+        // Lights and fans are gated behind the viewLivingRoomLights feature flag.
         if (showLights) {
             ControlGroup(
                 title = "Lights",
@@ -61,20 +57,14 @@ fun LivingRoomContent(
                 useCardUis = true,
                 onAction = onAction,
             )
-        }
 
-        ControlGroup(
-            title = "Cat Water Fountain",
-            entities = ui.items,
-            onAction = onAction,
-            empty = {
-                Text(
-                    "No water level sensor found.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            },
-        )
+            ControlGroup(
+                title = "Fans",
+                entities = ui.fans,
+                useCardUis = true,
+                onAction = onAction,
+            )
+        }
     }
 }
 
@@ -84,10 +74,9 @@ private fun LivingRoomScreenPreview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
             LivingRoomContent(
-                ui = LivingRoomUiState(lights = previewLights, items = previewLevels),
+                ui = LivingRoomUiState(lights = previewLights, fans = previewFans),
                 onBack = {},
                 onOpenSettings = {},
-                onOpenGraph = {},
                 onToggle = {},
                 showLights = true,
             )

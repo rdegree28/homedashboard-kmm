@@ -21,8 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.degree.homedash.livingroom.LivingRoomScreen
-import com.degree.homedash.livingroom.WaterGraphScreen
 import com.degree.homedash.office.OfficeScreen
+import com.degree.homedash.pets.PetsScreen
+import com.degree.homedash.pets.WaterGraphScreen
 import com.degree.homedash.plants.PlantGraphScreen
 import com.degree.homedash.plants.PlantsScreen
 import com.degree.homedash.shared.data.FeatureFlag
@@ -107,6 +108,7 @@ fun App(defaultConfig: HaConfig? = null) {
                             onOpenOffice = { navigate(Screen.Office) },
                             onOpenPlants = { navigate(Screen.Plants) },
                             onOpenLivingRoom = { navigate(Screen.LivingRoom) },
+                            onOpenPets = { navigate(Screen.Pets) },
                             onOpenSettings = { navigate(Screen.Settings) },
                         )
 
@@ -137,6 +139,12 @@ fun App(defaultConfig: HaConfig? = null) {
                             showLights = FeatureFlag.ViewLivingRoomLights in featureFlags,
                             onBack = ::goBack,
                             onOpenSettings = { navigate(Screen.Settings) },
+                        )
+
+                        Screen.Pets -> PetsScreen(
+                            repository = repository,
+                            onBack = ::goBack,
+                            onOpenSettings = { navigate(Screen.Settings) },
                             onOpenGraph = { id ->
                                 graphEntityId = id
                                 navigate(Screen.WaterGraph)
@@ -156,4 +164,4 @@ fun App(defaultConfig: HaConfig? = null) {
 }
 
 /** Top-level destinations; the launcher (Home) is the root of the back stack. */
-private enum class Screen { Home, Office, Plants, LivingRoom, Settings, Login, PlantGraph, WaterGraph }
+private enum class Screen { Home, Office, Plants, LivingRoom, Pets, Settings, Login, PlantGraph, WaterGraph }

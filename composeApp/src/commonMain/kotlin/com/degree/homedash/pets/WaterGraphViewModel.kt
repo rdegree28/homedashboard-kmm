@@ -1,4 +1,4 @@
-package com.degree.homedash.livingroom
+package com.degree.homedash.pets
 
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel

@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Chair
 import androidx.compose.material.icons.filled.LocalFlorist
+import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Weekend
 import androidx.compose.material3.Card
@@ -42,6 +43,7 @@ fun HomeScreen(
     onOpenOffice: () -> Unit,
     onOpenPlants: () -> Unit,
     onOpenLivingRoom: () -> Unit,
+    onOpenPets: () -> Unit,
     onOpenSettings: () -> Unit,
     showOffice: Boolean = false,
 ) {
@@ -52,6 +54,7 @@ fun HomeScreen(
         onOpenOffice = onOpenOffice,
         onOpenPlants = onOpenPlants,
         onOpenLivingRoom = onOpenLivingRoom,
+        onOpenPets = onOpenPets,
         onOpenSettings = onOpenSettings,
         showOffice = showOffice,
     )
@@ -64,6 +67,7 @@ fun HomeContent(
     onOpenOffice: () -> Unit,
     onOpenPlants: () -> Unit,
     onOpenLivingRoom: () -> Unit,
+    onOpenPets: () -> Unit,
     onOpenSettings: () -> Unit,
     showOffice: Boolean = false,
 ) {
@@ -73,6 +77,7 @@ fun HomeContent(
         if (showOffice) DashboardCard("Office", Icons.Filled.Chair, AppColors.Wet, onOpenOffice)
         DashboardCard("Plants", Icons.Filled.LocalFlorist, AppColors.Healthy, onOpenPlants)
         DashboardCard("Living Room", Icons.Filled.Weekend, AppColors.Accent, onOpenLivingRoom)
+        DashboardCard("Pets", Icons.Filled.Pets, AppColors.Wet, onOpenPets)
     }
 }
 
@@ -142,6 +147,7 @@ private fun HomeScreenPreview() {
                 onOpenOffice = {},
                 onOpenPlants = {},
                 onOpenLivingRoom = {},
+                onOpenPets = {},
                 onOpenSettings = {},
                 showOffice = true,
             )

@@ -2,8 +2,8 @@ package com.degree.homedash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.degree.homedash.livingroom.LivingRoomEntities
-import com.degree.homedash.livingroom.toWaterLevel
+import com.degree.homedash.pets.PetsEntities
+import com.degree.homedash.pets.toWaterLevel
 import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,7 +25,7 @@ class HomeViewModel(
     val warnings: StateFlow<List<HomeWarning>> =
         repo.states
             .map { states ->
-                buildList { catWaterWarning(states[LivingRoomEntities.CAT_WATER_LEVEL])?.let(::add) }
+                buildList { catWaterWarning(states[PetsEntities.CAT_WATER_LEVEL])?.let(::add) }
             }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 }

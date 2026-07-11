@@ -7,21 +7,21 @@ import com.degree.homedash.controls.EntityMetadata
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.ui.formatNumber
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 @Immutable
 data class LivingRoomUiState(
     val lights: List<EntityUi.Light>,
-    val items: List<EntityUi.WaterLevel>,
+    val fans: List<EntityUi.Fan>,
 )
 
-/** Projects the configured Living Room sensors into [LivingRoomUiState]. */
+/** Projects the configured Living Room lights into [LivingRoomUiState]. */
 class LivingRoomViewModel(
     private val repo: HomeAssistantRepo,
 ) : ViewModel() {
@@ -37,7 +37,10 @@ class LivingRoomViewModel(
                         states[LivingRoomEntities.DINING_LIGHT].toLight(LivingRoomEntities.DINING_LIGHT, "Dining Ceiling"),
                         states[LivingRoomEntities.KITCHEN_STOVE_LIGHT].toLight(LivingRoomEntities.KITCHEN_STOVE_LIGHT, "Kitchen Stove"),
                     ),
-                    items = listOfNotNull(states[LivingRoomEntities.CAT_WATER_LEVEL]?.toWaterLevel()),
+                    fans = listOf(
+                        states[LivingRoomEntities.LIVING_ROOM_FAN].toFan(LivingRoomEntities.LIVING_ROOM_FAN, "Fan"),
+                        states[LivingRoomEntities.LIVING_ROOM_BOX_FAN].toFan(LivingRoomEntities.LIVING_ROOM_BOX_FAN, "Box Fan"),
+                    ),
                 )
             }
             .distinctUntilChanged()
@@ -55,19 +58,14 @@ private fun EntityState?.toLight(entityId: String, name: String) = EntityUi.Ligh
     offline = this == null || this.isUnavailable,
 )
 
-/** Projects a percentage-level entity into its UI model (shared by the list and the graph screen). */
-internal fun EntityState.toWaterLevel(): EntityUi.WaterLevel {
-    val pct = state.toDoubleOrNull()?.takeUnless { isUnavailable }
-    return EntityUi.WaterLevel(
-        metadata = EntityMetadata.WaterLevel(entityId),
-        name = feederName(this),
-        pct = pct,
-        valueText = pct?.let { "${formatNumber(it, decimals = 0)} %" } ?: "—",
+private fun EntityState?.toFan(entityId: String, name: String): EntityUi.Fan {
+    val stepPct = this?.attrDouble("percentage_step")
+    val levelCount = if (stepPct != null && stepPct > 0.0) (100.0 / stepPct).roundToInt() else 0
+    return EntityUi.Fan(
+        metadata = EntityMetadata.Fan(entityId, levelCount),
+        name = name,
+        isOn = this?.isOn == true,
+        offline = this == null || this.isUnavailable,
+        percentage = this?.attrDouble("percentage")?.roundToInt() ?: 0,
     )
-}
-
-/** Friendly name with a trailing level/percentage qualifier stripped for a clean title. */
-internal fun feederName(entity: EntityState): String {
-    val raw = entity.friendlyName ?: entity.entityId.substringAfter('.').replace('_', ' ')
-    return "Remaining Water"
 }

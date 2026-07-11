@@ -1,4 +1,4 @@
-package com.degree.homedash.livingroom
+package com.degree.homedash.pets
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues

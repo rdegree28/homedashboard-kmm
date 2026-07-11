@@ -29,13 +29,14 @@ sealed interface EntityAction {
 /** How a control should render. `ControlGroup` picks this per group; individual controls don't. */
 enum class ControlLayout { Row, Card }
 
-/** True for entity types that have a card rendering (currently only lights). */
-fun EntityUi.hasCard(): Boolean = this is EntityUi.Light
+/** True for entity types that have a card rendering (currently lights and fans). */
+fun EntityUi.hasCard(): Boolean = this is EntityUi.Light || this is EntityUi.Fan
 
 /**
  * Central renderer: maps an [EntityUi] to the right control, in the requested [layout], routing user
- * interaction through [onAction]. Only lights currently have a [ControlLayout.Card] form; every other
- * type renders its row regardless of [layout]. [modifier] applies to the card cell (grid weighting).
+ * interaction through [onAction]. Lights and fans have a [ControlLayout.Card] form (tap to toggle);
+ * every other type renders its row regardless of [layout]. [modifier] applies to the card cell
+ * (grid weighting).
  */
 @Composable
 fun EntityControl(
@@ -57,17 +58,39 @@ fun EntityControl(
             }
         }
 
-        is EntityUi.Fan -> FanControl(
-            ui = FanUi(
+        is EntityUi.Fan -> {
+            val onToggle = { onAction(EntityAction.Toggle(entity.entityId)) }
+            val fanUi = FanUi(
                 name = entity.name,
                 isOn = entity.isOn,
                 offline = entity.offline,
                 levelCount = entity.metadata.levelCount,
                 percentage = entity.percentage,
-            ),
-            onSetSpeed = { pct -> onAction(EntityAction.SetSpeed(entity.entityId, pct)) },
-            onToggle = { onAction(EntityAction.Toggle(entity.entityId)) },
-        )
+            )
+            when (layout) {
+                ControlLayout.Row -> FanControl(
+                    ui = fanUi,
+                    onSetSpeed = { pct -> onAction(EntityAction.SetSpeed(entity.entityId, pct)) },
+                    onToggle = onToggle,
+                )
+                ControlLayout.Card -> {
+                    val icon: @Composable (Color) -> Unit = { tint ->
+                        FanIcon(
+                            spinning = entity.isOn,
+                            durationMs = fanSpinDurationMs(
+                                percentage = entity.percentage,
+                                levelCount = entity.metadata.levelCount,
+                                hasSpeedControl = entity.metadata.levelCount >= 2,
+                            ),
+                            tint = tint,
+                            modifier = Modifier.size(Dimens.RowIconSize),
+                        )
+                    }
+                    val ui = ToggleUi(name = entity.name, isOn = entity.isOn, offline = entity.offline)
+                    EntityToggleCard(ui, AppColors.Accent, onToggle, icon, modifier)
+                }
+            }
+        }
 
         is EntityUi.Climate -> {
             val (icon: ImageVector, tint: Color) = when (entity.metadata.kind) {
@@ -113,5 +136,15 @@ private fun EntityLightCardPreview() = ControlPreview {
         EntityControl(previewLight("On", isOn = true), ControlLayout.Card, {}, Modifier.weight(1f))
         EntityControl(previewLight("Off", isOn = false), ControlLayout.Card, {}, Modifier.weight(1f))
         EntityControl(previewLight("Offline", offline = true), ControlLayout.Card, {}, Modifier.weight(1f))
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
+@Composable
+private fun EntityFanCardPreview() = ControlPreview {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        EntityControl(previewFanUi("On", isOn = true, percentage = 75, levelCount = 12), ControlLayout.Card, {}, Modifier.weight(1f))
+        EntityControl(previewFanUi("Off", isOn = false), ControlLayout.Card, {}, Modifier.weight(1f))
+        EntityControl(previewFanUi("Offline", offline = true), ControlLayout.Card, {}, Modifier.weight(1f))
     }
 }
