@@ -75,7 +75,6 @@ internal fun FanControlCard(
         ) {
             Row(
                 modifier = Modifier
-                    .weight(1f)
                     .fillMaxHeight()
                     .clickable(onClick = onToggle),
                 verticalAlignment = Alignment.CenterVertically,
@@ -92,7 +91,7 @@ internal fun FanControlCard(
                 percentage = ui.percentage,
                 levelCount = ui.levelCount,
                 onSet = onSetSpeed,
-                modifier = Modifier.weight(1.3f),
+                modifier = Modifier.weight(1f),
             )
         }
     }
