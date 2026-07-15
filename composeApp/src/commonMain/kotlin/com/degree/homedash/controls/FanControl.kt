@@ -65,7 +65,8 @@ fun FanControl(
             FanSpeedSlider(
                 percentage = ui.percentage,
                 levelCount = ui.levelCount,
-                onSet = onSetSpeed
+                onSet = onSetSpeed,
+                modifier = Modifier.fillMaxWidth().padding(start = 42.dp, bottom = 4.dp),
             )
         }
     }
@@ -77,15 +78,16 @@ fun FanControl(
  * onto that level under HA's ceil-based percentage→speed conversion (no dead/duplicate steps).
  */
 @Composable
-private fun FanSpeedSlider(
+internal fun FanSpeedSlider(
     percentage: Int,
     levelCount: Int,
     onSet: (Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val currentLevel = (percentage / 100f * levelCount).roundToInt().coerceIn(0, levelCount)
     var level by remember(currentLevel) { mutableStateOf(currentLevel.toFloat()) }
     Row(
-        modifier = Modifier.fillMaxWidth().padding(start = 42.dp, bottom = 4.dp),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {

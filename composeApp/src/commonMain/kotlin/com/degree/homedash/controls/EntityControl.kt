@@ -35,6 +35,15 @@ fun EntityUi.hasCard(): Boolean =
     this is EntityUi.Light || this is EntityUi.Fan || this is EntityUi.Climate
 
 /**
+ * How many grid columns this entity's card should span (out of the grid's 2). A fan spans the full
+ * row only while it is showing its speed slider (on + multi-level) — the same condition
+ * `FanControlCard` uses for `showSlider`; otherwise it's a single-column toggle tile like the rest.
+ * `ControlGroup` packs rows to a total width of 2 using this, so cards reflow as fans toggle.
+ */
+fun EntityUi.cardSpan(): Int =
+    if (this is EntityUi.Fan && isOn && metadata.levelCount >= 2) 2 else 1
+
+/**
  * Central renderer: maps an [EntityUi] to the right control, in the requested [layout], routing user
  * interaction through [onAction]. Lights and fans have a [ControlLayout.Card] form (tap to toggle),
  * climate has a read-only card; every other type renders its row regardless of [layout]. [modifier]
@@ -69,28 +78,19 @@ fun EntityControl(
                 levelCount = entity.metadata.levelCount,
                 percentage = entity.percentage,
             )
+            val onSetSpeed = { pct: Int -> onAction(EntityAction.SetSpeed(entity.entityId, pct)) }
             when (layout) {
                 ControlLayout.Row -> FanControl(
                     ui = fanUi,
-                    onSetSpeed = { pct -> onAction(EntityAction.SetSpeed(entity.entityId, pct)) },
+                    onSetSpeed = onSetSpeed,
                     onToggle = onToggle,
                 )
-                ControlLayout.Card -> {
-                    val icon: @Composable (Color) -> Unit = { tint ->
-                        FanIcon(
-                            spinning = entity.isOn,
-                            durationMs = fanSpinDurationMs(
-                                percentage = entity.percentage,
-                                levelCount = entity.metadata.levelCount,
-                                hasSpeedControl = entity.metadata.levelCount >= 2,
-                            ),
-                            tint = tint,
-                            modifier = Modifier.size(Dimens.RowIconSize),
-                        )
-                    }
-                    val ui = ToggleUi(name = entity.name, isOn = entity.isOn, offline = entity.offline)
-                    EntityToggleCard(ui, AppColors.Accent, onToggle, icon, modifier)
-                }
+                ControlLayout.Card -> FanControlCard(
+                    ui = fanUi,
+                    onSetSpeed = onSetSpeed,
+                    onToggle = onToggle,
+                    modifier = modifier,
+                )
             }
         }
 
