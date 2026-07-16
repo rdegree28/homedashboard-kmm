@@ -48,6 +48,7 @@ data class OfficeUiState(
     val smallLight: EntityUi.Light,
     val officeFan: EntityUi.Fan,
     val boxFan: EntityUi.Fan,
+    val mistingFan: EntityUi.Fan,
     val activeSignal: String?,
     val temperature: EntityUi.Climate,
     val humidity: EntityUi.Climate,
@@ -124,6 +125,7 @@ private fun buildOfficeUiState(
     smallLight = states[OfficeEntities.SMALL_LIGHT].toLight(OfficeEntities.SMALL_LIGHT, "Small"),
     officeFan = states[OfficeEntities.OFFICE_FAN].toFan(OfficeEntities.OFFICE_FAN, "Office Fan"),
     boxFan = states[OfficeEntities.BOX_FAN].toFan(OfficeEntities.BOX_FAN, "Box Fan"),
+    mistingFan = states[OfficeEntities.MISTING_FAN].toFan(OfficeEntities.MISTING_FAN, "Misting Fan"),
     activeSignal = states[OfficeEntities.SIGNAL_MODE]?.state,
     temperature = states[OfficeEntities.TEMPERATURE].toClimate(OfficeEntities.TEMPERATURE, "Temperature", ClimateKind.Temperature),
     humidity = states[OfficeEntities.HUMIDITY]
@@ -155,7 +157,13 @@ private fun EntityState?.toLight(entityId: String, name: String) = EntityUi.Ligh
 
 private fun EntityState?.toFan(entityId: String, name: String): EntityUi.Fan {
     val stepPct = this?.attrDouble("percentage_step")
-    val levelCount = if (stepPct != null && stepPct > 0.0) (100.0 / stepPct).roundToInt() else 0
+
+    val levelCount = when {
+        this?.entityId == OfficeEntities.MISTING_FAN -> 6
+        stepPct != null -> if (stepPct > 0.0) (100.0 / stepPct).roundToInt() else 0
+        else -> 0
+    }
+
     return EntityUi.Fan(
         metadata = EntityMetadata.Fan(entityId, levelCount),
         name = name,

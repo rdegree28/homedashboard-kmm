@@ -7,6 +7,7 @@ object OfficeEntities {
 
     const val OFFICE_FAN = "fan.office_fan_office_fan"
     const val BOX_FAN = "fan.office_box_fan"
+    const val MISTING_FAN = "fan.misting_fan"
 
     const val SIGNAL_MODE = "sensor.office_signal_mode"
     const val TRAFFIC_SIGNAL = "light.office_traffic_signal"

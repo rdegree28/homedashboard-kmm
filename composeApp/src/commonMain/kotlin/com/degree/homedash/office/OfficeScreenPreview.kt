@@ -18,6 +18,7 @@ internal val previewOfficeUiState = OfficeUiState(
     smallLight = EntityUi.Light(EntityMetadata.Light("light.small"), "Small", isOn = false, offline = false),
     officeFan = EntityUi.Fan(EntityMetadata.Fan("fan.office", levelCount = 12), "Office Fan", isOn = true, offline = false, percentage = 75),
     boxFan = EntityUi.Fan(EntityMetadata.Fan("fan.box", levelCount = 0), "Box Fan", isOn = false, offline = false, percentage = 0),
+    mistingFan = EntityUi.Fan(EntityMetadata.Fan("fan.misting", levelCount = 0), "Misting Fan", isOn = false, offline = false, percentage = 0),
     activeSignal = "green",
     temperature = EntityUi.Climate(EntityMetadata.Climate("sensor.temp", ClimateKind.Temperature), "Temperature", "75.6 °F"),
     humidity = EntityUi.Climate(EntityMetadata.Climate("sensor.humidity", ClimateKind.Humidity), "Humidity", "48.5 %", subvalueText = "Dew pt 50.9 °F"),

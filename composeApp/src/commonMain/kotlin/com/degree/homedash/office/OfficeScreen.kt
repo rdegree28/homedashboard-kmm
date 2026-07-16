@@ -85,7 +85,7 @@ fun OfficeContent(
 
         ControlGroup(
             title = "Fans",
-            entities = listOf(ui.officeFan, ui.boxFan),
+            entities = listOf(ui.officeFan, ui.boxFan, ui.mistingFan),
             useCardUis = true,
             onAction = onAction,
         )
