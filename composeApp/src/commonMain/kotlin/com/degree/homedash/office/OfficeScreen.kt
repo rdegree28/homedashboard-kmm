@@ -18,8 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -36,7 +34,6 @@ fun OfficeScreen(
     repository: HomeAssistantRepo,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
-    useCardUis: Boolean = false,
 ) {
     val vm: OfficeViewModel = viewModel { OfficeViewModel(repository) }
     val ui by vm.uiState.collectAsStateWithLifecycle()
@@ -48,14 +45,13 @@ fun OfficeScreen(
         onToggle = vm::toggle,
         onSetFanSpeed = vm::setFanSpeed,
         onSignal = vm::signal,
-        useCardUis = useCardUis,
     )
 }
 
 /**
  * Stateless Office UI — a projected [OfficeUiState] in, all actions out. Rendered by [OfficeScreen]
- * and previews. When [useCardUis] is true, sections that support it (currently Lights) render as
- * a grid of tappable cards instead of rows.
+ * and previews. Lights, Fans, and Climate render as card grids; the remaining sections (Status,
+ * Doors, Workstation) stay as rows.
  */
 @Composable
 fun OfficeContent(
@@ -65,7 +61,6 @@ fun OfficeContent(
     onToggle: (String) -> Unit,
     onSetFanSpeed: (String, Int) -> Unit,
     onSignal: (SignalMode) -> Unit,
-    useCardUis: Boolean = false,
 ) {
     val onAction: (EntityAction) -> Unit = { action ->
         when (action) {
@@ -84,13 +79,14 @@ fun OfficeContent(
         ControlGroup(
             title = "Lights",
             entities = listOf(ui.officeLight, ui.smallLight),
-            useCardUis = useCardUis,
+            useCardUis = true,
             onAction = onAction,
         )
 
         ControlGroup(
             title = "Fans",
             entities = listOf(ui.officeFan, ui.boxFan),
+            useCardUis = true,
             onAction = onAction,
         )
 
@@ -101,6 +97,7 @@ fun OfficeContent(
         ControlGroup(
             title = "Climate",
             entities = listOf(ui.temperature, ui.humidity),
+            useCardUis = true,
             onAction = onAction,
         )
 
@@ -169,16 +166,9 @@ private fun signalColor(mode: SignalMode): Color = when (mode) {
     SignalMode.MEETING -> AppColors.StatusRed
 }
 
-/** Drives [OfficeScreenPreview] twice: rows (false) and card UIs (true). */
-private class UseCardUisProvider : PreviewParameterProvider<Boolean> {
-    override val values = sequenceOf(false, true)
-}
-
 @Preview(widthDp = 380, heightDp = 1700)
 @Composable
-private fun OfficeScreenPreview(
-    @PreviewParameter(UseCardUisProvider::class) useCardUis: Boolean,
-) {
+private fun OfficeScreenPreview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
             OfficeContent(
@@ -188,7 +178,6 @@ private fun OfficeScreenPreview(
                 onToggle = {},
                 onSetFanSpeed = { _, _ -> },
                 onSignal = {},
-                useCardUis = useCardUis,
             )
         }
     }

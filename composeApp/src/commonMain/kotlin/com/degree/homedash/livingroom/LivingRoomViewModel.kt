@@ -8,6 +8,7 @@ import com.degree.homedash.controls.EntityMetadata
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
+import com.degree.homedash.ui.dewPointText
 import com.degree.homedash.ui.formatNumber
 import com.degree.homedash.ui.formatNumberOrSelf
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,7 +17,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlin.math.ln
 import kotlin.math.roundToInt
 
 @Immutable
@@ -89,36 +89,16 @@ private fun EntityState?.toClimate(entityId: String, label: String, kind: Climat
 }
 
 /**
- * Dew point derived from the temperature + relative-humidity sensors (Magnus–Tetens). Displayed in the
- * temperature sensor's own unit (°F/°C). Reads the humidity sensor as an input only — it isn't shown.
- * Shows "—" until both sensors report a usable numeric value.
+ * Dew point derived from the temperature + relative-humidity sensors ([dewPointText], Magnus–Tetens),
+ * shown as a standalone card in the temperature sensor's own unit (°F/°C) with the humidity reading as
+ * a subvalue. Shows "—" until both sensors report a usable numeric value.
  */
 private fun dewPointClimate(tempState: EntityState?, humidityState: EntityState?): EntityUi.Climate {
-    val tempUnit = tempState?.attrString("unit_of_measurement").orEmpty()
-    val fahrenheit = tempUnit.contains("F", ignoreCase = true)
-    val temp = tempState?.state?.toDoubleOrNull()?.takeUnless { tempState.isUnavailable }
     val rh = humidityState?.state?.toDoubleOrNull()?.takeUnless { humidityState.isUnavailable }
-
-    val value = if (temp != null && rh != null && rh > 0.0) {
-        val tempC = if (fahrenheit) (temp - 32.0) * 5.0 / 9.0 else temp
-        val dewC = dewPointCelsius(tempC, rh)
-        val dew = if (fahrenheit) dewC * 9.0 / 5.0 + 32.0 else dewC
-        "${formatNumber(dew, decimals = 1)} $tempUnit".trim()
-    } else {
-        "—"
-    }
     return EntityUi.Climate(
         EntityMetadata.Climate(LivingRoomEntities.HUMIDITY, ClimateKind.DewPoint),
         label = "Dew Point",
-        valueText = value,
+        valueText = dewPointText(tempState, humidityState) ?: "—",
         subvalueText = if (rh != null) "${formatNumber(rh, decimals = 0)}%" else null,
     )
-}
-
-/** Magnus–Tetens dew point in °C from a Celsius temperature and relative humidity percentage (0–100). */
-private fun dewPointCelsius(tempC: Double, rh: Double): Double {
-    val a = 17.62
-    val b = 243.12
-    val gamma = ln(rh / 100.0) + a * tempC / (b + tempC)
-    return b * gamma / (a - gamma)
 }

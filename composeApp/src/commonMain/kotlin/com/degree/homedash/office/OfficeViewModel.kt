@@ -10,6 +10,7 @@ import com.degree.homedash.shared.data.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.network.ConnectionStatus
+import com.degree.homedash.ui.dewPointText
 import com.degree.homedash.ui.formatNumberOrSelf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -125,7 +126,12 @@ private fun buildOfficeUiState(
     boxFan = states[OfficeEntities.BOX_FAN].toFan(OfficeEntities.BOX_FAN, "Box Fan"),
     activeSignal = states[OfficeEntities.SIGNAL_MODE]?.state,
     temperature = states[OfficeEntities.TEMPERATURE].toClimate(OfficeEntities.TEMPERATURE, "Temperature", ClimateKind.Temperature),
-    humidity = states[OfficeEntities.HUMIDITY].toClimate(OfficeEntities.HUMIDITY, "Humidity", ClimateKind.Humidity),
+    humidity = states[OfficeEntities.HUMIDITY]
+        .toClimate(OfficeEntities.HUMIDITY, "Humidity", ClimateKind.Humidity)
+        .copy(
+            subvalueText = dewPointText(states[OfficeEntities.TEMPERATURE], states[OfficeEntities.HUMIDITY])
+                ?.let { "Dew pt $it" },
+        ),
     door = states[OfficeEntities.DOOR].toDoor(OfficeEntities.DOOR, "Office Door"),
     workstation = states[OfficeEntities.WORKSTATION].toToggleUi("Workstation"),
     hexagon = states[OfficeEntities.HEXAGON].toToggleUi("Hexagon Lights"),
