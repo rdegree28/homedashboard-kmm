@@ -65,7 +65,8 @@ internal fun FanControlCard(
 
     Surface(
         shape = RoundedCornerShape(Dimens.CardCorner),
-        color = MaterialTheme.colorScheme.surfaceContainer,
+        color = AppColors.CardBackground,
+        shadowElevation = Dimens.CardElevation,
         modifier = modifier.height(Dimens.EntityCardHeight),
     ) {
         Row(

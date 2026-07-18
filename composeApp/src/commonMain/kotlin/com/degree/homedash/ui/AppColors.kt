@@ -19,6 +19,7 @@ object AppColors {
     val Accent = Color(0xFF4C8DFF) // chart line/fill, fan on
     val LightOn = Color(0xFFFFC107) // light bulb on (amber)
     val WorkstationOn = Color(0xFFFFE135) // workstation on (banana)
+    val CardBackground = Color(0xFF211F26) // single background for all entity cards, regardless of state
     val GridLine = Color(0x22FFFFFF) // chart gridlines
     val ColumbiaBlue = Color(0xFF3458B2) // dashboard header background
     val ColumbiaBlueOn = Color(0xFFFFFFFF) // dark navy text/icons on the header

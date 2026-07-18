@@ -7,7 +7,8 @@ import androidx.compose.ui.unit.dp
 object Dimens {
     val EntityCardHeight: Dp = 100.dp
     val EntityCardPadding: Dp = 14.dp
-    val CardCorner: Dp = 16.dp
+    val CardCorner: Dp = 12.dp
+    val CardElevation: Dp = 1.dp
     val EntityRowHeight: Dp = 52.dp
     val RowIconSize: Dp = 26.dp
     val RowLabelGap: Dp = 16.dp

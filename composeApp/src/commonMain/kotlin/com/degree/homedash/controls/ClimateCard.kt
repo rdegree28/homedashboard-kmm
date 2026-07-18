@@ -42,7 +42,8 @@ internal fun ClimateCard(
 ) {
     Surface(
         shape = RoundedCornerShape(Dimens.CardCorner),
-        color = MaterialTheme.colorScheme.surfaceContainer,
+        color = AppColors.CardBackground,
+        shadowElevation = Dimens.CardElevation,
         modifier = modifier.height(Dimens.EntityCardHeight),
     ) {
         Box(Modifier.fillMaxSize().padding(Dimens.EntityCardPadding)) {

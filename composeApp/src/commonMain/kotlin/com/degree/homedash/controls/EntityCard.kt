@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
+import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 
 /**
@@ -35,7 +36,8 @@ internal fun EntityCard(
         onClick = onClick,
         enabled = enabled,
         shape = RoundedCornerShape(Dimens.CardCorner),
-        color = MaterialTheme.colorScheme.surfaceContainer,
+        color = AppColors.CardBackground,
+        shadowElevation = Dimens.CardElevation,
         modifier = modifier.height(Dimens.EntityCardHeight),
     ) {
         Box(Modifier.fillMaxSize().padding(Dimens.EntityCardPadding)) {
