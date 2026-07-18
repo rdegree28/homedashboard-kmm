@@ -167,51 +167,51 @@ internal fun decimateHistory(points: List<HistoryPoint>, maxPoints: Int = 512): 
     return out
 }
 
+/** One [bucketHistory] time window: its start time plus the time-weighted [average] and [peak] value. */
+internal class HistoryBucket(val timeSeconds: Double, val average: Double, val peak: Double)
+
 /**
- * Averages [points] into fixed [bucketSeconds]-wide time windows, yielding a smooth, low-point series
- * (e.g. hourly averages over a week). Each window's value is the *time-weighted* average: because the
- * readings are stepwise (a value holds until the next sample), a segment contributes to a bucket in
- * proportion to how long it overlaps that bucket — so a value that persists counts more than a brief
- * spike, and clusters of state-changes don't bias the result. Bucket points sit at the window start;
- * a terminal point at the last timestamp extends the final step to the range's end. Empty windows are
- * skipped (the step-after chart holds the prior value across the gap). Returns [points] unchanged when
- * there are fewer than two.
+ * Buckets [points] into fixed [bucketSeconds]-wide time windows (e.g. hourly over a week), returning
+ * each non-empty window's start time, time-weighted average, and peak value — a smooth, low-point
+ * series. The average is *time-weighted* because the readings are stepwise (a value holds until the
+ * next sample), so a segment contributes to a bucket in proportion to how long it overlaps it: a value
+ * that persists counts more than a brief spike, and clusters of state-changes don't bias the result.
+ * The peak is the highest value present at any moment in the window. Empty windows are omitted (a
+ * step-after chart holds the prior value across the gap). Returns one bucket per point when there are
+ * fewer than two.
  */
-internal fun averageHistory(points: List<HistoryPoint>, bucketSeconds: Double = 3600.0): List<HistoryPoint> {
-    if (points.size < 2) return points
+internal fun bucketHistory(points: List<HistoryPoint>, bucketSeconds: Double = 3600.0): List<HistoryBucket> {
+    if (points.size < 2) return points.map { HistoryBucket(it.timeSeconds, it.value, it.value) }
     val minT = points.first().timeSeconds
     val maxT = points.last().timeSeconds
     val span = (maxT - minT).coerceAtLeast(1.0)
     val dur = bucketSeconds.coerceAtLeast(1.0)
-    val buckets = (ceil(span / dur).toInt()).coerceAtLeast(1)
+    val n = (ceil(span / dur).toInt()).coerceAtLeast(1)
 
-    val weight = DoubleArray(buckets)   // total time each bucket has data for
-    val weighted = DoubleArray(buckets) // Σ value·overlap per bucket
+    val weight = DoubleArray(n)   // total time each bucket has data for
+    val weighted = DoubleArray(n) // Σ value·overlap per bucket
+    val peak = DoubleArray(n) { Double.NEGATIVE_INFINITY }
 
     for (i in 0 until points.size - 1) {
         val v = points[i].value
         var t = points[i].timeSeconds
         val segEnd = points[i + 1].timeSeconds
         while (t < segEnd) {
-            val b = (((t - minT) / dur).toInt()).coerceIn(0, buckets - 1)
+            val b = (((t - minT) / dur).toInt()).coerceIn(0, n - 1)
             val chunkEnd = minOf(segEnd, minT + (b + 1) * dur)
             val overlap = chunkEnd - t
             if (overlap <= 0.0) break
             weight[b] += overlap
             weighted[b] += v * overlap
+            if (v > peak[b]) peak[b] = v
             t = chunkEnd
         }
     }
 
-    val out = ArrayList<HistoryPoint>(buckets + 1)
-    var lastAvg = points.first().value
-    for (b in 0 until buckets) {
-        if (weight[b] > 0.0) {
-            lastAvg = weighted[b] / weight[b]
-            out.add(HistoryPoint(timeSeconds = minT + b * dur, value = lastAvg))
-        }
+    val out = ArrayList<HistoryBucket>(n)
+    for (b in 0 until n) {
+        if (weight[b] > 0.0) out.add(HistoryBucket(minT + b * dur, weighted[b] / weight[b], peak[b]))
     }
-    out.add(HistoryPoint(timeSeconds = maxT, value = lastAvg)) // hold the final step to the right edge
     return out
 }
 

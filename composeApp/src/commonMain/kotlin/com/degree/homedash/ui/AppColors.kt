@@ -17,6 +17,7 @@ object AppColors {
     val Wet = Color(0xFF4FC3F7) // humidity, very-wet soil, office card
     val TempWarm = Color(0xFFFF8A65) // temperature
     val Accent = Color(0xFF4C8DFF) // chart line/fill, fan on
+    val PowerPeak = Color(0xFFFFA726) // hourly peak power line (orange)
     val LightOn = Color(0xFFFFC107) // light bulb on (amber)
     val WorkstationOn = Color(0xFFFFE135) // workstation on (banana)
     val CardBackground = Color(0xFF211F26) // single background for all entity cards, regardless of state

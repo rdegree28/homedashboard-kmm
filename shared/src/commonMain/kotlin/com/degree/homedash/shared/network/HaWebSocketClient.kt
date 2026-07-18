@@ -134,6 +134,11 @@ class HaWebSocketClient(
                 if (HaProtocol.messageType(authResp) != "auth_ok") {
                     throw HaException("Authentication failed (${HaProtocol.messageType(authResp)})")
                 }
+
+                // Expose the session BEFORE announcing Connected: consumers react to Connected by firing
+                // requests (e.g. history fetches) through request()/session, so a still-null session here
+                // would make those throw "Not connected" and silently fail.
+                session = this
                 _connection.value = ConnectionStatus.Connected
                 log.i { "connected; seeding states + subscribing" }
 
@@ -141,9 +146,6 @@ class HaWebSocketClient(
                 val statesId = nextId()
                 send(Frame.Text(HaProtocol.encodeGetStates(statesId)))
                 send(Frame.Text(HaProtocol.encodeSubscribeStateChanged(nextId())))
-
-                // 3. Expose this session for outbound service calls.
-                session = this
 
                 // 4. Receive loop (ends when the server/network closes the channel).
                 try {
