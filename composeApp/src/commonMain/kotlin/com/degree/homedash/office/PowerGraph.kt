@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
-import com.degree.homedash.ui.decimateHistory
+import com.degree.homedash.ui.averageHistory
 import kotlin.math.roundToInt
 
 /** A compact area/line chart of numeric history, echoing the old HA Power Usage graph. */
@@ -40,9 +40,9 @@ fun PowerGraph(points: List<HistoryPoint>, modifier: Modifier = Modifier) {
             return@Box
         }
 
-        // Downsample once per data change; a chart can't show more detail than its pixel width, and
-        // this keeps the cached Path build below cheap even for a week of raw meter readings.
-        val data = remember(points) { decimateHistory(points) }
+        // Reduce to hourly time-weighted averages once per data change: fewer, smoother points than the
+        // raw week of meter readings, so the step chart reads clearly instead of a dense comb of spikes.
+        val data = remember(points) { averageHistory(points, bucketSeconds = 3600.0) }
         val maxV = remember(data) { data.maxOf { it.value }.coerceAtLeast(1.0) }
         val minT = data.first().timeSeconds
         val span = remember(data) { (data.last().timeSeconds - minT).coerceAtLeast(1.0) }
@@ -59,16 +59,31 @@ fun PowerGraph(points: List<HistoryPoint>, modifier: Modifier = Modifier) {
                     y = (h - (p.value / maxV) * h).toFloat(),
                 )
 
+                // Power is a stepwise reading — each value holds until the next sample — so connect
+                // samples with a horizontal hold at the previous value then a vertical jump (step-after),
+                // never a diagonal ramp. A rise from 0 to Y stays at 0 until it steps straight up to Y.
+                val offs = data.map { pointAt(it) }
                 val area = Path().apply {
                     moveTo(0f, h)
-                    data.forEach { val o = pointAt(it); lineTo(o.x, o.y) }
+                    offs.forEachIndexed { i, o ->
+                        if (i == 0) {
+                            lineTo(o.x, o.y)
+                        } else {
+                            lineTo(o.x, offs[i - 1].y)
+                            lineTo(o.x, o.y)
+                        }
+                    }
                     lineTo(w, h)
                     close()
                 }
                 val line = Path().apply {
-                    data.forEachIndexed { i, p ->
-                        val o = pointAt(p)
-                        if (i == 0) moveTo(o.x, o.y) else lineTo(o.x, o.y)
+                    offs.forEachIndexed { i, o ->
+                        if (i == 0) {
+                            moveTo(o.x, o.y)
+                        } else {
+                            lineTo(o.x, offs[i - 1].y)
+                            lineTo(o.x, o.y)
+                        }
                     }
                 }
 
