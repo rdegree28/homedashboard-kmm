@@ -3,7 +3,7 @@ package com.degree.homedash
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import com.degree.homedash.shared.data.ConfigStore
-import com.degree.homedash.shared.data.HaConfig
+import com.degree.homedash.shared.api.HaConfig
 import kotlinx.browser.document
 
 @OptIn(ExperimentalComposeUiApi::class)

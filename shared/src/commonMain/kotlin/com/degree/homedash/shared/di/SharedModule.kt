@@ -1,8 +1,8 @@
 package com.degree.homedash.shared.di
 
 import com.degree.homedash.shared.data.ConfigStore
-import com.degree.homedash.shared.data.HomeAssistantRepo
-import com.degree.homedash.shared.network.HaWebSocketClient
+import com.degree.homedash.shared.repo.HomeAssistantRepo
+import com.degree.homedash.shared.api.HaWebSocketClient
 import org.koin.dsl.module
 
 /** Koin module exposing the shared HA core. */

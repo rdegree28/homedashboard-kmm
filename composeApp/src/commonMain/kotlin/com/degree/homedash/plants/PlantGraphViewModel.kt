@@ -4,9 +4,9 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.controls.EntityUi
-import com.degree.homedash.shared.data.HomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.HistoryPoint
-import com.degree.homedash.shared.network.ConnectionStatus
+import com.degree.homedash.shared.api.HaConnectionStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -42,7 +42,7 @@ class PlantGraphViewModel(
         viewModelScope.launch {
             combine(repo.connection, range) { connection, range -> connection to range }
                 .collect { (connection, range) ->
-                    if (connection == ConnectionStatus.Connected) {
+                    if (connection == HaConnectionStatus.Connected) {
                         runCatching { history.value = repo.powerHistory(entityId, hoursBack = range.hoursBack) }
                     }
                 }

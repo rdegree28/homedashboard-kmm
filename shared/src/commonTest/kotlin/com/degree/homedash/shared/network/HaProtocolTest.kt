@@ -1,5 +1,6 @@
 package com.degree.homedash.shared.network
 
+import com.degree.homedash.shared.api.HaProtocol
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull

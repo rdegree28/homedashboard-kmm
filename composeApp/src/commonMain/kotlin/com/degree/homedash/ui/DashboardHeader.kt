@@ -37,13 +37,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.shared.network.ConnectionStatus
+import com.degree.homedash.shared.api.HaConnectionStatus
 
 /**
  * App-wide Home Assistant connection status, provided once at the app root so every
  * [DashboardHeader] can show its status dot without each screen threading it through.
  */
-val LocalConnectionStatus = compositionLocalOf<ConnectionStatus> { ConnectionStatus.Disconnected }
+val LocalHaConnectionStatus = compositionLocalOf<HaConnectionStatus> { HaConnectionStatus.Disconnected }
 
 /**
  * Standard dashboard page layout: a flush, full-bleed [DashboardHeader] above a vertically
@@ -56,7 +56,7 @@ fun DashboardScaffold(
     title: String,
     onBack: (() -> Unit)? = null,
     onOpenSettings: (() -> Unit)? = null,
-    connection: ConnectionStatus = LocalConnectionStatus.current,
+    connection: HaConnectionStatus = LocalHaConnectionStatus.current,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
@@ -73,14 +73,14 @@ fun DashboardScaffold(
  * Shared dashboard header: optional back arrow, title, a [connection] status dot, and an optional
  * Settings (gear) action. A full-width Columbia-blue bar whose background extends up under the status
  * bar (content is inset below it via [WindowInsets.statusBars]), so place it flush at the top of the
- * screen, not inside content padding. [connection] defaults to [LocalConnectionStatus].
+ * screen, not inside content padding. [connection] defaults to [LocalHaConnectionStatus].
  */
 @Composable
 fun DashboardHeader(
     title: String,
     onBack: (() -> Unit)? = null,
     onOpenSettings: (() -> Unit)? = null,
-    connection: ConnectionStatus = LocalConnectionStatus.current,
+    connection: HaConnectionStatus = LocalHaConnectionStatus.current,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -123,11 +123,11 @@ fun DashboardHeader(
 }
 
 /** Connection status → indicator color: green connected, amber connecting, red error, gray offline. */
-private fun connectionColor(status: ConnectionStatus): Color = when (status) {
-    ConnectionStatus.Connected -> AppColors.StatusGreen
-    ConnectionStatus.Connecting -> AppColors.StatusAmber
-    is ConnectionStatus.Error -> AppColors.StatusRed
-    ConnectionStatus.Disconnected -> AppColors.StatusGray
+private fun connectionColor(status: HaConnectionStatus): Color = when (status) {
+    HaConnectionStatus.Connected -> AppColors.StatusGreen
+    HaConnectionStatus.Connecting -> AppColors.StatusAmber
+    is HaConnectionStatus.Error -> AppColors.StatusRed
+    HaConnectionStatus.Disconnected -> AppColors.StatusGray
 }
 
 @Preview
@@ -136,13 +136,13 @@ private fun DashboardHeaderPreview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             // Root screen: gear only, connected.
-            DashboardHeader("Office", onOpenSettings = {}, connection = ConnectionStatus.Connected)
+            DashboardHeader("Office", onOpenSettings = {}, connection = HaConnectionStatus.Connected)
             // Nested screen: back + gear, connecting.
-            DashboardHeader("Plants", onBack = {}, onOpenSettings = {}, connection = ConnectionStatus.Connecting)
+            DashboardHeader("Plants", onBack = {}, onOpenSettings = {}, connection = HaConnectionStatus.Connecting)
             // Graph screen: back only, error.
-            DashboardHeader("Water Level", onBack = {}, connection = ConnectionStatus.Error("timeout"))
+            DashboardHeader("Water Level", onBack = {}, connection = HaConnectionStatus.Error("timeout"))
             // Disconnected (gray), gear only.
-            DashboardHeader("Living Room", onOpenSettings = {}, connection = ConnectionStatus.Disconnected)
+            DashboardHeader("Living Room", onOpenSettings = {}, connection = HaConnectionStatus.Disconnected)
         }
     }
 }

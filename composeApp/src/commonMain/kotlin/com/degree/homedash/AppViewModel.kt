@@ -7,10 +7,10 @@ import com.degree.homedash.shared.data.AuthUser
 import com.degree.homedash.shared.data.ConfigStore
 import com.degree.homedash.shared.data.FeatureFlag
 import com.degree.homedash.shared.data.FeatureFlagDao
-import com.degree.homedash.shared.data.HaConfig
-import com.degree.homedash.shared.data.HomeAssistantRepo
+import com.degree.homedash.shared.api.HaConfig
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.data.Users
-import com.degree.homedash.shared.network.HaWebSocketClient
+import com.degree.homedash.shared.api.HaWebSocketClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

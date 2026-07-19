@@ -1,7 +1,6 @@
-package com.degree.homedash.shared.network
+package com.degree.homedash.shared.api
 
 import co.touchlab.kermit.Logger
-import com.degree.homedash.shared.data.HaConfig
 import com.degree.homedash.shared.model.EntityState
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -26,16 +25,16 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.JsonObject
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Maintains a live connection to Home Assistant's WebSocket API, exposing the current entity
- * states and connection status as [StateFlow]s and reconnecting automatically with backoff.
+ * states and connection status as [kotlinx.coroutines.flow.StateFlow]s and reconnecting automatically with backoff.
  */
 class HaWebSocketClient(
     private val clientFactory: () -> HttpClient = { createHttpClient { install(WebSockets) } },
@@ -46,8 +45,8 @@ class HaWebSocketClient(
     private val _states = MutableStateFlow<Map<String, EntityState>>(emptyMap())
     val states: StateFlow<Map<String, EntityState>> = _states.asStateFlow()
 
-    private val _connection = MutableStateFlow<ConnectionStatus>(ConnectionStatus.Disconnected)
-    val connection: StateFlow<ConnectionStatus> = _connection.asStateFlow()
+    private val _connection = MutableStateFlow<HaConnectionStatus>(HaConnectionStatus.Disconnected)
+    val connection: StateFlow<HaConnectionStatus> = _connection.asStateFlow()
 
     // All `result` messages are re-broadcast here so request() can await its matching id.
     private val results = MutableSharedFlow<String>(extraBufferCapacity = 16)
@@ -64,30 +63,30 @@ class HaWebSocketClient(
     fun start(config: HaConfig) {
         sessionJob?.cancel()
         sessionJob = scope.launch {
-            var backoffMs = 1_000L
+            var backoffMs = 1_000L.milliseconds
             while (isActive) {
                 try {
-                    _connection.value = ConnectionStatus.Connecting
+                    _connection.value = HaConnectionStatus.Connecting
                     runSession(config)
-                    backoffMs = 1_000L
+                    backoffMs = 1_000L.milliseconds
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
                     log.e(e) { "WebSocket session ended with error" }
-                    _connection.value = ConnectionStatus.Error(e.message)
+                    _connection.value = HaConnectionStatus.Error(e.message)
                 }
                 if (!isActive) break
                 delay(backoffMs)
-                backoffMs = (backoffMs * 2).coerceAtMost(15_000L)
+                backoffMs = (backoffMs * 2).coerceAtMost(15_000L.milliseconds)
             }
-            _connection.value = ConnectionStatus.Disconnected
+            _connection.value = HaConnectionStatus.Disconnected
         }
     }
 
     fun stop() {
         sessionJob?.cancel()
         sessionJob = null
-        _connection.value = ConnectionStatus.Disconnected
+        _connection.value = HaConnectionStatus.Disconnected
     }
 
     /** Fire a service call if connected; silently dropped while disconnected. */
@@ -106,7 +105,7 @@ class HaWebSocketClient(
         val id = nextId()
         // Subscribe before sending (UNDISPATCHED) so we can't miss a fast reply.
         val awaiter = async(start = CoroutineStart.UNDISPATCHED) {
-            withTimeout(20_000L) {
+            withTimeout(20_000L.milliseconds) {
                 results.first { HaProtocol.resultId(it) == id }
             }
         }
@@ -139,7 +138,7 @@ class HaWebSocketClient(
                 // requests (e.g. history fetches) through request()/session, so a still-null session here
                 // would make those throw "Not connected" and silently fail.
                 session = this
-                _connection.value = ConnectionStatus.Connected
+                _connection.value = HaConnectionStatus.Connected
                 log.i { "connected; seeding states + subscribing" }
 
                 // 2. Seed current states + subscribe to live changes.
@@ -153,7 +152,7 @@ class HaWebSocketClient(
                         val frame = incoming.receive()
                         if (frame is Frame.Text) handleMessage(frame.readText(), statesId)
                     }
-                } catch (e: ClosedReceiveChannelException) {
+                } catch (_: ClosedReceiveChannelException) {
                     // remote closed the connection; outer loop will reconnect.
                 } finally {
                     session = null

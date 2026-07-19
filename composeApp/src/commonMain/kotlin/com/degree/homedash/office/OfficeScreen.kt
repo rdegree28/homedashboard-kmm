@@ -24,7 +24,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.HexagonControl
 import com.degree.homedash.controls.WorkstationControl
-import com.degree.homedash.shared.data.HomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold

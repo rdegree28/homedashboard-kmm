@@ -4,7 +4,7 @@ import com.degree.homedash.controls.ClimateKind
 import com.degree.homedash.controls.EntityMetadata
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.shared.model.HistoryPoint
-import com.degree.homedash.shared.network.ConnectionStatus
+import com.degree.homedash.shared.api.HaConnectionStatus
 import kotlin.math.sin
 
 // Shared sample data for the Office screen preview.
@@ -13,7 +13,7 @@ internal val previewHistory: List<HistoryPoint> =
     List(48) { i -> HistoryPoint(timeSeconds = i.toDouble(), value = (sin(i * 0.4) * 40 + 55).coerceAtLeast(0.0)) }
 
 internal val previewOfficeUiState = OfficeUiState(
-    connection = ConnectionStatus.Connected,
+    connection = HaConnectionStatus.Connected,
     officeLight = EntityUi.Light(EntityMetadata.Light("light.office"), "Office", isOn = true, offline = false),
     smallLight = EntityUi.Light(EntityMetadata.Light("light.small"), "Small", isOn = false, offline = false),
     officeFan = EntityUi.Fan(EntityMetadata.Fan("fan.office", levelCount = 12), "Office Fan", isOn = true, offline = false, percentage = 75),

@@ -1,10 +1,11 @@
-package com.degree.homedash.shared.data
+package com.degree.homedash.shared.repo
 
+import com.degree.homedash.shared.api.HaConfig
+import com.degree.homedash.shared.api.HaConnectionStatus
+import com.degree.homedash.shared.api.HaProtocol
+import com.degree.homedash.shared.api.HaWebSocketClient
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
-import com.degree.homedash.shared.network.ConnectionStatus
-import com.degree.homedash.shared.network.HaProtocol
-import com.degree.homedash.shared.network.HaWebSocketClient
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -22,7 +23,7 @@ class HomeAssistantRepo(
 ) {
 
     val states: StateFlow<Map<String, EntityState>> = client.states
-    val connection: StateFlow<ConnectionStatus> = client.connection
+    val connection: StateFlow<HaConnectionStatus> = client.connection
 
     fun entity(entityId: String): EntityState? = states.value[entityId]
 
@@ -46,7 +47,8 @@ class HomeAssistantRepo(
     suspend fun setFanPercentage(
         entityId: String,
         percentage: Int,
-    ) = client.callService("fan", "set_percentage", entityId, buildJsonObject { put("percentage", percentage) })
+    ) = client.callService("fan", "set_percentage", entityId,
+        buildJsonObject { put("percentage", percentage) })
 
     suspend fun callService(
         domain: String,

@@ -27,9 +27,9 @@ import com.degree.homedash.pets.WaterGraphScreen
 import com.degree.homedash.plants.PlantGraphScreen
 import com.degree.homedash.plants.PlantsScreen
 import com.degree.homedash.shared.data.FeatureFlag
-import com.degree.homedash.shared.data.HaConfig
+import com.degree.homedash.shared.api.HaConfig
 import com.degree.homedash.shared.data.Users
-import com.degree.homedash.ui.LocalConnectionStatus
+import com.degree.homedash.ui.LocalHaConnectionStatus
 
 @Composable
 fun App(defaultConfig: HaConfig? = null) {
@@ -62,7 +62,7 @@ fun App(defaultConfig: HaConfig? = null) {
 
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-            CompositionLocalProvider(LocalConnectionStatus provides connection) {
+            CompositionLocalProvider(LocalHaConnectionStatus provides connection) {
                 Box(
                     Modifier.windowInsetsPadding(
                         WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),

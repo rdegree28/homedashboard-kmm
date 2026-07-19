@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.degree.homedash.controls.ClimateKind
 import com.degree.homedash.controls.EntityMetadata
 import com.degree.homedash.controls.EntityUi
-import com.degree.homedash.shared.data.HomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.ui.dewPointText
 import com.degree.homedash.ui.formatNumber

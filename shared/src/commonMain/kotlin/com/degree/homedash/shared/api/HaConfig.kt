@@ -1,4 +1,4 @@
-package com.degree.homedash.shared.data
+package com.degree.homedash.shared.api
 
 /** Connection settings for a Home Assistant instance. */
 data class HaConfig(

@@ -6,10 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.degree.homedash.controls.ClimateKind
 import com.degree.homedash.controls.EntityMetadata
 import com.degree.homedash.controls.EntityUi
-import com.degree.homedash.shared.data.HomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
-import com.degree.homedash.shared.network.ConnectionStatus
+import com.degree.homedash.shared.api.HaConnectionStatus
 import com.degree.homedash.ui.dewPointText
 import com.degree.homedash.ui.formatNumberOrSelf
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,7 +43,7 @@ data class DoorUi(val label: String, val statusText: String, val open: Boolean, 
 
 @Immutable
 data class OfficeUiState(
-    val connection: ConnectionStatus,
+    val connection: HaConnectionStatus,
     val officeLight: EntityUi.Light,
     val smallLight: EntityUi.Light,
     val officeFan: EntityUi.Fan,
@@ -80,7 +80,7 @@ class OfficeViewModel(
     init {
         viewModelScope.launch {
             repo.connection.collect { status ->
-                if (status == ConnectionStatus.Connected) {
+                if (status == HaConnectionStatus.Connected) {
                     runCatching {
                         powerHistory.value = repo.powerHistory(OfficeEntities.POWER, hoursBack = 168)
                     }
@@ -109,7 +109,7 @@ class OfficeViewModel(
     }
 
     private companion object {
-        val EMPTY = buildOfficeUiState(emptyMap(), ConnectionStatus.Disconnected, emptyList())
+        val EMPTY = buildOfficeUiState(emptyMap(), HaConnectionStatus.Disconnected, emptyList())
     }
 }
 
@@ -117,7 +117,7 @@ class OfficeViewModel(
 
 private fun buildOfficeUiState(
     states: Map<String, EntityState>,
-    connection: ConnectionStatus,
+    connection: HaConnectionStatus,
     powerHistory: List<HistoryPoint>,
 ) = OfficeUiState(
     connection = connection,

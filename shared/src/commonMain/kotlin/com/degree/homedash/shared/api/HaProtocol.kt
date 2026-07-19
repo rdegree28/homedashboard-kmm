@@ -1,4 +1,4 @@
-package com.degree.homedash.shared.network
+package com.degree.homedash.shared.api
 
 import com.degree.homedash.shared.model.AuthMessage
 import com.degree.homedash.shared.model.CallServiceCommand
@@ -51,7 +51,7 @@ object HaProtocol {
         arr.map { json.decodeFromJsonElement(EntityState.serializer(), it) }
     }.getOrDefault(emptyList())
 
-    /** Parse a `state_changed` event; [StateChanged.newState] is null when the entity was removed. */
+    /** Parse a `state_changed` event; [com.degree.homedash.shared.model.StateChanged.newState] is null when the entity was removed. */
     fun parseStateChanged(text: String): StateChanged? = runCatching {
         val data = json.parseToJsonElement(text).jsonObject["event"]
             ?.jsonObject?.get("data")?.jsonObject ?: return null
