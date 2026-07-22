@@ -36,17 +36,17 @@ import kotlin.time.Duration.Companion.milliseconds
  * Maintains a live connection to Home Assistant's WebSocket API, exposing the current entity
  * states and connection status as [kotlinx.coroutines.flow.StateFlow]s and reconnecting automatically with backoff.
  */
-class HaWebSocketClient(
+internal class HaWebSocketClient(
     private val clientFactory: () -> HttpClient = { createHttpClient { install(WebSockets) } },
-) {
+) : HaClient {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val log = Logger.withTag("HaWebSocketClient")
 
     private val _states = MutableStateFlow<Map<String, EntityState>>(emptyMap())
-    val states: StateFlow<Map<String, EntityState>> = _states.asStateFlow()
+    override val states: StateFlow<Map<String, EntityState>> = _states.asStateFlow()
 
     private val _connection = MutableStateFlow<HaConnectionStatus>(HaConnectionStatus.Disconnected)
-    val connection: StateFlow<HaConnectionStatus> = _connection.asStateFlow()
+    override val connection: StateFlow<HaConnectionStatus> = _connection.asStateFlow()
 
     // All `result` messages are re-broadcast here so request() can await its matching id.
     private val results = MutableSharedFlow<String>(extraBufferCapacity = 16)
@@ -60,7 +60,7 @@ class HaWebSocketClient(
 
     private suspend fun nextId(): Long = idMutex.withLock { ++lastId }
 
-    fun start(config: HaConfig) {
+    override fun start(config: HaConfig) {
         sessionJob?.cancel()
         sessionJob = scope.launch {
             var backoffMs = 1_000L.milliseconds
@@ -83,30 +83,30 @@ class HaWebSocketClient(
         }
     }
 
-    fun stop() {
+    override fun stop() {
         sessionJob?.cancel()
         sessionJob = null
         _connection.value = HaConnectionStatus.Disconnected
     }
 
     /** Fire a service call if connected; silently dropped while disconnected. */
-    suspend fun callService(
+    override suspend fun callService(
         domain: String,
         service: String,
         entityId: String?,
-        serviceData: JsonObject? = null,
+        serviceData: JsonObject?,
     ) {
         val active = session ?: return
-        active.send(Frame.Text(HaProtocol.encodeCallService(nextId(), domain, service, entityId, serviceData)))
+        active.send(Frame.Text(HaProtocolHelper.encodeCallService(nextId(), domain, service, entityId, serviceData)))
     }
 
     /** Send a command (built with the allocated id) and await its matching `result` message. */
-    suspend fun request(buildCommand: (Long) -> String): String = coroutineScope {
+    override suspend fun request(buildCommand: (Long) -> String): String = coroutineScope {
         val id = nextId()
         // Subscribe before sending (UNDISPATCHED) so we can't miss a fast reply.
         val awaiter = async(start = CoroutineStart.UNDISPATCHED) {
             withTimeout(20_000L.milliseconds) {
-                results.first { HaProtocol.resultId(it) == id }
+                results.first { HaProtocolHelper.resultId(it) == id }
             }
         }
         val active = session ?: run {
@@ -127,11 +127,11 @@ class HaWebSocketClient(
                 // 1. Auth handshake.
                 (incoming.receive() as Frame.Text).readText() // auth_required
                 log.i { "auth_required received; sending auth" }
-                send(Frame.Text(HaProtocol.encodeAuth(config.token)))
+                send(Frame.Text(HaProtocolHelper.encodeAuth(config.token)))
                 val authResp = (incoming.receive() as Frame.Text).readText()
-                log.i { "auth response: ${HaProtocol.messageType(authResp)}" }
-                if (HaProtocol.messageType(authResp) != "auth_ok") {
-                    throw HaException("Authentication failed (${HaProtocol.messageType(authResp)})")
+                log.i { "auth response: ${HaProtocolHelper.messageType(authResp)}" }
+                if (HaProtocolHelper.messageType(authResp) != "auth_ok") {
+                    throw HaException("Authentication failed (${HaProtocolHelper.messageType(authResp)})")
                 }
 
                 // Expose the session BEFORE announcing Connected: consumers react to Connected by firing
@@ -143,8 +143,8 @@ class HaWebSocketClient(
 
                 // 2. Seed current states + subscribe to live changes.
                 val statesId = nextId()
-                send(Frame.Text(HaProtocol.encodeGetStates(statesId)))
-                send(Frame.Text(HaProtocol.encodeSubscribeStateChanged(nextId())))
+                send(Frame.Text(HaProtocolHelper.encodeGetStates(statesId)))
+                send(Frame.Text(HaProtocolHelper.encodeSubscribeStateChanged(nextId())))
 
                 // 4. Receive loop (ends when the server/network closes the channel).
                 try {
@@ -168,16 +168,16 @@ class HaWebSocketClient(
         text: String,
         statesId: Long,
     ) {
-        when (HaProtocol.messageType(text)) {
+        when (HaProtocolHelper.messageType(text)) {
             "result" -> {
                 results.tryEmit(text) // let any pending request() match by id
-                if (HaProtocol.resultId(text) == statesId && HaProtocol.isResultSuccess(text)) {
-                    val list = HaProtocol.parseStates(text)
+                if (HaProtocolHelper.resultId(text) == statesId && HaProtocolHelper.isResultSuccess(text)) {
+                    val list = HaProtocolHelper.parseStates(text)
                     if (list.isNotEmpty()) _states.value = list.associateBy { it.entityId }
                 }
             }
             "event" -> {
-                val change = HaProtocol.parseStateChanged(text) ?: return
+                val change = HaProtocolHelper.parseStateChanged(text) ?: return
                 _states.update { current ->
                     if (change.newState == null) current - change.entityId
                     else current + (change.entityId to change.newState)

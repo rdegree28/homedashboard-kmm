@@ -25,7 +25,7 @@ import kotlinx.serialization.json.longOrNull
  * Mirrors the reference handshake in tools/ha-dashboard-loop/ha.mjs.
  * Kept side-effect free so it is fully unit-testable in commonTest.
  */
-object HaProtocol {
+internal object HaProtocolHelper {
     val json: Json = Json {
         ignoreUnknownKeys = true
         encodeDefaults = true

@@ -1,18 +1,18 @@
 package com.degree.homedash.shared.network
 
-import com.degree.homedash.shared.api.HaProtocol
+import com.degree.homedash.shared.api.HaProtocolHelper
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class HaProtocolTest {
+class HaProtocolHelperTest {
 
     @Test
     fun readsMessageType() {
-        assertEquals("auth_required", HaProtocol.messageType("""{"type":"auth_required","ha_version":"x"}"""))
-        assertEquals("auth_ok", HaProtocol.messageType("""{"type":"auth_ok"}"""))
-        assertNull(HaProtocol.messageType("not json"))
+        assertEquals("auth_required", HaProtocolHelper.messageType("""{"type":"auth_required","ha_version":"x"}"""))
+        assertEquals("auth_ok", HaProtocolHelper.messageType("""{"type":"auth_ok"}"""))
+        assertNull(HaProtocolHelper.messageType("not json"))
     }
 
     @Test
@@ -24,10 +24,10 @@ class HaProtocolTest {
             ]}
         """.trimIndent()
 
-        assertTrue(HaProtocol.isResultSuccess(text))
-        assertEquals(2L, HaProtocol.resultId(text))
+        assertTrue(HaProtocolHelper.isResultSuccess(text))
+        assertEquals(2L, HaProtocolHelper.resultId(text))
 
-        val states = HaProtocol.parseStates(text)
+        val states = HaProtocolHelper.parseStates(text)
         assertEquals(2, states.size)
         val light = states.first { it.entityId == "light.office_light" }
         assertTrue(light.isOn)
@@ -47,7 +47,7 @@ class HaProtocolTest {
             }}}
         """.trimIndent()
 
-        val change = HaProtocol.parseStateChanged(text)
+        val change = HaProtocolHelper.parseStateChanged(text)
         assertEquals("fan.office_box_fan", change?.entityId)
         assertEquals("on", change?.newState?.state)
         assertTrue(change?.newState?.isOn == true)
@@ -62,23 +62,23 @@ class HaProtocolTest {
             }}}
         """.trimIndent()
 
-        val change = HaProtocol.parseStateChanged(text)
+        val change = HaProtocolHelper.parseStateChanged(text)
         assertEquals("light.gone", change?.entityId)
         assertNull(change?.newState)
     }
 
     @Test
     fun encodesAuthAndCommands() {
-        val auth = HaProtocol.encodeAuth("TOKEN123")
+        val auth = HaProtocolHelper.encodeAuth("TOKEN123")
         assertTrue(auth.contains("\"auth\""))
         assertTrue(auth.contains("\"access_token\":\"TOKEN123\""))
 
-        val getStates = HaProtocol.encodeGetStates(1)
-        assertEquals("get_states", HaProtocol.messageType(getStates))
-        assertEquals(1L, HaProtocol.resultId(getStates))
+        val getStates = HaProtocolHelper.encodeGetStates(1)
+        assertEquals("get_states", HaProtocolHelper.messageType(getStates))
+        assertEquals(1L, HaProtocolHelper.resultId(getStates))
 
-        val call = HaProtocol.encodeCallService(7, "light", "toggle", "light.office_light")
-        assertEquals("call_service", HaProtocol.messageType(call))
+        val call = HaProtocolHelper.encodeCallService(7, "light", "toggle", "light.office_light")
+        assertEquals("call_service", HaProtocolHelper.messageType(call))
         assertTrue(call.contains("\"domain\":\"light\""))
         assertTrue(call.contains("\"service\":\"toggle\""))
         assertTrue(call.contains("light.office_light"))
@@ -86,7 +86,7 @@ class HaProtocolTest {
 
     @Test
     fun callServiceWithoutEntityOmitsTarget() {
-        val call = HaProtocol.encodeCallService(8, "homeassistant", "restart", entityId = null)
+        val call = HaProtocolHelper.encodeCallService(8, "homeassistant", "restart", entityId = null)
         // explicitNulls=false should drop the null target entirely
         assertTrue(!call.contains("target"))
     }

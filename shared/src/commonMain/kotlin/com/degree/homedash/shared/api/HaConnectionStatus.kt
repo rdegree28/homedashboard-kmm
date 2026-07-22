@@ -10,6 +10,6 @@ sealed interface HaConnectionStatus {
     ) : HaConnectionStatus
 }
 
-class HaException(
+internal class HaException(
     message: String,
 ) : Exception(message)

@@ -10,7 +10,6 @@ import com.degree.homedash.shared.data.FeatureFlagDao
 import com.degree.homedash.shared.api.HaConfig
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.data.Users
-import com.degree.homedash.shared.api.HaWebSocketClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +27,7 @@ class AppViewModel(
     private val configStore: ConfigStore = ConfigStore(),
     private val authDao: AuthDao = AuthDao(),
     private val featureFlagDao: FeatureFlagDao = FeatureFlagDao(),
-    val repository: HomeAssistantRepo = HomeAssistantRepo(HaWebSocketClient()),
+    val repository: HomeAssistantRepo = HomeAssistantRepo.create(),
 ) : ViewModel() {
 
     private val _config = MutableStateFlow(configStore.load() ?: defaultConfig)

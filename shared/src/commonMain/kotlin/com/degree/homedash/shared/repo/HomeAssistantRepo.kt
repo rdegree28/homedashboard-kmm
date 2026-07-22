@@ -2,8 +2,9 @@ package com.degree.homedash.shared.repo
 
 import com.degree.homedash.shared.api.HaConfig
 import com.degree.homedash.shared.api.HaConnectionStatus
-import com.degree.homedash.shared.api.HaProtocol
 import com.degree.homedash.shared.api.HaWebSocketClient
+import com.degree.homedash.shared.api.HomeAssistantApi
+import com.degree.homedash.shared.api.WebSocketHomeAssistantApi
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
 import kotlinx.coroutines.flow.StateFlow
@@ -16,38 +17,38 @@ import kotlin.time.ExperimentalTime
 
 /**
  * High-level entry point for the UI: live entity states + connection status, plus typed actions.
- * Office-specific orchestration lives a layer above (the UI/state-holder).
+ * Talks only to [HomeAssistantApi]; Office-specific orchestration lives a layer above (the UI/state-holder).
  */
-class HomeAssistantRepo(
-    private val client: HaWebSocketClient,
+class HomeAssistantRepo internal constructor(
+    private val api: HomeAssistantApi,
 ) {
 
-    val states: StateFlow<Map<String, EntityState>> = client.states
-    val connection: StateFlow<HaConnectionStatus> = client.connection
+    val states: StateFlow<Map<String, EntityState>> = api.states
+    val connection: StateFlow<HaConnectionStatus> = api.connection
 
     fun entity(entityId: String): EntityState? = states.value[entityId]
 
-    fun connect(config: HaConfig) = client.start(config)
-    fun disconnect() = client.stop()
+    fun connect(config: HaConfig) = api.connect(config)
+    fun disconnect() = api.disconnect()
 
     suspend fun toggle(entityId: String) =
-        client.callService(entityId.substringBefore('.'), "toggle", entityId)
+        api.callService(entityId.substringBefore('.'), "toggle", entityId)
 
     suspend fun turnOn(entityId: String) =
-        client.callService(entityId.substringBefore('.'), "turn_on", entityId)
+        api.callService(entityId.substringBefore('.'), "turn_on", entityId)
 
     suspend fun turnOff(entityId: String) =
-        client.callService(entityId.substringBefore('.'), "turn_off", entityId)
+        api.callService(entityId.substringBefore('.'), "turn_off", entityId)
 
     /** Run a `script.*` entity. */
     suspend fun runScript(scriptEntityId: String) =
-        client.callService("script", "turn_on", scriptEntityId)
+        api.callService("script", "turn_on", scriptEntityId)
 
     /** Set a fan's speed (0–100%). The value arrives back via the entity's `percentage` attribute. */
     suspend fun setFanPercentage(
         entityId: String,
         percentage: Int,
-    ) = client.callService("fan", "set_percentage", entityId,
+    ) = api.callService("fan", "set_percentage", entityId,
         buildJsonObject { put("percentage", percentage) })
 
     suspend fun callService(
@@ -55,9 +56,9 @@ class HomeAssistantRepo(
         service: String,
         entityId: String?,
         serviceData: JsonObject? = null,
-    ) = client.callService(domain, service, entityId, serviceData)
+    ) = api.callService(domain, service, entityId, serviceData)
 
-    /** Fetch [hoursBack] hours of numeric history for [entityId] over the WebSocket. */
+    /** Fetch [hoursBack] hours of numeric history for [entityId], ending now. */
     @OptIn(ExperimentalTime::class)
     suspend fun powerHistory(
         entityId: String,
@@ -65,9 +66,11 @@ class HomeAssistantRepo(
     ): List<HistoryPoint> {
         val end = Clock.System.now()
         val start = end.minus(hoursBack.hours)
-        val text = client.request { id ->
-            HaProtocol.encodeHistory(id, entityId, start.toString(), end.toString())
-        }
-        return HaProtocol.parseHistory(text, entityId)
+        return api.history(entityId, start.toString(), end.toString())
+    }
+
+    companion object {
+        /** The production repository backed by a live Home Assistant WebSocket connection. */
+        fun create(): HomeAssistantRepo = HomeAssistantRepo(WebSocketHomeAssistantApi(HaWebSocketClient()))
     }
 }
