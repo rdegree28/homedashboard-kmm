@@ -1,5 +1,7 @@
 package com.degree.homedash.shared.data
 
+import com.degree.homedash.shared.model.AuthUser
+
 /** Resolves which [FeatureFlag]s are enabled for a given user (local hardcoded rules for now). */
 class FeatureFlagDao {
 

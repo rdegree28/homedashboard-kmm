@@ -30,8 +30,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.shared.data.AuthUser
-import com.degree.homedash.shared.data.Users
+import com.degree.homedash.shared.model.AuthUser
 import com.degree.homedash.ui.AppColors
 
 /**
@@ -124,7 +123,7 @@ fun LoginScreen(
 private fun LoginScreenPreview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
-            LoginScreen(users = Users.all, onLogin = { _, _ -> false })
+            LoginScreen(users = listOf(AuthUser("Rob"), AuthUser("Molly")), onLogin = { _, _ -> false })
         }
     }
 }

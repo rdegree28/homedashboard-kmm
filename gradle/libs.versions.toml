@@ -41,6 +41,7 @@ koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "settings" }
 multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "settings" }
 multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "settings" }
+multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "settings" }
 # Logging
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 # Android

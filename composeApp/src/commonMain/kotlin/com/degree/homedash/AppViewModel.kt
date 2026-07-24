@@ -2,20 +2,20 @@ package com.degree.homedash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.degree.homedash.shared.data.AuthDao
-import com.degree.homedash.shared.data.AuthUser
+import com.degree.homedash.shared.dao.AuthRepo
+import com.degree.homedash.shared.model.AuthUser
 import com.degree.homedash.shared.data.ConfigStore
 import com.degree.homedash.shared.data.FeatureFlag
 import com.degree.homedash.shared.data.FeatureFlagDao
 import com.degree.homedash.shared.api.HaConfig
 import com.degree.homedash.shared.repo.HomeAssistantRepo
-import com.degree.homedash.shared.data.Users
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 /**
  * App-scoped holder for the single Home Assistant connection and the persisted config. Owning these
@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.stateIn
 class AppViewModel(
     defaultConfig: HaConfig? = null,
     private val configStore: ConfigStore = ConfigStore(),
-    private val authDao: AuthDao = AuthDao(),
+    private val authRepo: AuthRepo = AuthRepo.create(),
     private val featureFlagDao: FeatureFlagDao = FeatureFlagDao(),
     val repository: HomeAssistantRepo = HomeAssistantRepo.create(),
 ) : ViewModel() {
@@ -33,14 +33,17 @@ class AppViewModel(
     private val _config = MutableStateFlow(configStore.load() ?: defaultConfig)
     val config: StateFlow<HaConfig?> = _config.asStateFlow()
 
-    private val _currentUser = MutableStateFlow(authDao.load())
-    val currentUser: StateFlow<AuthUser?> = _currentUser.asStateFlow()
+    /** The logged-in user, driven reactively by [AuthRepo] (persisted across launches). */
+    val currentUser: StateFlow<AuthUser?> = authRepo.loadCurrentUser()
+
+    /** The selectable users for the login screen. */
+    val users: List<AuthUser> = authRepo.loadAllUserNames().map(::AuthUser)
 
     /** Feature flags enabled for the current user; recomputed on login/logout. */
     val featureFlags: StateFlow<Set<FeatureFlag>> =
         currentUser
             .map { featureFlagDao.flagsFor(it) }
-            .stateIn(viewModelScope, SharingStarted.Eagerly, featureFlagDao.flagsFor(_currentUser.value))
+            .stateIn(viewModelScope, SharingStarted.Eagerly, featureFlagDao.flagsFor(currentUser.value))
 
     init {
         _config.value?.let { repository.connect(it) }
@@ -53,17 +56,15 @@ class AppViewModel(
         repository.connect(config)
     }
 
-    /** Validate [pin] for [user]; on success persist the session and return true. */
+    /** Validate [pin] for [user]; on success persist the session (which updates [currentUser]) and return true. */
     fun login(user: AuthUser, pin: String): Boolean {
-        if (!Users.validate(user, pin)) return false
-        authDao.save(user)
-        _currentUser.value = user
+        if (!authRepo.validate(user.name, pin)) return false
+        viewModelScope.launch { authRepo.onUserLoggedIn(user.name) }
         return true
     }
 
     /** Clear the persisted session. */
     fun logout() {
-        authDao.clear()
-        _currentUser.value = null
+        viewModelScope.launch { authRepo.onUserLoggedOut() }
     }
 }

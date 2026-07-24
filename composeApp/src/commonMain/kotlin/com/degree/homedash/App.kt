@@ -28,7 +28,6 @@ import com.degree.homedash.plants.PlantGraphScreen
 import com.degree.homedash.plants.PlantsScreen
 import com.degree.homedash.shared.data.FeatureFlag
 import com.degree.homedash.shared.api.HaConfig
-import com.degree.homedash.shared.data.Users
 import com.degree.homedash.ui.LocalHaConnectionStatus
 
 @Composable
@@ -91,7 +90,7 @@ fun App(defaultConfig: HaConfig? = null) {
                         )
 
                         Screen.Login -> LoginScreen(
-                            users = Users.all,
+                            users = appVm.users,
                             onLogin = { user, pin ->
                                 appVm.login(user, pin).also { ok ->
                                     if (ok) {
