@@ -26,7 +26,7 @@ import com.degree.homedash.pets.PetsScreen
 import com.degree.homedash.pets.WaterGraphScreen
 import com.degree.homedash.plants.PlantGraphScreen
 import com.degree.homedash.plants.PlantsScreen
-import com.degree.homedash.shared.data.FeatureFlag
+import com.degree.homedash.shared.model.FeatureFlag
 import com.degree.homedash.shared.api.HaConfig
 import com.degree.homedash.ui.LocalHaConnectionStatus
 

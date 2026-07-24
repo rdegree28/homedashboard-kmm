@@ -5,8 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.degree.homedash.shared.dao.AuthRepo
 import com.degree.homedash.shared.model.AuthUser
 import com.degree.homedash.shared.data.ConfigStore
-import com.degree.homedash.shared.data.FeatureFlag
-import com.degree.homedash.shared.data.FeatureFlagDao
+import com.degree.homedash.shared.model.FeatureFlag
+import com.degree.homedash.shared.dao.FeatureFlagDao
+import com.degree.homedash.shared.dao.FeatureFlagDaoStaticImpl
 import com.degree.homedash.shared.api.HaConfig
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +27,7 @@ class AppViewModel(
     defaultConfig: HaConfig? = null,
     private val configStore: ConfigStore = ConfigStore(),
     private val authRepo: AuthRepo = AuthRepo.create(),
-    private val featureFlagDao: FeatureFlagDao = FeatureFlagDao(),
+    private val featureFlagDao: FeatureFlagDao = FeatureFlagDaoStaticImpl(),
     val repository: HomeAssistantRepo = HomeAssistantRepo.create(),
 ) : ViewModel() {
 
@@ -39,11 +40,14 @@ class AppViewModel(
     /** The selectable users for the login screen. */
     val users: List<AuthUser> = authRepo.loadAllUserNames().map(::AuthUser)
 
-    /** Feature flags enabled for the current user; recomputed on login/logout. */
+    /** Feature flags enabled for the current user (none when logged out); recomputed on login/logout. */
     val featureFlags: StateFlow<Set<FeatureFlag>> =
         currentUser
-            .map { featureFlagDao.flagsFor(it) }
-            .stateIn(viewModelScope, SharingStarted.Eagerly, featureFlagDao.flagsFor(currentUser.value))
+            .map { flagsFor(it) }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, flagsFor(currentUser.value))
+
+    private fun flagsFor(user: AuthUser?): Set<FeatureFlag> =
+        user?.let(featureFlagDao::getFeatureFlagsForUser).orEmpty()
 
     init {
         _config.value?.let { repository.connect(it) }
