@@ -1,5 +1,6 @@
 package com.degree.homedash.ui
 
+import com.degree.homedash.shared.model.EntityState
 import kotlin.math.pow
 import kotlin.math.round
 
@@ -13,3 +14,17 @@ fun formatNumber(value: Double, decimals: Int = 1): String {
 /** Like [formatNumber] but takes a raw string, passing non-numeric values through unchanged. */
 fun formatNumberOrSelf(raw: String, decimals: Int = 1): String =
     raw.toDoubleOrNull()?.let { formatNumber(it, decimals) } ?: raw
+
+/**
+ * An entity's state formatted for display: the reading rounded to [decimals], with its
+ * `unit_of_measurement` appended. A missing entity always reads "—".
+ *
+ * [dashWhenUnavailable] also dashes an entity reporting `unavailable`/`unknown`, which is what most
+ * readouts want. Pass false for sensors that should show whatever HA last reported instead.
+ */
+fun EntityState?.readingText(decimals: Int, dashWhenUnavailable: Boolean = true): String {
+    if (this == null) return "—"
+    if (dashWhenUnavailable && isUnavailable) return "—"
+    val unit = attrString("unit_of_measurement").orEmpty()
+    return "${formatNumberOrSelf(state, decimals)} $unit".trim()
+}

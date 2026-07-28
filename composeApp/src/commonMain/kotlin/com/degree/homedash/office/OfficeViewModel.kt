@@ -12,7 +12,7 @@ import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.api.HaConnectionStatus
 import com.degree.homedash.ui.dewPointText
-import com.degree.homedash.ui.formatNumberOrSelf
+import com.degree.homedash.ui.readingText
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -160,12 +160,5 @@ private fun EntityState?.toToggleUi(name: String) = ToggleUi(
 )
 
 /** Formatted sensor readout. [dashWhenUnavailable] shows "—" for unavailable states. */
-private fun EntityState?.toSensorUi(label: String, decimals: Int, dashWhenUnavailable: Boolean): SensorUi {
-    val unit = this?.attrString("unit_of_measurement").orEmpty()
-    val value = when {
-        this == null -> "—"
-        dashWhenUnavailable && this.isUnavailable -> "—"
-        else -> "${formatNumberOrSelf(state, decimals)} $unit".trim()
-    }
-    return SensorUi(label, value)
-}
+private fun EntityState?.toSensorUi(label: String, decimals: Int, dashWhenUnavailable: Boolean): SensorUi =
+    SensorUi(label, readingText(decimals, dashWhenUnavailable))

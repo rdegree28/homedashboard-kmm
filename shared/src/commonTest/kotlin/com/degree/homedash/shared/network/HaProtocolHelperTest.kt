@@ -3,6 +3,7 @@ package com.degree.homedash.shared.network
 import com.degree.homedash.shared.api.HaProtocolHelper
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
@@ -89,5 +90,43 @@ class HaProtocolHelperTest {
         val call = HaProtocolHelper.encodeCallService(8, "homeassistant", "restart", entityId = null)
         // explicitNulls=false should drop the null target entirely
         assertTrue(!call.contains("target"))
+    }
+
+    @Test
+    fun parseRootRejectsMalformedJson() {
+        assertNull(HaProtocolHelper.parseRoot("not json"))
+        assertNull(HaProtocolHelper.parseRoot("""["an","array"]"""))
+        assertNotNull(HaProtocolHelper.parseRoot("""{"type":"auth_ok"}"""))
+    }
+
+    /**
+     * The receive loop parses a frame once and calls the [kotlinx.serialization.json.JsonObject]
+     * overloads; everything else calls the String ones. They must not drift.
+     */
+    @Test
+    fun jsonObjectOverloadsAgreeWithStringOverloads() {
+        val frames = listOf(
+            """{"id":2,"type":"result","success":true,"result":[
+              {"entity_id":"light.office_light","state":"on","attributes":{"friendly_name":"Office Light"}}
+            ]}""",
+            """{"id":3,"type":"result","success":false,"error":{"code":"x"}}""",
+            """{"type":"event","event":{"event_type":"state_changed","data":{
+              "entity_id":"fan.office_box_fan",
+              "new_state":{"entity_id":"fan.office_box_fan","state":"on","attributes":{}}
+            }}}""",
+            """{"type":"event","event":{"event_type":"state_changed","data":{
+              "entity_id":"light.gone","new_state":null
+            }}}""",
+            """{"type":"auth_ok"}""",
+        )
+
+        for (text in frames) {
+            val root = assertNotNull(HaProtocolHelper.parseRoot(text), text)
+            assertEquals(HaProtocolHelper.messageType(text), HaProtocolHelper.messageType(root), text)
+            assertEquals(HaProtocolHelper.resultId(text), HaProtocolHelper.resultId(root), text)
+            assertEquals(HaProtocolHelper.isResultSuccess(text), HaProtocolHelper.isResultSuccess(root), text)
+            assertEquals(HaProtocolHelper.parseStates(text), HaProtocolHelper.parseStates(root), text)
+            assertEquals(HaProtocolHelper.parseStateChanged(text), HaProtocolHelper.parseStateChanged(root), text)
+        }
     }
 }

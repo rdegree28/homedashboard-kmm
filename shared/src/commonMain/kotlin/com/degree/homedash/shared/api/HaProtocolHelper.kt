@@ -33,28 +33,42 @@ internal object HaProtocolHelper {
         isLenient = true
     }
 
-    fun messageType(text: String): String? = runCatching {
-        json.parseToJsonElement(text).jsonObject["type"]?.jsonPrimitive?.content
+    /**
+     * Parse a frame into its root object, or null if it isn't valid JSON.
+     *
+     * Callers that read more than one field should parse once with this and use the [JsonObject]
+     * overloads below — the `get_states` reply is a few hundred KB, so re-parsing it per field is the
+     * difference between one pass and four.
+     */
+    fun parseRoot(text: String): JsonObject? = runCatching {
+        json.parseToJsonElement(text).jsonObject
     }.getOrNull()
 
-    fun resultId(text: String): Long? = runCatching {
-        json.parseToJsonElement(text).jsonObject["id"]?.jsonPrimitive?.longOrNull
-    }.getOrNull()
+    fun messageType(root: JsonObject): String? = root["type"]?.jsonPrimitive?.contentOrNull
 
-    fun isResultSuccess(text: String): Boolean = runCatching {
-        json.parseToJsonElement(text).jsonObject["success"]?.jsonPrimitive?.booleanOrNull == true
-    }.getOrDefault(false)
+    fun messageType(text: String): String? = parseRoot(text)?.let(::messageType)
+
+    fun resultId(root: JsonObject): Long? = root["id"]?.jsonPrimitive?.longOrNull
+
+    fun resultId(text: String): Long? = parseRoot(text)?.let(::resultId)
+
+    fun isResultSuccess(root: JsonObject): Boolean =
+        root["success"]?.jsonPrimitive?.booleanOrNull == true
+
+    fun isResultSuccess(text: String): Boolean = parseRoot(text)?.let(::isResultSuccess) ?: false
 
     /** Parse the `result` array of a `get_states` response into entity states. */
-    fun parseStates(text: String): List<EntityState> = runCatching {
-        val arr = json.parseToJsonElement(text).jsonObject["result"]?.jsonArray ?: return emptyList()
+    fun parseStates(root: JsonObject): List<EntityState> = runCatching {
+        val arr = root["result"]?.jsonArray ?: return emptyList()
         arr.map { json.decodeFromJsonElement(EntityState.serializer(), it) }
     }.getOrDefault(emptyList())
 
+    fun parseStates(text: String): List<EntityState> =
+        parseRoot(text)?.let(::parseStates) ?: emptyList()
+
     /** Parse a `state_changed` event; [com.degree.homedash.shared.model.StateChanged.newState] is null when the entity was removed. */
-    fun parseStateChanged(text: String): StateChanged? = runCatching {
-        val data = json.parseToJsonElement(text).jsonObject["event"]
-            ?.jsonObject?.get("data")?.jsonObject ?: return null
+    fun parseStateChanged(root: JsonObject): StateChanged? = runCatching {
+        val data = root["event"]?.jsonObject?.get("data")?.jsonObject ?: return null
         val entityId = data["entity_id"]?.jsonPrimitive?.content ?: return null
         val ns = data["new_state"]
         val newState = if (ns == null || ns is JsonNull) {
@@ -64,6 +78,8 @@ internal object HaProtocolHelper {
         }
         StateChanged(entityId, newState)
     }.getOrNull()
+
+    fun parseStateChanged(text: String): StateChanged? = parseRoot(text)?.let(::parseStateChanged)
 
     // --- encoders ---
 

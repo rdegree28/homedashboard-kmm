@@ -9,7 +9,7 @@ import com.degree.homedash.shared.model.entity.LightMetadata
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
 import com.degree.homedash.shared.model.entity.WaterLevelMetadata
 import com.degree.homedash.ui.formatNumber
-import com.degree.homedash.ui.formatNumberOrSelf
+import com.degree.homedash.ui.readingText
 import kotlin.math.roundToInt
 
 /**
@@ -81,10 +81,3 @@ private fun EntityState?.isOffline(): Boolean = this == null || this.isUnavailab
 /** The numeric state, or null when it isn't a usable reading. */
 private fun EntityState?.percentOrNull(): Double? =
     this?.state?.toDoubleOrNull()?.takeUnless { isUnavailable }
-
-/** Formatted reading with its unit — always "—" when there's nothing to report. */
-private fun EntityState?.readingText(decimals: Int): String {
-    if (this == null || isUnavailable) return "—"
-    val unit = attrString("unit_of_measurement").orEmpty()
-    return "${formatNumberOrSelf(state, decimals)} $unit".trim()
-}

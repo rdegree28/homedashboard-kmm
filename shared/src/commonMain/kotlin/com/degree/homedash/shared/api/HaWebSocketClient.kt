@@ -48,8 +48,13 @@ internal class HaWebSocketClient(
     private val _connection = MutableStateFlow<HaConnectionStatus>(HaConnectionStatus.Disconnected)
     override val connection: StateFlow<HaConnectionStatus> = _connection.asStateFlow()
 
-    // All `result` messages are re-broadcast here so request() can await its matching id.
-    private val results = MutableSharedFlow<String>(extraBufferCapacity = 16)
+    // All `result` messages are re-broadcast here so request() can await its matching id. The id is
+    // extracted once by the receive loop: awaiters see every result, so matching on a pre-read id
+    // keeps them from re-parsing each payload (the get_states reply is a few hundred KB).
+    private val results = MutableSharedFlow<ResultMessage>(extraBufferCapacity = 16)
+
+    /** A `result` frame with its id already read off, plus the raw text for the caller to parse. */
+    private data class ResultMessage(val id: Long?, val text: String)
 
     private val idMutex = Mutex()
     private var lastId = 0L
@@ -106,7 +111,7 @@ internal class HaWebSocketClient(
         // Subscribe before sending (UNDISPATCHED) so we can't miss a fast reply.
         val awaiter = async(start = CoroutineStart.UNDISPATCHED) {
             withTimeout(20_000L.milliseconds) {
-                results.first { HaProtocolHelper.resultId(it) == id }
+                results.first { it.id == id }.text
             }
         }
         val active = session ?: run {
@@ -164,20 +169,39 @@ internal class HaWebSocketClient(
         }
     }
 
+    /**
+     * Route one inbound frame. The frame is parsed **once** here and the root object handed to each
+     * reader — [HaProtocolHelper]'s String entry points each parse afresh, which on the `get_states`
+     * reply meant parsing a few hundred KB four times over.
+     */
     private fun handleMessage(
         text: String,
         statesId: Long,
     ) {
-        when (HaProtocolHelper.messageType(text)) {
+        val root = HaProtocolHelper.parseRoot(text)
+        if (root == null) {
+            log.w { "dropping unparseable frame: ${text.summarize()}" }
+            return
+        }
+        when (HaProtocolHelper.messageType(root)) {
             "result" -> {
-                results.tryEmit(text) // let any pending request() match by id
-                if (HaProtocolHelper.resultId(text) == statesId && HaProtocolHelper.isResultSuccess(text)) {
-                    val list = HaProtocolHelper.parseStates(text)
-                    if (list.isNotEmpty()) _states.value = list.associateBy { it.entityId }
+                val id = HaProtocolHelper.resultId(root)
+                results.tryEmit(ResultMessage(id, text)) // let any pending request() match by id
+                if (id == statesId && HaProtocolHelper.isResultSuccess(root)) {
+                    val list = HaProtocolHelper.parseStates(root)
+                    if (list.isNotEmpty()) {
+                        _states.value = list.associateBy { it.entityId }
+                    } else {
+                        log.w { "get_states returned no entities: ${text.summarize()}" }
+                    }
                 }
             }
             "event" -> {
-                val change = HaProtocolHelper.parseStateChanged(text) ?: return
+                val change = HaProtocolHelper.parseStateChanged(root)
+                if (change == null) {
+                    log.w { "unrecognised event frame: ${text.summarize()}" }
+                    return
+                }
                 _states.update { current ->
                     if (change.newState == null) current - change.entityId
                     else current + (change.entityId to change.newState)
@@ -186,3 +210,7 @@ internal class HaWebSocketClient(
         }
     }
 }
+
+/** Frames run to hundreds of KB — never log one whole. */
+private fun String.summarize(limit: Int = 200): String =
+    if (length <= limit) this else "${take(limit)}… (${length} chars)"
