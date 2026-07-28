@@ -5,4 +5,5 @@ package com.degree.homedash.shared.model.entity
  */
 data class LightMetadata(
     override val entityId: String,
+    override val displayName: String,
 ) : EntityMetadata

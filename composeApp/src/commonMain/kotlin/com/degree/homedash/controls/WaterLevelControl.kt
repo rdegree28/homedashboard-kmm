@@ -48,7 +48,7 @@ fun WaterLevelControl(
     ) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = ui.name,
+                text = ui.displayName,
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.titleMedium,
             )

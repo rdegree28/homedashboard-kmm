@@ -7,20 +7,17 @@ import com.degree.homedash.controls.EntityUi
 
 internal val previewLights: List<EntityUi.Light> = listOf(
     EntityUi.Light(
-        metadata = LightMetadata(LivingRoomEntities.LIVING_ROOM_LIGHT_WEST),
-        name = "Ceiling",
+        metadata = LightMetadata(LivingRoomEntities.LIVING_ROOM_LIGHT_WEST, "Ceiling"),
         isOn = true,
         offline = false,
     ),
     EntityUi.Light(
-        metadata = LightMetadata(LivingRoomEntities.LIVING_ROOM_LIGHT_EAST),
-        name = "Lamp",
+        metadata = LightMetadata(LivingRoomEntities.LIVING_ROOM_LIGHT_EAST, "Lamp"),
         isOn = false,
         offline = false,
     ),
     EntityUi.Light(
-        metadata = LightMetadata(LivingRoomEntities.HOMEWORK_LIGHT),
-        name = "Accent",
+        metadata = LightMetadata(LivingRoomEntities.HOMEWORK_LIGHT, "Accent"),
         isOn = false,
         offline = true,
     ),
@@ -28,15 +25,13 @@ internal val previewLights: List<EntityUi.Light> = listOf(
 
 internal val previewFans: List<EntityUi.Fan> = listOf(
     EntityUi.Fan(
-        metadata = FanMetadata(LivingRoomEntities.LIVING_ROOM_FAN, levelCount = 12),
-        name = "Fan",
+        metadata = FanMetadata(LivingRoomEntities.LIVING_ROOM_FAN, "Fan", FanMetadata.SpeedAdjustment(12)),
         isOn = true,
         offline = false,
         percentage = 75,
     ),
     EntityUi.Fan(
-        metadata = FanMetadata(LivingRoomEntities.LIVING_ROOM_BOX_FAN, levelCount = 3),
-        name = "Ceiling Fan",
+        metadata = FanMetadata(LivingRoomEntities.LIVING_ROOM_BOX_FAN, "Ceiling Fan", FanMetadata.SpeedAdjustment(3)),
         isOn = false,
         offline = false,
         percentage = 0,
@@ -45,13 +40,11 @@ internal val previewFans: List<EntityUi.Fan> = listOf(
 
 internal val previewClimate: List<EntityUi.Climate> = listOf(
     EntityUi.Climate(
-        metadata = ClimateMetadata(LivingRoomEntities.TEMPERATURE, ClimateMetadata.ClimateKind.Temperature),
-        label = "Temperature",
+        metadata = ClimateMetadata(LivingRoomEntities.TEMPERATURE, "Temperature", ClimateMetadata.ClimateKind.Temperature),
         valueText = "72.5 °F",
     ),
     EntityUi.Climate(
-        metadata = ClimateMetadata(LivingRoomEntities.HUMIDITY, ClimateMetadata.ClimateKind.DewPoint),
-        label = "Dew Point",
+        metadata = ClimateMetadata(LivingRoomEntities.HUMIDITY, "Dew Point", ClimateMetadata.ClimateKind.DewPoint),
         valueText = "50.9 °F (48%)",
     ),
 )

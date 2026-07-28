@@ -6,4 +6,5 @@ package com.degree.homedash.shared.model.entity
  */
 data class SoilMoistureMetadata(
     override val entityId: String,
+    override val displayName: String,
 ) : EntityMetadata

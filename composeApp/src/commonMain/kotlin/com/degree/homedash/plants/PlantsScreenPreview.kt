@@ -9,8 +9,7 @@ import kotlin.math.sin
 
 internal val previewPlants: List<EntityUi.SoilMoisture> = listOf(
     EntityUi.SoilMoisture(
-        metadata = SoilMoistureMetadata("sensor.louie_moisture_sensor_soil_moisture"),
-        name = "Louie",
+        metadata = SoilMoistureMetadata("sensor.louie_moisture_sensor_soil_moisture", "Louie"),
         pct = 58.0,
         valueText = "58 %",
     ),

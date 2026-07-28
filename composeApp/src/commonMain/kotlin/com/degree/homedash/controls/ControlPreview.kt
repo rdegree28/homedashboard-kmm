@@ -42,8 +42,7 @@ internal fun previewLight(
     isOn: Boolean = false,
     offline: Boolean = false,
 ) = EntityUi.Light(
-    metadata = LightMetadata("light.${name.lowercase()}"),
-    name = name,
+    metadata = LightMetadata("light.${name.lowercase()}", name),
     isOn = isOn,
     offline = offline,
 )
@@ -63,8 +62,11 @@ internal fun previewFanUi(
     percentage: Int = 0,
     levelCount: Int = 0,
 ) = EntityUi.Fan(
-    metadata = FanMetadata("fan.${name.lowercase()}", levelCount = levelCount),
-    name = name,
+    metadata = FanMetadata(
+        "fan.${name.lowercase()}",
+        name,
+        FanMetadata.SpeedAdjustment.forLevelCount(levelCount),
+    ),
     isOn = isOn,
     offline = offline,
     percentage = percentage,
@@ -75,7 +77,6 @@ internal fun previewClimate(
     valueText: String,
     kind: ClimateMetadata.ClimateKind,
 ) = EntityUi.Climate(
-    metadata = ClimateMetadata("sensor.${label.lowercase()}", kind = kind),
-    label = label,
+    metadata = ClimateMetadata("sensor.${label.lowercase()}", label, kind = kind),
     valueText = valueText,
 )

@@ -3,11 +3,10 @@ package com.degree.homedash.pets
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
+import com.degree.homedash.controls.toEntityUis
+import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
-import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.ui.formatNumber
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -22,30 +21,15 @@ data class PetsUiState(
 /** Projects the configured Pets sensors (the cat water fountain) into [PetsUiState]. */
 class PetsViewModel(
     private val repo: HomeAssistantRepo,
+    metadataRepo: EntityMetadataRepo = EntityMetadataRepo(),
 ) : ViewModel() {
+
+    /** The screen's roster; static, so it's read once rather than on every state push. */
+    private val entities = metadataRepo.loadPetsEntityMetadataList()
 
     val uiState: StateFlow<PetsUiState> =
         repo.states
-            .map { states ->
-                PetsUiState(listOfNotNull(states[PetsEntities.CAT_WATER_LEVEL]?.toWaterLevel()))
-            }
+            .map { states -> PetsUiState(entities.toEntityUis(states).filterIsInstance<EntityUi.WaterLevel>()) }
             .distinctUntilChanged()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PetsUiState(emptyList()))
-}
-
-/** Projects a percentage-level entity into its UI model (shared by the list and the graph screen). */
-internal fun EntityState.toWaterLevel(): EntityUi.WaterLevel {
-    val pct = state.toDoubleOrNull()?.takeUnless { isUnavailable }
-    return EntityUi.WaterLevel(
-        metadata = WaterLevelMetadata(entityId),
-        name = feederName(this),
-        pct = pct,
-        valueText = pct?.let { "${formatNumber(it, decimals = 0)} %" } ?: "—",
-    )
-}
-
-/** Friendly name with a trailing level/percentage qualifier stripped for a clean title. */
-internal fun feederName(entity: EntityState): String {
-    val raw = entity.friendlyName ?: entity.entityId.substringAfter('.').replace('_', ' ')
-    return "Remaining Water"
 }

@@ -6,4 +6,5 @@ package com.degree.homedash.shared.model.entity
  */
 data class WaterLevelMetadata(
     override val entityId: String,
+    override val displayName: String,
 ) : EntityMetadata

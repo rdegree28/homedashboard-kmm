@@ -78,14 +78,14 @@ fun OfficeContent(
     ) {
         ControlGroup(
             title = "Lights",
-            entities = listOf(ui.officeLight, ui.smallLight),
+            entities = ui.lights,
             useCardUis = true,
             onAction = onAction,
         )
 
         ControlGroup(
             title = "Fans",
-            entities = listOf(ui.officeFan, ui.boxFan, ui.mistingFan),
+            entities = ui.fans,
             useCardUis = true,
             onAction = onAction,
         )
@@ -96,14 +96,14 @@ fun OfficeContent(
 
         ControlGroup(
             title = "Climate",
-            entities = listOf(ui.temperature, ui.humidity),
+            entities = ui.climate,
             useCardUis = true,
             onAction = onAction,
         )
 
         ControlGroup(
             title = "Doors",
-            entities = listOf(ui.door),
+            entities = ui.doors,
             onAction = onAction,
         )
 

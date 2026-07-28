@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
+import com.degree.homedash.controls.toEntityUis
+import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
@@ -18,7 +20,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 // --- UI models: small immutable projections the Office composables render (no raw EntityState). ---
 
@@ -43,15 +44,11 @@ data class DoorUi(val label: String, val statusText: String, val open: Boolean, 
 @Immutable
 data class OfficeUiState(
     val connection: HaConnectionStatus,
-    val officeLight: EntityUi.Light,
-    val smallLight: EntityUi.Light,
-    val officeFan: EntityUi.Fan,
-    val boxFan: EntityUi.Fan,
-    val mistingFan: EntityUi.Fan,
+    val lights: List<EntityUi.Light>,
+    val fans: List<EntityUi.Fan>,
+    val climate: List<EntityUi.Climate>,
+    val doors: List<EntityUi.Door>,
     val activeSignal: String?,
-    val temperature: EntityUi.Climate,
-    val humidity: EntityUi.Climate,
-    val door: EntityUi.Door,
     val workstation: ToggleUi,
     val hexagon: ToggleUi,
     val power: SensorUi,
@@ -65,13 +62,17 @@ data class OfficeUiState(
  */
 class OfficeViewModel(
     private val repo: HomeAssistantRepo,
+    metadataRepo: EntityMetadataRepo = EntityMetadataRepo(),
 ) : ViewModel() {
 
     private val powerHistory = MutableStateFlow<List<HistoryPoint>>(emptyList())
 
+    /** The screen's roster; static, so it's read once rather than on every state push. */
+    private val entities = metadataRepo.loadOfficeEntityMetadataList()
+
     val uiState: StateFlow<OfficeUiState> =
         combine(repo.states, repo.connection, powerHistory) { states, connection, history ->
-            buildOfficeUiState(states, connection, history)
+            buildOfficeUiState(entities, states, connection, history)
         }
             .distinctUntilChanged()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EMPTY)
@@ -108,79 +109,55 @@ class OfficeViewModel(
     }
 
     private companion object {
-        val EMPTY = buildOfficeUiState(emptyMap(), HaConnectionStatus.Disconnected, emptyList())
+        val EMPTY = buildOfficeUiState(emptyList(), emptyMap(), HaConnectionStatus.Disconnected, emptyList())
     }
 }
 
 // --- Projection helpers ---
 
 private fun buildOfficeUiState(
+    entities: List<EntityMetadata>,
     states: Map<String, EntityState>,
     connection: HaConnectionStatus,
     powerHistory: List<HistoryPoint>,
-) = OfficeUiState(
-    connection = connection,
-    officeLight = states[OfficeEntities.OFFICE_LIGHT].toLight(OfficeEntities.OFFICE_LIGHT, "Office"),
-    smallLight = states[OfficeEntities.SMALL_LIGHT].toLight(OfficeEntities.SMALL_LIGHT, "Small"),
-    officeFan = states[OfficeEntities.OFFICE_FAN].toFan(OfficeEntities.OFFICE_FAN, "Office Fan"),
-    boxFan = states[OfficeEntities.BOX_FAN].toFan(OfficeEntities.BOX_FAN, "Box Fan"),
-    mistingFan = states[OfficeEntities.MISTING_FAN].toFan(OfficeEntities.MISTING_FAN, "Misting Fan"),
-    activeSignal = states[OfficeEntities.SIGNAL_MODE]?.state,
-    temperature = states[OfficeEntities.TEMPERATURE].toClimate(OfficeEntities.TEMPERATURE, "Temperature", ClimateMetadata.ClimateKind.Temperature),
-    humidity = states[OfficeEntities.HUMIDITY]
-        .toClimate(OfficeEntities.HUMIDITY, "Humidity", ClimateMetadata.ClimateKind.Humidity)
-        .copy(
-            subvalueText = dewPointText(states[OfficeEntities.TEMPERATURE], states[OfficeEntities.HUMIDITY])
-                ?.let { "Dew pt $it" },
-        ),
-    door = states[OfficeEntities.DOOR].toDoor(OfficeEntities.DOOR, "Office Door"),
-    workstation = states[OfficeEntities.WORKSTATION].toToggleUi("Workstation"),
-    hexagon = states[OfficeEntities.HEXAGON].toToggleUi("Hexagon Lights"),
-    power = states[OfficeEntities.POWER].toSensorUi("Power", decimals = 2, dashWhenUnavailable = false),
-    energy = states[OfficeEntities.ENERGY].toSensorUi("Total Power Used", decimals = 2, dashWhenUnavailable = false),
-    powerHistory = powerHistory,
-)
+): OfficeUiState {
+    val uis = entities.toEntityUis(states)
+    return OfficeUiState(
+        connection = connection,
+        lights = uis.filterIsInstance<EntityUi.Light>(),
+        fans = uis.filterIsInstance<EntityUi.Fan>(),
+        climate = uis.filterIsInstance<EntityUi.Climate>().withDewPointSubvalue(states),
+        doors = uis.filterIsInstance<EntityUi.Door>(),
+        activeSignal = states[OfficeEntities.SIGNAL_MODE]?.state,
+        // The remaining Office controls have no EntityMetadata type, so they stay hand-wired.
+        workstation = states[OfficeEntities.WORKSTATION].toToggleUi("Workstation"),
+        hexagon = states[OfficeEntities.HEXAGON].toToggleUi("Hexagon Lights"),
+        power = states[OfficeEntities.POWER].toSensorUi("Power", decimals = 2, dashWhenUnavailable = false),
+        energy = states[OfficeEntities.ENERGY].toSensorUi("Total Power Used", decimals = 2, dashWhenUnavailable = false),
+        powerHistory = powerHistory,
+    )
+}
+
+/**
+ * Office shows dew point as a subvalue under the humidity reading (rather than as its own card, the
+ * way the Living Room does) — it needs both sensors, so it can't come from a single-entity projection.
+ */
+private fun List<EntityUi.Climate>.withDewPointSubvalue(states: Map<String, EntityState>): List<EntityUi.Climate> {
+    val dewPoint = dewPointText(states[OfficeEntities.TEMPERATURE], states[OfficeEntities.HUMIDITY]) ?: return this
+    return map { climate ->
+        if (climate.metadata.kind == ClimateMetadata.ClimateKind.Humidity) {
+            climate.copy(subvalueText = "Dew pt $dewPoint")
+        } else {
+            climate
+        }
+    }
+}
 
 private fun EntityState?.toToggleUi(name: String) = ToggleUi(
     name = name,
     isOn = this?.isOn == true,
     offline = this == null || this.isUnavailable,
 )
-
-private fun EntityState?.toLight(entityId: String, name: String) = EntityUi.Light(
-    metadata = LightMetadata(entityId),
-    name = name,
-    isOn = this?.isOn == true,
-    offline = this == null || this.isUnavailable,
-)
-
-private fun EntityState?.toFan(entityId: String, name: String): EntityUi.Fan {
-    val stepPct = this?.attrDouble("percentage_step")
-
-    val levelCount = when {
-        this?.entityId == OfficeEntities.MISTING_FAN -> 6
-        stepPct != null -> if (stepPct > 0.0) (100.0 / stepPct).roundToInt() else 0
-        else -> 0
-    }
-
-    return EntityUi.Fan(
-        metadata = FanMetadata(entityId, levelCount),
-        name = name,
-        isOn = this?.isOn == true,
-        offline = this == null || this.isUnavailable,
-        percentage = this?.attrDouble("percentage")?.roundToInt() ?: 0,
-    )
-}
-
-/** Formatted climate readout — always shows "—" when unavailable. */
-private fun EntityState?.toClimate(entityId: String, label: String, kind: ClimateMetadata.ClimateKind): EntityUi.Climate {
-    val unit = this?.attrString("unit_of_measurement").orEmpty()
-    val value = when {
-        this == null || this.isUnavailable -> "—"
-        else -> "${formatNumberOrSelf(state, decimals = 1)} $unit".trim()
-    }
-    return EntityUi.Climate(ClimateMetadata(entityId, kind), label = label, valueText = value)
-}
 
 /** Formatted sensor readout. [dashWhenUnavailable] shows "—" for unavailable states. */
 private fun EntityState?.toSensorUi(label: String, decimals: Int, dashWhenUnavailable: Boolean): SensorUi {
@@ -191,15 +168,4 @@ private fun EntityState?.toSensorUi(label: String, decimals: Int, dashWhenUnavai
         else -> "${formatNumberOrSelf(state, decimals)} $unit".trim()
     }
     return SensorUi(label, value)
-}
-
-private fun EntityState?.toDoor(entityId: String, label: String): EntityUi.Door {
-    val unavailable = this == null || this.isUnavailable
-    val open = this?.state == "on" // device_class opening: on = open
-    val status = when {
-        unavailable -> "—"
-        open -> "Open"
-        else -> "Closed"
-    }
-    return EntityUi.Door(DoorMetadata(entityId), label = label, statusText = status, open = open, unavailable = unavailable)
 }

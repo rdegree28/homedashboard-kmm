@@ -6,6 +6,7 @@ package com.degree.homedash.shared.model.entity
  */
 data class ClimateMetadata(
     override val entityId: String,
+    override val displayName: String,
     val kind: ClimateKind,
 ) : EntityMetadata {
 

@@ -5,18 +5,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
+import com.degree.homedash.controls.toEntityUis
+import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.ui.dewPointText
 import com.degree.homedash.ui.formatNumber
-import com.degree.homedash.ui.formatNumberOrSelf
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 @Immutable
 data class LivingRoomUiState(
@@ -28,27 +28,20 @@ data class LivingRoomUiState(
 /** Projects the configured Living Room lights into [LivingRoomUiState]. */
 class LivingRoomViewModel(
     private val repo: HomeAssistantRepo,
+    metadataRepo: EntityMetadataRepo = EntityMetadataRepo(),
 ) : ViewModel() {
+
+    /** The screen's roster; static, so it's read once rather than on every state push. */
+    private val entities = metadataRepo.loadLivingRoomEntityMetadataList()
 
     val uiState: StateFlow<LivingRoomUiState> =
         repo.states
             .map { states ->
+                val uis = entities.toEntityUis(states)
                 LivingRoomUiState(
-                    lights = listOf(
-                        states[LivingRoomEntities.LIVING_ROOM_LIGHT_WEST].toLight(LivingRoomEntities.LIVING_ROOM_LIGHT_WEST, "West"),
-                        states[LivingRoomEntities.LIVING_ROOM_LIGHT_EAST].toLight(LivingRoomEntities.LIVING_ROOM_LIGHT_EAST, "East"),
-                        states[LivingRoomEntities.HOMEWORK_LIGHT].toLight(LivingRoomEntities.HOMEWORK_LIGHT, "Homework"),
-                        states[LivingRoomEntities.DINING_LIGHT].toLight(LivingRoomEntities.DINING_LIGHT, "Dining Ceiling"),
-                        states[LivingRoomEntities.KITCHEN_STOVE_LIGHT].toLight(LivingRoomEntities.KITCHEN_STOVE_LIGHT, "Kitchen Stove"),
-                    ),
-                    fans = listOf(
-                        states[LivingRoomEntities.LIVING_ROOM_FAN].toFan(LivingRoomEntities.LIVING_ROOM_FAN, "Fan"),
-                        states[LivingRoomEntities.LIVING_ROOM_BOX_FAN].toFan(LivingRoomEntities.LIVING_ROOM_BOX_FAN, "Box Fan"),
-                    ),
-                    climate = listOf(
-                        states[LivingRoomEntities.TEMPERATURE].toClimate(LivingRoomEntities.TEMPERATURE, "Temperature", ClimateMetadata.ClimateKind.Temperature),
-                            dewPointClimate(states[LivingRoomEntities.TEMPERATURE], states[LivingRoomEntities.HUMIDITY]),
-                    ),
+                    lights = uis.filterIsInstance<EntityUi.Light>(),
+                    fans = uis.filterIsInstance<EntityUi.Fan>(),
+                    climate = uis.filterIsInstance<EntityUi.Climate>().withDewPoint(states),
                 )
             }
             .distinctUntilChanged()
@@ -59,32 +52,17 @@ class LivingRoomViewModel(
     }
 }
 
-private fun EntityState?.toLight(entityId: String, name: String) = EntityUi.Light(
-    metadata = LightMetadata(entityId),
-    name = name,
-    isOn = this?.isOn == true,
-    offline = this == null || this.isUnavailable,
-)
-
-private fun EntityState?.toFan(entityId: String, name: String): EntityUi.Fan {
-    val stepPct = this?.attrDouble("percentage_step")
-    val levelCount = if (stepPct != null && stepPct > 0.0) (100.0 / stepPct).roundToInt() else 0
-    return EntityUi.Fan(
-        metadata = FanMetadata(entityId, levelCount),
-        name = name,
-        isOn = this?.isOn == true,
-        offline = this == null || this.isUnavailable,
-        percentage = this?.attrDouble("percentage")?.roundToInt() ?: 0,
-    )
-}
-
-private fun EntityState?.toClimate(entityId: String, label: String, kind: ClimateMetadata.ClimateKind): EntityUi.Climate {
-    val unit = this?.attrString("unit_of_measurement").orEmpty()
-    val value = when {
-        this == null || this.isUnavailable -> "—"
-        else -> "${formatNumberOrSelf(state, decimals = 1)} $unit".trim()
+/**
+ * Fills in the dew point card, which needs both the temperature and humidity sensors and so can't come
+ * from a single-entity projection — the roster's [ClimateMetadata.ClimateKind.DewPoint] entry arrives
+ * holding the raw humidity reading, and this swaps in the computed value.
+ */
+private fun List<EntityUi.Climate>.withDewPoint(states: Map<String, EntityState>): List<EntityUi.Climate> = map { climate ->
+    if (climate.metadata.kind == ClimateMetadata.ClimateKind.DewPoint) {
+        dewPointClimate(climate.metadata, states[LivingRoomEntities.TEMPERATURE], states[LivingRoomEntities.HUMIDITY])
+    } else {
+        climate
     }
-    return EntityUi.Climate(ClimateMetadata(entityId, kind), label = label, valueText = value)
 }
 
 /**
@@ -92,11 +70,14 @@ private fun EntityState?.toClimate(entityId: String, label: String, kind: Climat
  * shown as a standalone card in the temperature sensor's own unit (°F/°C) with the humidity reading as
  * a subvalue. Shows "—" until both sensors report a usable numeric value.
  */
-private fun dewPointClimate(tempState: EntityState?, humidityState: EntityState?): EntityUi.Climate {
+private fun dewPointClimate(
+    metadata: ClimateMetadata,
+    tempState: EntityState?,
+    humidityState: EntityState?,
+): EntityUi.Climate {
     val rh = humidityState?.state?.toDoubleOrNull()?.takeUnless { humidityState.isUnavailable }
     return EntityUi.Climate(
-        ClimateMetadata(LivingRoomEntities.HUMIDITY, ClimateMetadata.ClimateKind.DewPoint),
-        label = "Dew Point",
+        metadata = metadata,
         valueText = dewPointText(tempState, humidityState) ?: "—",
         subvalueText = if (rh != null) "${formatNumber(rh, decimals = 0)}%" else null,
     )

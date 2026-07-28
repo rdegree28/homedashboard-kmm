@@ -8,8 +8,7 @@ import com.degree.homedash.shared.model.HistoryPoint
 
 internal val previewLevels: List<EntityUi.WaterLevel> = listOf(
     EntityUi.WaterLevel(
-        metadata = WaterLevelMetadata(PetsEntities.CAT_WATER_LEVEL),
-        name = "Remaining Water",
+        metadata = WaterLevelMetadata(PetsEntities.CAT_WATER_LEVEL, "Remaining Water"),
         pct = 68.0,
         valueText = "68 %",
     ),

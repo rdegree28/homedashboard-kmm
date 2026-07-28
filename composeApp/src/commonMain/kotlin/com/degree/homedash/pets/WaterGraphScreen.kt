@@ -22,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.degree.homedash.controls.WaterLevelControl
 import com.degree.homedash.controls.waterLevelColor
 import com.degree.homedash.plants.TimeRange
+import com.degree.homedash.controls.displayName
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
@@ -42,7 +43,7 @@ fun WaterGraphContent(
     onRangeChange: (TimeRange) -> Unit,
     onBack: () -> Unit,
 ) {
-    DashboardScaffold(title = ui.item?.name ?: "Water Level", onBack = onBack) {
+    DashboardScaffold(title = ui.item?.displayName ?: "Water Level", onBack = onBack) {
         ControlGroup("Water Level") {
             ui.item?.let { WaterLevelControl(it) }
             Spacer(Modifier.height(8.dp))

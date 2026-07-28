@@ -4,7 +4,10 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.controls.EntityUi
+import com.degree.homedash.controls.toEntityUi
 import com.degree.homedash.plants.TimeRange
+import com.degree.homedash.shared.model.entity.WaterLevelMetadata
+import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.api.HaConnectionStatus
@@ -27,14 +30,23 @@ data class WaterGraphUiState(
 class WaterGraphViewModel(
     private val repo: HomeAssistantRepo,
     private val entityId: String,
+    metadataRepo: EntityMetadataRepo = EntityMetadataRepo(),
 ) : ViewModel() {
+
+    /** The graphed entity's descriptor, so this screen's title matches the Pets list it was opened from. */
+    private val metadata: WaterLevelMetadata =
+        metadataRepo.loadPetsEntityMetadataList()
+            .filterIsInstance<WaterLevelMetadata>()
+            .firstOrNull { it.entityId == entityId }
+            ?: WaterLevelMetadata(entityId, "Water Level")
 
     private val range = MutableStateFlow(TimeRange.DAY)
     private val history = MutableStateFlow<List<HistoryPoint>>(emptyList())
 
     val uiState: StateFlow<WaterGraphUiState> =
         combine(repo.states, range, history) { states, range, history ->
-            WaterGraphUiState(item = states[entityId]?.toWaterLevel(), history = history, range = range)
+            val item = states[entityId]?.let { metadata.toEntityUi(it) as EntityUi.WaterLevel }
+            WaterGraphUiState(item = item, history = history, range = range)
         }
             .distinctUntilChanged()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), WaterGraphUiState(null, emptyList(), TimeRange.DAY))

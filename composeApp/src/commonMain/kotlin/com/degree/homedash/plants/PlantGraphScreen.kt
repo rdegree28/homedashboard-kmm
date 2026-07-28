@@ -21,6 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.degree.homedash.controls.SoilMoistureControl
 import com.degree.homedash.controls.moistureColor
+import com.degree.homedash.controls.displayName
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
@@ -49,7 +50,7 @@ fun PlantGraphContent(
     onRangeChange: (TimeRange) -> Unit,
     onBack: () -> Unit,
 ) {
-    DashboardScaffold(title = ui.plant?.name ?: "Plant", onBack = onBack) {
+    DashboardScaffold(title = ui.plant?.displayName ?: "Plant", onBack = onBack) {
         ControlGroup("Soil Moisture") {
             ui.plant?.let { SoilMoistureControl(it) }
             Spacer(Modifier.height(8.dp))

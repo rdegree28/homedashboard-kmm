@@ -42,7 +42,7 @@ fun EntityUi.hasCard(): Boolean =
  * `ControlGroup` packs rows to a total width of 2 using this, so cards reflow as fans toggle.
  */
 fun EntityUi.cardSpan(): Int =
-    if (this is EntityUi.Fan && isOn && metadata.levelCount >= 2) 2 else 1
+    if (this is EntityUi.Fan && isOn && metadata.speedAdjustment != null) 2 else 1
 
 /**
  * Central renderer: maps an [EntityUi] to the right control, in the requested [layout], routing user
@@ -63,7 +63,7 @@ fun EntityControl(
             val icon: @Composable (Color) -> Unit = { tint ->
                 LightIcon(on = entity.isOn, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
             }
-            val ui = ToggleUi(name = entity.name, isOn = entity.isOn, offline = entity.offline)
+            val ui = ToggleUi(name = entity.displayName, isOn = entity.isOn, offline = entity.offline)
             when (layout) {
                 ControlLayout.Row -> EntityToggleRow(ui, AppColors.LightOn, onToggle, icon)
                 ControlLayout.Card -> EntityToggleCard(ui, AppColors.LightOn, onToggle, icon, modifier)
@@ -73,10 +73,10 @@ fun EntityControl(
         is EntityUi.Fan -> {
             val onToggle = { onAction(EntityAction.Toggle(entity.entityId)) }
             val fanUi = FanUi(
-                name = entity.name,
+                name = entity.displayName,
                 isOn = entity.isOn,
                 offline = entity.offline,
-                levelCount = entity.metadata.levelCount,
+                levelCount = entity.metadata.speedAdjustment?.levelCount ?: 0,
                 percentage = entity.percentage,
             )
             val onSetSpeed = { pct: Int -> onAction(EntityAction.SetSpeed(entity.entityId, pct)) }
@@ -103,12 +103,12 @@ fun EntityControl(
             }
             when (layout) {
                 ControlLayout.Row -> ClimateRow(
-                    ui = SensorUi(entity.label, entity.valueText),
+                    ui = SensorUi(entity.displayName, entity.valueText),
                     icon = icon,
                     tint = tint
                 )
                 ControlLayout.Card -> ClimateCard(
-                    label = entity.label,
+                    label = entity.displayName,
                     valueText = entity.valueText,
                     subvalueText = entity.subvalueText,
                     icon = icon,
@@ -120,7 +120,7 @@ fun EntityControl(
 
         is EntityUi.Door -> DoorRow(
             DoorUi(
-                label = entity.label,
+                label = entity.displayName,
                 statusText = entity.statusText,
                 open = entity.open,
                 unavailable = entity.unavailable,
