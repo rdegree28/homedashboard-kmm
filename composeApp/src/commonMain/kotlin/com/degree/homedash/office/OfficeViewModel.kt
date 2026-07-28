@@ -3,8 +3,7 @@ package com.degree.homedash.office
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.degree.homedash.controls.ClimateKind
-import com.degree.homedash.controls.EntityMetadata
+import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
@@ -127,9 +126,9 @@ private fun buildOfficeUiState(
     boxFan = states[OfficeEntities.BOX_FAN].toFan(OfficeEntities.BOX_FAN, "Box Fan"),
     mistingFan = states[OfficeEntities.MISTING_FAN].toFan(OfficeEntities.MISTING_FAN, "Misting Fan"),
     activeSignal = states[OfficeEntities.SIGNAL_MODE]?.state,
-    temperature = states[OfficeEntities.TEMPERATURE].toClimate(OfficeEntities.TEMPERATURE, "Temperature", ClimateKind.Temperature),
+    temperature = states[OfficeEntities.TEMPERATURE].toClimate(OfficeEntities.TEMPERATURE, "Temperature", ClimateMetadata.ClimateKind.Temperature),
     humidity = states[OfficeEntities.HUMIDITY]
-        .toClimate(OfficeEntities.HUMIDITY, "Humidity", ClimateKind.Humidity)
+        .toClimate(OfficeEntities.HUMIDITY, "Humidity", ClimateMetadata.ClimateKind.Humidity)
         .copy(
             subvalueText = dewPointText(states[OfficeEntities.TEMPERATURE], states[OfficeEntities.HUMIDITY])
                 ?.let { "Dew pt $it" },
@@ -149,7 +148,7 @@ private fun EntityState?.toToggleUi(name: String) = ToggleUi(
 )
 
 private fun EntityState?.toLight(entityId: String, name: String) = EntityUi.Light(
-    metadata = EntityMetadata.Light(entityId),
+    metadata = LightMetadata(entityId),
     name = name,
     isOn = this?.isOn == true,
     offline = this == null || this.isUnavailable,
@@ -165,7 +164,7 @@ private fun EntityState?.toFan(entityId: String, name: String): EntityUi.Fan {
     }
 
     return EntityUi.Fan(
-        metadata = EntityMetadata.Fan(entityId, levelCount),
+        metadata = FanMetadata(entityId, levelCount),
         name = name,
         isOn = this?.isOn == true,
         offline = this == null || this.isUnavailable,
@@ -174,13 +173,13 @@ private fun EntityState?.toFan(entityId: String, name: String): EntityUi.Fan {
 }
 
 /** Formatted climate readout — always shows "—" when unavailable. */
-private fun EntityState?.toClimate(entityId: String, label: String, kind: ClimateKind): EntityUi.Climate {
+private fun EntityState?.toClimate(entityId: String, label: String, kind: ClimateMetadata.ClimateKind): EntityUi.Climate {
     val unit = this?.attrString("unit_of_measurement").orEmpty()
     val value = when {
         this == null || this.isUnavailable -> "—"
         else -> "${formatNumberOrSelf(state, decimals = 1)} $unit".trim()
     }
-    return EntityUi.Climate(EntityMetadata.Climate(entityId, kind), label = label, valueText = value)
+    return EntityUi.Climate(ClimateMetadata(entityId, kind), label = label, valueText = value)
 }
 
 /** Formatted sensor readout. [dashWhenUnavailable] shows "—" for unavailable states. */
@@ -202,5 +201,5 @@ private fun EntityState?.toDoor(entityId: String, label: String): EntityUi.Door 
         open -> "Open"
         else -> "Closed"
     }
-    return EntityUi.Door(EntityMetadata.Door(entityId), label = label, statusText = status, open = open, unavailable = unavailable)
+    return EntityUi.Door(DoorMetadata(entityId), label = label, statusText = status, open = open, unavailable = unavailable)
 }

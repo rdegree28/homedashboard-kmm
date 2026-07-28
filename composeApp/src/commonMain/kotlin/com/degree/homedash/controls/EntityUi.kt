@@ -1,5 +1,6 @@
 package com.degree.homedash.controls
 
+import com.degree.homedash.shared.model.entity.*
 import androidx.compose.runtime.Immutable
 
 /**
@@ -13,7 +14,7 @@ sealed interface EntityUi {
 
     @Immutable
     data class Light(
-        override val metadata: EntityMetadata.Light,
+        override val metadata: LightMetadata,
         val name: String,
         val isOn: Boolean,
         val offline: Boolean,
@@ -21,7 +22,7 @@ sealed interface EntityUi {
 
     @Immutable
     data class Fan(
-        override val metadata: EntityMetadata.Fan,
+        override val metadata: FanMetadata,
         val name: String,
         val isOn: Boolean,
         val offline: Boolean,
@@ -30,7 +31,7 @@ sealed interface EntityUi {
 
     @Immutable
     data class Climate(
-        override val metadata: EntityMetadata.Climate,
+        override val metadata: ClimateMetadata,
         val label: String,
         val valueText: String,
         val subvalueText: String? = null,
@@ -38,7 +39,7 @@ sealed interface EntityUi {
 
     @Immutable
     data class Door(
-        override val metadata: EntityMetadata.Door,
+        override val metadata: DoorMetadata,
         val label: String,
         val statusText: String,
         val open: Boolean,
@@ -47,7 +48,7 @@ sealed interface EntityUi {
 
     @Immutable
     data class SoilMoisture(
-        override val metadata: EntityMetadata.SoilMoisture,
+        override val metadata: SoilMoistureMetadata,
         val name: String,
         val pct: Double?,
         val valueText: String,
@@ -55,7 +56,7 @@ sealed interface EntityUi {
 
     @Immutable
     data class WaterLevel(
-        override val metadata: EntityMetadata.WaterLevel,
+        override val metadata: WaterLevelMetadata,
         val name: String,
         val pct: Double?,
         val valueText: String,

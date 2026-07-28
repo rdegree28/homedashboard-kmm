@@ -1,5 +1,6 @@
 package com.degree.homedash.controls
 
+import com.degree.homedash.shared.model.entity.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
@@ -96,9 +97,9 @@ fun EntityControl(
 
         is EntityUi.Climate -> {
             val (icon: ImageVector, tint: Color) = when (entity.metadata.kind) {
-                ClimateKind.Temperature -> Icons.Filled.Thermostat to AppColors.TempWarm
-                ClimateKind.Humidity -> Icons.Filled.WaterDrop to AppColors.Wet
-                ClimateKind.DewPoint -> Icons.Filled.Opacity to AppColors.Wet
+                ClimateMetadata.ClimateKind.Temperature -> Icons.Filled.Thermostat to AppColors.TempWarm
+                ClimateMetadata.ClimateKind.Humidity -> Icons.Filled.WaterDrop to AppColors.Wet
+                ClimateMetadata.ClimateKind.DewPoint -> Icons.Filled.Opacity to AppColors.Wet
             }
             when (layout) {
                 ControlLayout.Row -> ClimateRow(
@@ -170,8 +171,8 @@ private fun EntityFanCardPreview() = ControlPreview {
 @Composable
 private fun EntityClimateCardPreview() = ControlPreview {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        EntityControl(previewClimate("Temperature", "72.5 °F", ClimateKind.Temperature), ControlLayout.Card, {}, Modifier.weight(1f))
-        EntityControl(previewClimate("Humidity", "48 %", ClimateKind.Humidity), ControlLayout.Card, {}, Modifier.weight(1f))
-        EntityControl(previewClimate("Dew Point", "50.9 °F", ClimateKind.DewPoint), ControlLayout.Card, {}, Modifier.weight(1f))
+        EntityControl(previewClimate("Temperature", "72.5 °F", ClimateMetadata.ClimateKind.Temperature), ControlLayout.Card, {}, Modifier.weight(1f))
+        EntityControl(previewClimate("Humidity", "48 %", ClimateMetadata.ClimateKind.Humidity), ControlLayout.Card, {}, Modifier.weight(1f))
+        EntityControl(previewClimate("Dew Point", "50.9 °F", ClimateMetadata.ClimateKind.DewPoint), ControlLayout.Card, {}, Modifier.weight(1f))
     }
 }

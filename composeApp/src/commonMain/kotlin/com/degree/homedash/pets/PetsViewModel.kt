@@ -3,7 +3,7 @@ package com.degree.homedash.pets
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.degree.homedash.controls.EntityMetadata
+import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
@@ -37,7 +37,7 @@ class PetsViewModel(
 internal fun EntityState.toWaterLevel(): EntityUi.WaterLevel {
     val pct = state.toDoubleOrNull()?.takeUnless { isUnavailable }
     return EntityUi.WaterLevel(
-        metadata = EntityMetadata.WaterLevel(entityId),
+        metadata = WaterLevelMetadata(entityId),
         name = feederName(this),
         pct = pct,
         valueText = pct?.let { "${formatNumber(it, decimals = 0)} %" } ?: "—",

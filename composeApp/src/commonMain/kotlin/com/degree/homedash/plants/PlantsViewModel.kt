@@ -3,7 +3,7 @@ package com.degree.homedash.plants
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.degree.homedash.controls.EntityMetadata
+import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.plantName
 import com.degree.homedash.shared.repo.HomeAssistantRepo
@@ -41,7 +41,7 @@ class PlantsViewModel(
 internal fun EntityState.toSoilMoisture(): EntityUi.SoilMoisture {
     val pct = state.toDoubleOrNull()?.takeUnless { isUnavailable }
     return EntityUi.SoilMoisture(
-        metadata = EntityMetadata.SoilMoisture(entityId),
+        metadata = SoilMoistureMetadata(entityId),
         name = plantName(this),
         pct = pct,
         valueText = pct?.let { "${formatNumber(it, decimals = 1)} %" } ?: "—",

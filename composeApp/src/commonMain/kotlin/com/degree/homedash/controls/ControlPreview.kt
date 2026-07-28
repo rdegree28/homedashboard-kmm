@@ -1,5 +1,6 @@
 package com.degree.homedash.controls
 
+import com.degree.homedash.shared.model.entity.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -41,7 +42,7 @@ internal fun previewLight(
     isOn: Boolean = false,
     offline: Boolean = false,
 ) = EntityUi.Light(
-    metadata = EntityMetadata.Light("light.${name.lowercase()}"),
+    metadata = LightMetadata("light.${name.lowercase()}"),
     name = name,
     isOn = isOn,
     offline = offline,
@@ -62,7 +63,7 @@ internal fun previewFanUi(
     percentage: Int = 0,
     levelCount: Int = 0,
 ) = EntityUi.Fan(
-    metadata = EntityMetadata.Fan("fan.${name.lowercase()}", levelCount = levelCount),
+    metadata = FanMetadata("fan.${name.lowercase()}", levelCount = levelCount),
     name = name,
     isOn = isOn,
     offline = offline,
@@ -72,9 +73,9 @@ internal fun previewFanUi(
 internal fun previewClimate(
     label: String,
     valueText: String,
-    kind: ClimateKind,
+    kind: ClimateMetadata.ClimateKind,
 ) = EntityUi.Climate(
-    metadata = EntityMetadata.Climate("sensor.${label.lowercase()}", kind = kind),
+    metadata = ClimateMetadata("sensor.${label.lowercase()}", kind = kind),
     label = label,
     valueText = valueText,
 )

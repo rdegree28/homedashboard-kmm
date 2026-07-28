@@ -3,8 +3,7 @@ package com.degree.homedash.livingroom
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.degree.homedash.controls.ClimateKind
-import com.degree.homedash.controls.EntityMetadata
+import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
@@ -47,7 +46,7 @@ class LivingRoomViewModel(
                         states[LivingRoomEntities.LIVING_ROOM_BOX_FAN].toFan(LivingRoomEntities.LIVING_ROOM_BOX_FAN, "Box Fan"),
                     ),
                     climate = listOf(
-                        states[LivingRoomEntities.TEMPERATURE].toClimate(LivingRoomEntities.TEMPERATURE, "Temperature", ClimateKind.Temperature),
+                        states[LivingRoomEntities.TEMPERATURE].toClimate(LivingRoomEntities.TEMPERATURE, "Temperature", ClimateMetadata.ClimateKind.Temperature),
                             dewPointClimate(states[LivingRoomEntities.TEMPERATURE], states[LivingRoomEntities.HUMIDITY]),
                     ),
                 )
@@ -61,7 +60,7 @@ class LivingRoomViewModel(
 }
 
 private fun EntityState?.toLight(entityId: String, name: String) = EntityUi.Light(
-    metadata = EntityMetadata.Light(entityId),
+    metadata = LightMetadata(entityId),
     name = name,
     isOn = this?.isOn == true,
     offline = this == null || this.isUnavailable,
@@ -71,7 +70,7 @@ private fun EntityState?.toFan(entityId: String, name: String): EntityUi.Fan {
     val stepPct = this?.attrDouble("percentage_step")
     val levelCount = if (stepPct != null && stepPct > 0.0) (100.0 / stepPct).roundToInt() else 0
     return EntityUi.Fan(
-        metadata = EntityMetadata.Fan(entityId, levelCount),
+        metadata = FanMetadata(entityId, levelCount),
         name = name,
         isOn = this?.isOn == true,
         offline = this == null || this.isUnavailable,
@@ -79,13 +78,13 @@ private fun EntityState?.toFan(entityId: String, name: String): EntityUi.Fan {
     )
 }
 
-private fun EntityState?.toClimate(entityId: String, label: String, kind: ClimateKind): EntityUi.Climate {
+private fun EntityState?.toClimate(entityId: String, label: String, kind: ClimateMetadata.ClimateKind): EntityUi.Climate {
     val unit = this?.attrString("unit_of_measurement").orEmpty()
     val value = when {
         this == null || this.isUnavailable -> "—"
         else -> "${formatNumberOrSelf(state, decimals = 1)} $unit".trim()
     }
-    return EntityUi.Climate(EntityMetadata.Climate(entityId, kind), label = label, valueText = value)
+    return EntityUi.Climate(ClimateMetadata(entityId, kind), label = label, valueText = value)
 }
 
 /**
@@ -96,7 +95,7 @@ private fun EntityState?.toClimate(entityId: String, label: String, kind: Climat
 private fun dewPointClimate(tempState: EntityState?, humidityState: EntityState?): EntityUi.Climate {
     val rh = humidityState?.state?.toDoubleOrNull()?.takeUnless { humidityState.isUnavailable }
     return EntityUi.Climate(
-        EntityMetadata.Climate(LivingRoomEntities.HUMIDITY, ClimateKind.DewPoint),
+        ClimateMetadata(LivingRoomEntities.HUMIDITY, ClimateMetadata.ClimateKind.DewPoint),
         label = "Dew Point",
         valueText = dewPointText(tempState, humidityState) ?: "—",
         subvalueText = if (rh != null) "${formatNumber(rh, decimals = 0)}%" else null,

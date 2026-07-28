@@ -1,6 +1,6 @@
 package com.degree.homedash.plants
 
-import com.degree.homedash.controls.EntityMetadata
+import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.shared.model.HistoryPoint
 import kotlin.math.sin
@@ -9,7 +9,7 @@ import kotlin.math.sin
 
 internal val previewPlants: List<EntityUi.SoilMoisture> = listOf(
     EntityUi.SoilMoisture(
-        metadata = EntityMetadata.SoilMoisture("sensor.louie_moisture_sensor_soil_moisture"),
+        metadata = SoilMoistureMetadata("sensor.louie_moisture_sensor_soil_moisture"),
         name = "Louie",
         pct = 58.0,
         valueText = "58 %",
