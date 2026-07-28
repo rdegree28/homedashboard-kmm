@@ -28,7 +28,7 @@ data class LivingRoomUiState(
 /** Projects the configured Living Room lights into [LivingRoomUiState]. */
 class LivingRoomViewModel(
     private val repo: HomeAssistantRepo,
-    metadataRepo: EntityMetadataRepo = EntityMetadataRepo(),
+    metadataRepo: EntityMetadataRepo,
 ) : ViewModel() {
 
     /** The screen's roster; static, so it's read once rather than on every state push. */

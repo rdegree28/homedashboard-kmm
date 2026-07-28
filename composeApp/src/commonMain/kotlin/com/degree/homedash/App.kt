@@ -19,7 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.degree.homedash.di.appModule
 import com.degree.homedash.livingroom.LivingRoomScreen
 import com.degree.homedash.office.OfficeScreen
 import com.degree.homedash.pets.PetsScreen
@@ -28,15 +28,29 @@ import com.degree.homedash.plants.PlantGraphScreen
 import com.degree.homedash.plants.PlantsScreen
 import com.degree.homedash.shared.model.FeatureFlag
 import com.degree.homedash.shared.api.HaConfig
+import com.degree.homedash.shared.di.sharedModule
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.ui.LocalHaConnectionStatus
+import org.koin.compose.KoinApplication
+import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun App(defaultConfig: HaConfig? = null) {
-    val appVm: AppViewModel = viewModel { AppViewModel(defaultConfig) }
+    // The single Koin start for both platforms — the entry points (MainActivity, wasmJs main) just
+    // call App(), so starting here avoids duplicating it and can't double-start on Activity recreation.
+    KoinApplication(application = { modules(sharedModule, appModule(defaultConfig)) }) {
+        AppContent()
+    }
+}
+
+@Composable
+private fun AppContent() {
+    val appVm: AppViewModel = koinViewModel()
     val config by appVm.config.collectAsStateWithLifecycle()
     val currentUser by appVm.currentUser.collectAsStateWithLifecycle()
     val featureFlags by appVm.featureFlags.collectAsStateWithLifecycle()
-    val repository = appVm.repository
+    val repository: HomeAssistantRepo = koinInject()
     val connection by repository.connection.collectAsStateWithLifecycle()
 
     // Entity id whose history is shown on the PlantGraph destination.
@@ -102,7 +116,6 @@ fun App(defaultConfig: HaConfig? = null) {
                         )
 
                         Screen.Home -> HomeScreen(
-                            repository = repository,
                             showOffice = FeatureFlag.ViewOfficeScreen in featureFlags,
                             onOpenOffice = { navigate(Screen.Office) },
                             onOpenPlants = { navigate(Screen.Plants) },
@@ -112,13 +125,11 @@ fun App(defaultConfig: HaConfig? = null) {
                         )
 
                         Screen.Office -> OfficeScreen(
-                            repository = repository,
                             onBack = ::goBack,
                             onOpenSettings = { navigate(Screen.Settings) },
                         )
 
                         Screen.Plants -> PlantsScreen(
-                            repository = repository,
                             onBack = ::goBack,
                             onOpenSettings = { navigate(Screen.Settings) },
                             onOpenGraph = { id ->
@@ -128,20 +139,17 @@ fun App(defaultConfig: HaConfig? = null) {
                         )
 
                         Screen.PlantGraph -> PlantGraphScreen(
-                            repository = repository,
                             entityId = graphEntityId.orEmpty(),
                             onBack = ::goBack,
                         )
 
                         Screen.LivingRoom -> LivingRoomScreen(
-                            repository = repository,
                             showLights = FeatureFlag.ViewLivingRoomLights in featureFlags,
                             onBack = ::goBack,
                             onOpenSettings = { navigate(Screen.Settings) },
                         )
 
                         Screen.Pets -> PetsScreen(
-                            repository = repository,
                             onBack = ::goBack,
                             onOpenSettings = { navigate(Screen.Settings) },
                             onOpenGraph = { id ->
@@ -151,7 +159,6 @@ fun App(defaultConfig: HaConfig? = null) {
                         )
 
                         Screen.WaterGraph -> WaterGraphScreen(
-                            repository = repository,
                             entityId = graphEntityId.orEmpty(),
                             onBack = ::goBack,
                         )

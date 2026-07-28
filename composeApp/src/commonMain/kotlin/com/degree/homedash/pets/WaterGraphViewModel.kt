@@ -30,7 +30,7 @@ data class WaterGraphUiState(
 class WaterGraphViewModel(
     private val repo: HomeAssistantRepo,
     private val entityId: String,
-    metadataRepo: EntityMetadataRepo = EntityMetadataRepo(),
+    metadataRepo: EntityMetadataRepo,
 ) : ViewModel() {
 
     /** The graphed entity's descriptor, so this screen's title matches the Pets list it was opened from. */

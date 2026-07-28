@@ -18,20 +18,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.degree.homedash.controls.WaterLevelControl
 import com.degree.homedash.controls.waterLevelColor
 import com.degree.homedash.plants.TimeRange
 import com.degree.homedash.controls.displayName
-import com.degree.homedash.shared.repo.HomeAssistantRepo
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 import com.degree.homedash.ui.HistoryGraph
 import kotlin.math.roundToInt
 
 @Composable
-fun WaterGraphScreen(repository: HomeAssistantRepo, entityId: String, onBack: () -> Unit) {
-    val vm: WaterGraphViewModel = viewModel(key = entityId) { WaterGraphViewModel(repository, entityId) }
+fun WaterGraphScreen(entityId: String, onBack: () -> Unit) {
+    val vm: WaterGraphViewModel = koinViewModel(key = entityId) { parametersOf(entityId) }
     val ui by vm.uiState.collectAsStateWithLifecycle()
     WaterGraphContent(ui = ui, onRangeChange = vm::setRange, onBack = onBack)
 }

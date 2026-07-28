@@ -7,7 +7,6 @@ import com.degree.homedash.shared.model.AuthUser
 import com.degree.homedash.shared.data.ConfigStore
 import com.degree.homedash.shared.model.FeatureFlag
 import com.degree.homedash.shared.dao.FeatureFlagDao
-import com.degree.homedash.shared.dao.FeatureFlagDaoStaticImpl
 import com.degree.homedash.shared.api.HaConfig
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,11 +23,11 @@ import kotlinx.coroutines.launch
  * hands the same [repository] to every screen ViewModel.
  */
 class AppViewModel(
-    defaultConfig: HaConfig? = null,
-    private val configStore: ConfigStore = ConfigStore(),
-    private val authRepo: AuthRepo = AuthRepo.create(),
-    private val featureFlagDao: FeatureFlagDao = FeatureFlagDaoStaticImpl(),
-    val repository: HomeAssistantRepo = HomeAssistantRepo.create(),
+    defaultConfig: HaConfig?,
+    private val configStore: ConfigStore,
+    private val authRepo: AuthRepo,
+    private val featureFlagDao: FeatureFlagDao,
+    private val repository: HomeAssistantRepo,
 ) : ViewModel() {
 
     private val _config = MutableStateFlow(configStore.load() ?: defaultConfig)

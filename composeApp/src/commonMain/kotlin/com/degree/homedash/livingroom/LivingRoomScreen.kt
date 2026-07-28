@@ -8,21 +8,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.degree.homedash.controls.EntityAction
-import com.degree.homedash.shared.repo.HomeAssistantRepo
+import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 
 @Composable
 fun LivingRoomScreen(
     modifier: Modifier = Modifier,
-    repository: HomeAssistantRepo,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
     showLights: Boolean = false,
 ) {
-    val vm: LivingRoomViewModel = viewModel { LivingRoomViewModel(repository) }
+    val vm: LivingRoomViewModel = koinViewModel()
     val ui by vm.uiState.collectAsStateWithLifecycle()
     LivingRoomContent(
         modifier = modifier,

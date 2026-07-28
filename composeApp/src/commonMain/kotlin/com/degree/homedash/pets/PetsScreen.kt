@@ -8,20 +8,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.degree.homedash.controls.EntityAction
-import com.degree.homedash.shared.repo.HomeAssistantRepo
+import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 
 @Composable
 fun PetsScreen(
-    repository: HomeAssistantRepo,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenGraph: (String) -> Unit,
 ) {
-    val vm: PetsViewModel = viewModel { PetsViewModel(repository) }
+    val vm: PetsViewModel = koinViewModel()
     val ui by vm.uiState.collectAsStateWithLifecycle()
     PetsContent(ui = ui, onBack = onBack, onOpenSettings = onOpenSettings, onOpenGraph = onOpenGraph)
 }

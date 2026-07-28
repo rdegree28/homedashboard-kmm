@@ -25,7 +25,8 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.websockets)
-            implementation(libs.koin.core)
+            // api, not implementation: sharedModule exposes Koin's Module type to :composeApp.
+            api(libs.koin.core)
             implementation(libs.kermit)
             implementation(libs.multiplatform.settings)
         }

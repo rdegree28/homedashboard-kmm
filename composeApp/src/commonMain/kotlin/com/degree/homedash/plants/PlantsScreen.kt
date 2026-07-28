@@ -8,9 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.degree.homedash.controls.EntityAction
-import com.degree.homedash.shared.repo.HomeAssistantRepo
+import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 
@@ -21,12 +20,11 @@ object PlantEntities {
 
 @Composable
 fun PlantsScreen(
-    repository: HomeAssistantRepo,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
     onOpenGraph: (String) -> Unit,
 ) {
-    val vm: PlantsViewModel = viewModel { PlantsViewModel(repository) }
+    val vm: PlantsViewModel = koinViewModel()
     val ui by vm.uiState.collectAsStateWithLifecycle()
     PlantsContent(ui = ui, onBack = onBack, onOpenSettings = onOpenSettings, onOpenGraph = onOpenGraph)
 }

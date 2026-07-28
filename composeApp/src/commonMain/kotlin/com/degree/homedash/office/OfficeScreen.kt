@@ -20,22 +20,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.HexagonControl
 import com.degree.homedash.controls.WorkstationControl
-import com.degree.homedash.shared.repo.HomeAssistantRepo
+import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 
 @Composable
 fun OfficeScreen(
-    repository: HomeAssistantRepo,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
-    val vm: OfficeViewModel = viewModel { OfficeViewModel(repository) }
+    val vm: OfficeViewModel = koinViewModel()
     val ui by vm.uiState.collectAsStateWithLifecycle()
 
     OfficeContent(

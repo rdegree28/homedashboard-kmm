@@ -62,7 +62,7 @@ data class OfficeUiState(
  */
 class OfficeViewModel(
     private val repo: HomeAssistantRepo,
-    metadataRepo: EntityMetadataRepo = EntityMetadataRepo(),
+    metadataRepo: EntityMetadataRepo,
 ) : ViewModel() {
 
     private val powerHistory = MutableStateFlow<List<HistoryPoint>>(emptyList())

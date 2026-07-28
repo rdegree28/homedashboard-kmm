@@ -18,11 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.degree.homedash.controls.SoilMoistureControl
 import com.degree.homedash.controls.moistureColor
 import com.degree.homedash.controls.displayName
-import com.degree.homedash.shared.repo.HomeAssistantRepo
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 import com.degree.homedash.ui.HistoryGraph
@@ -37,8 +37,8 @@ enum class TimeRange(val label: String, val hoursBack: Int) {
 }
 
 @Composable
-fun PlantGraphScreen(repository: HomeAssistantRepo, entityId: String, onBack: () -> Unit) {
-    val vm: PlantGraphViewModel = viewModel(key = entityId) { PlantGraphViewModel(repository, entityId) }
+fun PlantGraphScreen(entityId: String, onBack: () -> Unit) {
+    val vm: PlantGraphViewModel = koinViewModel(key = entityId) { parametersOf(entityId) }
     val ui by vm.uiState.collectAsStateWithLifecycle()
     PlantGraphContent(ui = ui, onRangeChange = vm::setRange, onBack = onBack)
 }

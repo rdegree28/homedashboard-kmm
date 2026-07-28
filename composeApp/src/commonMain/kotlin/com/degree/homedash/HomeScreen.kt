@@ -32,14 +32,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.degree.homedash.shared.repo.HomeAssistantRepo
+import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.DashboardScaffold
 
 @Composable
 fun HomeScreen(
-    repository: HomeAssistantRepo,
     onOpenOffice: () -> Unit,
     onOpenPlants: () -> Unit,
     onOpenLivingRoom: () -> Unit,
@@ -47,7 +45,7 @@ fun HomeScreen(
     onOpenSettings: () -> Unit,
     showOffice: Boolean = false,
 ) {
-    val vm: HomeViewModel = viewModel { HomeViewModel(repository) }
+    val vm: HomeViewModel = koinViewModel()
     val warnings by vm.warnings.collectAsStateWithLifecycle()
     HomeContent(
         warnings = warnings,
@@ -71,7 +69,11 @@ fun HomeContent(
     onOpenSettings: () -> Unit,
     showOffice: Boolean = false,
 ) {
-    DashboardScaffold(title = "Home", onOpenSettings = onOpenSettings) {
+    DashboardScaffold(
+        title = "Home",
+        onOpenSettings = onOpenSettings,
+        versionLabel = "v${AppInfo.VERSION}",
+    ) {
         warnings.forEach { WarningCard(it) }
         // Office dashboard is gated behind the viewOfficeScreen feature flag.
         if (showOffice) DashboardCard("Office", Icons.Filled.Chair, AppColors.Wet, onOpenOffice)

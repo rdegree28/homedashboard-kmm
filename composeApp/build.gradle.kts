@@ -71,11 +71,19 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(compose.uiTooling)
             implementation(libs.kotlinx.coroutines.android)
+        }
+        // JVM-only: Koin's module verification is reflection-based.
+        androidUnitTest.dependencies {
+            implementation(kotlin("test"))
+            implementation(libs.koin.test)
+            implementation(libs.kotlinx.coroutines.test)
         }
         wasmJsMain {
             kotlin.srcDir(generateWebConfig)
@@ -99,7 +107,7 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = "1.0" // keep in step with AppInfo.VERSION, which the Home header displays
 
         buildConfigField("String", "HA_URL", "\"${localProps.getProperty("ha.url", "")}\"")
         buildConfigField("String", "HA_TOKEN", "\"${localProps.getProperty("ha.token", "")}\"")

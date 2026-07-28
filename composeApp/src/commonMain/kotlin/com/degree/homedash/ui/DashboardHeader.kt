@@ -24,6 +24,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -57,10 +58,11 @@ fun DashboardScaffold(
     onBack: (() -> Unit)? = null,
     onOpenSettings: (() -> Unit)? = null,
     connection: HaConnectionStatus = LocalHaConnectionStatus.current,
+    versionLabel: String? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-        DashboardHeader(title, onBack, onOpenSettings, connection)
+        DashboardHeader(title, onBack, onOpenSettings, connection, versionLabel)
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(Dimens.SectionSpacing),
@@ -70,10 +72,13 @@ fun DashboardScaffold(
 }
 
 /**
- * Shared dashboard header: optional back arrow, title, a [connection] status dot, and an optional
- * Settings (gear) action. A full-width Columbia-blue bar whose background extends up under the status
- * bar (content is inset below it via [WindowInsets.statusBars]), so place it flush at the top of the
- * screen, not inside content padding. [connection] defaults to [LocalHaConnectionStatus].
+ * Shared dashboard header: optional back arrow, title, an optional [versionLabel], a [connection]
+ * status dot, and an optional Settings (gear) action. A full-width Columbia-blue bar whose background
+ * extends up under the status bar (content is inset below it via [WindowInsets.statusBars]), so place
+ * it flush at the top of the screen, not inside content padding. [connection] defaults to
+ * [LocalHaConnectionStatus].
+ *
+ * [versionLabel] is set by the Home launcher only, to make the running build identifiable.
  */
 @Composable
 fun DashboardHeader(
@@ -81,6 +86,7 @@ fun DashboardHeader(
     onBack: (() -> Unit)? = null,
     onOpenSettings: (() -> Unit)? = null,
     connection: HaConnectionStatus = LocalHaConnectionStatus.current,
+    versionLabel: String? = null,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -105,6 +111,14 @@ fun DashboardHeader(
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
             )
+            if (versionLabel != null) {
+                Text(
+                    text = versionLabel,
+                    modifier = Modifier.padding(end = 8.dp),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = LocalContentColor.current.copy(alpha = 0.7f),
+                )
+            }
             Box(
                 Modifier
                     .size(10.dp)
@@ -135,6 +149,16 @@ private fun connectionColor(status: HaConnectionStatus): Color = when (status) {
 private fun DashboardHeaderPreview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            // Home: gear + version label.
+            DashboardHeader("Home", onOpenSettings = {}, connection = HaConnectionStatus.Connected, versionLabel = "v1.0")
+            // Everything at once, to check a long title doesn't crowd the version out.
+            DashboardHeader(
+                "Living Room Climate",
+                onBack = {},
+                onOpenSettings = {},
+                connection = HaConnectionStatus.Connecting,
+                versionLabel = "v1.0",
+            )
             // Root screen: gear only, connected.
             DashboardHeader("Office", onOpenSettings = {}, connection = HaConnectionStatus.Connected)
             // Nested screen: back + gear, connecting.

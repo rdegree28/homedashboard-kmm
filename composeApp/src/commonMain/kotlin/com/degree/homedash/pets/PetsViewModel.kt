@@ -21,7 +21,7 @@ data class PetsUiState(
 /** Projects the configured Pets sensors (the cat water fountain) into [PetsUiState]. */
 class PetsViewModel(
     private val repo: HomeAssistantRepo,
-    metadataRepo: EntityMetadataRepo = EntityMetadataRepo(),
+    metadataRepo: EntityMetadataRepo,
 ) : ViewModel() {
 
     /** The screen's roster; static, so it's read once rather than on every state push. */

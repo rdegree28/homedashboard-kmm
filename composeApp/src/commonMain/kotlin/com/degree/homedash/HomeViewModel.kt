@@ -20,7 +20,7 @@ data class HomeWarning(val message: String, val severity: WarningSeverity)
 /** Surfaces launcher warnings from live state (currently the cat water fountain level). */
 class HomeViewModel(
     private val repo: HomeAssistantRepo,
-    metadataRepo: EntityMetadataRepo = EntityMetadataRepo(),
+    metadataRepo: EntityMetadataRepo,
 ) : ViewModel() {
 
     private val petEntities = metadataRepo.loadPetsEntityMetadataList()
