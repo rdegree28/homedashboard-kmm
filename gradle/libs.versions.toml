@@ -1,5 +1,5 @@
 [versions]
-agp = "8.7.3"
+agp = "8.9.1" # minimum for activity-compose 1.12.x, pulled in by koin 4.2.x
 kotlin = "2.4.0"
 compose = "1.11.1"
 androidx-activityCompose = "1.9.3"
@@ -9,11 +9,13 @@ coroutines = "1.10.1"
 serialization = "1.8.0"
 datetime = "0.6.1"
 kotlinx-browser = "0.5.0"
-koin = "4.0.1"
+# 4.2.2 is built against lifecycle-viewmodel-compose 2.9.6, matching androidx-lifecycle below.
+# Older Koin (4.0.1 -> 2.8.3) compiles fine but dies at runtime on wasm with an IrLinkageError.
+koin = "4.2.2"
 settings = "1.2.0"
 kermit = "2.0.4"
 
-compileSdk = "35"
+compileSdk = "36" # required by activity-compose 1.12.x; targetSdk stays at 35 deliberately
 minSdk = "26"
 targetSdk = "35"
 
