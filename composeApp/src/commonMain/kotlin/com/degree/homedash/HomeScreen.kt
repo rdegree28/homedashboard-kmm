@@ -2,19 +2,11 @@ package com.degree.homedash
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Chair
-import androidx.compose.material.icons.filled.LocalFlorist
-import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material.icons.filled.Weekend
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -27,34 +19,32 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
+import com.degree.homedash.controls.ControlLayout
+import com.degree.homedash.controls.EntityAction
+import com.degree.homedash.controls.EntityControl
+import com.degree.homedash.controls.EntityUi
+import com.degree.homedash.controls.previewNavigation
+import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.DashboardScaffold
 
 @Composable
 fun HomeScreen(
-    onOpenOffice: () -> Unit,
-    onOpenPlants: () -> Unit,
-    onOpenLivingRoom: () -> Unit,
-    onOpenPets: () -> Unit,
+    onNavigate: (NavigationTarget) -> Unit,
     onOpenSettings: () -> Unit,
-    showOffice: Boolean = false,
 ) {
     val vm: HomeViewModel = koinViewModel()
     val warnings by vm.warnings.collectAsStateWithLifecycle()
     HomeContent(
         warnings = warnings,
-        onOpenOffice = onOpenOffice,
-        onOpenPlants = onOpenPlants,
-        onOpenLivingRoom = onOpenLivingRoom,
-        onOpenPets = onOpenPets,
+        navigation = vm.navigation,
+        onNavigate = onNavigate,
         onOpenSettings = onOpenSettings,
-        showOffice = showOffice,
     )
 }
 
@@ -62,12 +52,9 @@ fun HomeScreen(
 @Composable
 fun HomeContent(
     warnings: List<HomeWarning>,
-    onOpenOffice: () -> Unit,
-    onOpenPlants: () -> Unit,
-    onOpenLivingRoom: () -> Unit,
-    onOpenPets: () -> Unit,
+    navigation: List<EntityUi.Navigation>,
+    onNavigate: (NavigationTarget) -> Unit,
     onOpenSettings: () -> Unit,
-    showOffice: Boolean = false,
 ) {
     DashboardScaffold(
         title = "Home",
@@ -75,11 +62,13 @@ fun HomeContent(
         versionLabel = "v${AppInfo.VERSION}",
     ) {
         warnings.forEach { WarningCard(it) }
-        // Office dashboard is gated behind the viewOfficeScreen feature flag.
-        if (showOffice) DashboardCard("Office", Icons.Filled.Chair, AppColors.Wet, onOpenOffice)
-        DashboardCard("Plants", Icons.Filled.LocalFlorist, AppColors.Healthy, onOpenPlants)
-        DashboardCard("Living Room", Icons.Filled.Weekend, AppColors.Accent, onOpenLivingRoom)
-        DashboardCard("Pets", Icons.Filled.Pets, AppColors.Wet, onOpenPets)
+        // Rendered directly rather than through a ControlGroup: launcher cards are top-level, with no
+        // group wrapper or section title around them.
+        navigation.forEach { entity ->
+            EntityControl(entity, ControlLayout.Row, onAction = { action ->
+                if (action is EntityAction.Navigate) onNavigate(action.target)
+            })
+        }
     }
 }
 
@@ -109,49 +98,24 @@ private fun WarningCard(warning: HomeWarning) {
     }
 }
 
-@Composable
-private fun DashboardCard(
-    title: String,
-    icon: ImageVector,
-    tint: Color,
-    onClick: () -> Unit,
-) {
-    Card(modifier = Modifier.fillMaxWidth(), onClick = onClick) {
-        Row(
-            modifier = Modifier.fillMaxWidth().height(88.dp).padding(horizontal = 20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(imageVector = icon, contentDescription = null, tint = tint, modifier = Modifier.size(40.dp))
-            Spacer(Modifier.width(20.dp))
-            Text(
-                text = title,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(28.dp),
-            )
-        }
-    }
-}
+/** The launcher roster as the repo declares it, for previews. */
+private val previewNavigationCards: List<EntityUi.Navigation> = listOf(
+    previewNavigation(NavigationTarget.Office, "Office"),
+    previewNavigation(NavigationTarget.Plants, "Plants"),
+    previewNavigation(NavigationTarget.LivingRoom, "Living Room"),
+    previewNavigation(NavigationTarget.Pets, "Pets"),
+)
 
-@Preview(widthDp = 380, heightDp = 460)
+@Preview(widthDp = 380, heightDp = 560)
 @Composable
 private fun HomeScreenPreview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
             HomeContent(
                 warnings = listOf(HomeWarning("Cat water running low — 24 %", WarningSeverity.Warning)),
-                onOpenOffice = {},
-                onOpenPlants = {},
-                onOpenLivingRoom = {},
-                onOpenPets = {},
+                navigation = previewNavigationCards,
+                onNavigate = {},
                 onOpenSettings = {},
-                showOffice = true,
             )
         }
     }

@@ -1,6 +1,7 @@
 package com.degree.homedash.ui
 
 import androidx.compose.ui.graphics.Color
+import com.degree.homedash.shared.model.entity.NavigationMetadata.RoomTint
 
 /**
  * Shared accent/status colors used across dashboards. Material theme colors
@@ -24,4 +25,11 @@ object AppColors {
     val GridLine = Color(0x22FFFFFF) // chart gridlines
     val ColumbiaBlue = Color(0xFF3458B2) // dashboard header background
     val ColumbiaBlueOn = Color(0xFFFFFFFF) // dark navy text/icons on the header
+}
+
+/** Resolves the tint token a launcher card declares (see [RoomTint]) to its palette entry. */
+fun roomTint(tint: RoomTint): Color = when (tint) {
+    RoomTint.Wet -> AppColors.Wet
+    RoomTint.Healthy -> AppColors.Healthy
+    RoomTint.Accent -> AppColors.Accent
 }

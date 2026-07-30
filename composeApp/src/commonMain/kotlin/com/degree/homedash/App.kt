@@ -29,6 +29,7 @@ import com.degree.homedash.plants.PlantsScreen
 import com.degree.homedash.shared.model.FeatureFlag
 import com.degree.homedash.shared.api.HaConfig
 import com.degree.homedash.shared.di.sharedModule
+import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.ui.LocalHaConnectionStatus
 import org.koin.compose.KoinApplication
@@ -116,11 +117,7 @@ private fun AppContent() {
                         )
 
                         Screen.Home -> HomeScreen(
-                            showOffice = FeatureFlag.ViewOfficeScreen in featureFlags,
-                            onOpenOffice = { navigate(Screen.Office) },
-                            onOpenPlants = { navigate(Screen.Plants) },
-                            onOpenLivingRoom = { navigate(Screen.LivingRoom) },
-                            onOpenPets = { navigate(Screen.Pets) },
+                            onNavigate = { target -> navigate(target.toScreen()) },
                             onOpenSettings = { navigate(Screen.Settings) },
                         )
 
@@ -171,3 +168,11 @@ private fun AppContent() {
 
 /** Top-level destinations; the launcher (Home) is the root of the back stack. */
 private enum class Screen { Home, Office, Plants, LivingRoom, Pets, Settings, Login, PlantGraph, WaterGraph }
+
+/** Maps a launcher card's destination onto this file's private [Screen] stack. */
+private fun NavigationTarget.toScreen(): Screen = when (this) {
+    NavigationTarget.Office -> Screen.Office
+    NavigationTarget.Plants -> Screen.Plants
+    NavigationTarget.LivingRoom -> Screen.LivingRoom
+    NavigationTarget.Pets -> Screen.Pets
+}

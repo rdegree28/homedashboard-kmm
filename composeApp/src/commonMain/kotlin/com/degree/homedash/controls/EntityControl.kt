@@ -1,6 +1,7 @@
 package com.degree.homedash.controls
 
 import com.degree.homedash.shared.model.entity.*
+import com.degree.homedash.shared.model.entity.NavigationMetadata
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
@@ -26,6 +27,9 @@ sealed interface EntityAction {
     data class Toggle(val entityId: String) : EntityAction
     data class SetSpeed(val entityId: String, val percentage: Int) : EntityAction
     data class OpenGraph(val entityId: String) : EntityAction
+
+    /** Carries the typed destination rather than an entity id — a nav card's id is synthetic. */
+    data class Navigate(val target: NavigationMetadata.NavigationTarget) : EntityAction
 }
 
 /** How a control should render. `ControlGroup` picks this per group; individual controls don't. */
@@ -125,6 +129,13 @@ fun EntityControl(
                 open = entity.open,
                 unavailable = entity.unavailable,
             ),
+        )
+
+        // Same full-width card in either layout — launcher cards never join the 2-column grid.
+        is EntityUi.Navigation -> NavigationCard(
+            ui = entity,
+            onClick = { onAction(EntityAction.Navigate(entity.metadata.destination)) },
+            modifier = modifier,
         )
 
         is EntityUi.SoilMoisture -> SoilMoistureControl(

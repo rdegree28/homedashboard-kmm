@@ -20,7 +20,7 @@ val sharedModule = module {
     single<HaClient> { HaWebSocketClient() }
     single<HomeAssistantApi> { WebSocketHomeAssistantApi(get()) }
     single { HomeAssistantRepo(get()) }
-    single { EntityMetadataRepo() }
+    single { EntityMetadataRepo(get(), get()) }
     single { ConfigStore() }
     // AuthRepo's constructor is internal (it wraps the private AuthDao), so build it via its factory.
     single { AuthRepo.create() }
