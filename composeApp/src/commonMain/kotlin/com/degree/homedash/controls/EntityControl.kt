@@ -35,9 +35,10 @@ sealed interface EntityAction {
 /** How a control should render. `ControlGroup` picks this per group; individual controls don't. */
 enum class ControlLayout { Row, Card }
 
-/** True for entity types that have a card rendering (currently lights, fans, and climate). */
+/** True for entity types that have a card rendering (lights, fans, climate, and launcher tiles). */
 fun EntityUi.hasCard(): Boolean =
-    this is EntityUi.Light || this is EntityUi.Fan || this is EntityUi.Climate
+    this is EntityUi.Light || this is EntityUi.Fan || this is EntityUi.Climate ||
+        this is EntityUi.Navigation
 
 /**
  * How many grid columns this entity's card should span (out of the grid's 2). A fan spans the full
@@ -131,12 +132,13 @@ fun EntityControl(
             ),
         )
 
-        // Same full-width card in either layout — launcher cards never join the 2-column grid.
-        is EntityUi.Navigation -> NavigationCard(
-            ui = entity,
-            onClick = { onAction(EntityAction.Navigate(entity.metadata.destination)) },
-            modifier = modifier,
-        )
+        is EntityUi.Navigation -> {
+            val onClick = { onAction(EntityAction.Navigate(entity.metadata.destination)) }
+            when (layout) {
+                ControlLayout.Row -> NavigationCard(entity, onClick, modifier)
+                ControlLayout.Card -> NavigationTile(entity, onClick, modifier)
+            }
+        }
 
         is EntityUi.SoilMoisture -> SoilMoistureControl(
             ui = entity,

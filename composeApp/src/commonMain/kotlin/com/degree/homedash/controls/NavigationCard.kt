@@ -1,5 +1,7 @@
 package com.degree.homedash.controls
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
+import com.degree.homedash.ui.Dimens
 import com.degree.homedash.ui.icons.roomIcon
 import com.degree.homedash.ui.roomTint
 
@@ -62,10 +65,51 @@ fun NavigationCard(
     }
 }
 
+/**
+ * The grid form of a launcher card, for the Home screen's 2-column layout. Reuses [EntityCard] so a
+ * dashboard tile sits at the same size and weight as the light and fan tiles elsewhere; the label
+ * wraps to two lines, which "Living Room" needs at half width.
+ */
+@Composable
+fun NavigationTile(
+    ui: EntityUi.Navigation,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    EntityCard(
+        modifier = modifier,
+        label = ui.displayName,
+        onClick = onClick,
+        leading = {
+            Icon(
+                imageVector = roomIcon(ui.metadata.icon),
+                contentDescription = null,
+                tint = roomTint(ui.metadata.tint),
+                modifier = Modifier.size(Dimens.RowIconSize),
+            )
+        },
+    )
+}
+
 @Preview(widthDp = 380)
 @Composable
 private fun NavigationCardPreview() = ControlPreview {
     NavigationTarget.entries.forEach { target ->
         NavigationCard(previewNavigation(target), onClick = {})
+    }
+}
+
+/** The 2-column form, as Home lays it out. */
+@Preview(widthDp = 380)
+@Composable
+private fun NavigationTilePreview() = ControlPreview {
+    NavigationTarget.entries.toList().chunked(2).forEach { pair ->
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            pair.forEach { target ->
+                Box(Modifier.weight(1f)) {
+                    NavigationTile(previewNavigation(target), onClick = {}, modifier = Modifier.fillMaxWidth())
+                }
+            }
+        }
     }
 }

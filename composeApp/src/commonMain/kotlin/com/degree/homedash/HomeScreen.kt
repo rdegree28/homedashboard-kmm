@@ -1,7 +1,10 @@
 package com.degree.homedash
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -61,13 +64,27 @@ fun HomeContent(
         onOpenSettings = onOpenSettings,
         versionLabel = "v${AppInfo.VERSION}",
     ) {
+        // Warnings stay full-width above the grid.
         warnings.forEach { WarningCard(it) }
-        // Rendered directly rather than through a ControlGroup: launcher cards are top-level, with no
-        // group wrapper or section title around them.
-        navigation.forEach { entity ->
-            EntityControl(entity, ControlLayout.Row, onAction = { action ->
-                if (action is EntityAction.Navigate) onNavigate(action.target)
-            })
+
+        val onAction: (EntityAction) -> Unit = { action ->
+            if (action is EntityAction.Navigate) onNavigate(action.target)
+        }
+        // A 2-column tile grid, laid out here rather than via ControlGroup so the launcher keeps its
+        // bare look — no group wrapper, no section title. Its own 8dp spacing makes the grid read as
+        // one block instead of inheriting the scaffold's wider section gaps.
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            navigation.chunked(2).forEach { pair ->
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    pair.forEach { entity ->
+                        Box(Modifier.weight(1f)) {
+                            EntityControl(entity, ControlLayout.Card, onAction, Modifier.fillMaxWidth())
+                        }
+                    }
+                    // Pad an odd final row so its tile keeps the grid's column width.
+                    if (pair.size == 1) Spacer(Modifier.weight(1f))
+                }
+            }
         }
     }
 }
