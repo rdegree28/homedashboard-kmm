@@ -11,7 +11,7 @@ data class NavigationMetadata(
     val destination: NavigationTarget,
     override val displayName: String,
     val icon: RoomIcon,
-    val tint: RoomTint,
+    val tint: Long,
 ) : EntityMetadata {
 
     override val entityId: String get() = "nav.${destination.name.lowercase()}"
@@ -34,16 +34,5 @@ data class NavigationMetadata(
         Plant,
         Sofa,
         Paw
-    }
-
-    /**
-     * What colour a card's glyph is tinted. Like [RoomIcon] these are tokens, not values — `:shared`
-     * has no Compose dependency and so can't hold a `Color`. The names mirror the entries in the UI's
-     * `AppColors` palette that resolve them, keeping that mapping one-to-one.
-     */
-    enum class RoomTint {
-        Wet,
-        Healthy,
-        Accent
     }
 }

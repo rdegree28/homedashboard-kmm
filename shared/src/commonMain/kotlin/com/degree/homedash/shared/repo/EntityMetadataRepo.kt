@@ -11,7 +11,6 @@ import com.degree.homedash.shared.model.entity.LightMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
 import com.degree.homedash.shared.model.entity.NavigationMetadata.RoomIcon
-import com.degree.homedash.shared.model.entity.NavigationMetadata.RoomTint
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
 import com.degree.homedash.shared.model.entity.WaterLevelMetadata
 
@@ -108,10 +107,10 @@ class EntityMetadataRepo(
 
         /** Every launcher card, before feature-flag filtering. */
         val HOME_SCREEN_CARDS: List<NavigationMetadata> = listOf(
-            NavigationMetadata(NavigationTarget.LivingRoom, "Living Room", RoomIcon.Sofa, RoomTint.Accent),
-            NavigationMetadata(NavigationTarget.Office, "Office", RoomIcon.Desk, RoomTint.Wet),
-            NavigationMetadata(NavigationTarget.Plants, "Plants", RoomIcon.Plant, RoomTint.Healthy),
-            NavigationMetadata(NavigationTarget.Pets, "Pets", RoomIcon.Paw, RoomTint.Wet),
+            NavigationMetadata(NavigationTarget.LivingRoom, "Living Room", RoomIcon.Sofa, 0xFFF0C930),
+            NavigationMetadata(NavigationTarget.Office, "Office", RoomIcon.Desk, 0xFF3298CE),
+            NavigationMetadata(NavigationTarget.Plants, "Plants", RoomIcon.Plant, 0xFF00FF00),
+            NavigationMetadata(NavigationTarget.Pets, "Pets", RoomIcon.Paw, 0xFFC29844),
         )
 
         /** The flag a dashboard sits behind, or null when it's available to everyone. */

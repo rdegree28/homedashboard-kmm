@@ -2,8 +2,10 @@ package com.degree.homedash.controls
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
 import com.degree.homedash.ui.Dimens
 import com.degree.homedash.ui.icons.roomIcon
@@ -76,19 +79,29 @@ fun NavigationTile(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    EntityCard(
-        modifier = modifier,
-        label = ui.displayName,
+    HomeDashboardCard(
         onClick = onClick,
-        leading = {
+        enabled = true,
+        modifier = modifier,
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize().align(Alignment.TopCenter),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
             Icon(
                 imageVector = roomIcon(ui.metadata.icon),
                 contentDescription = null,
                 tint = roomTint(ui.metadata.tint),
-                modifier = Modifier.size(Dimens.RowIconSize),
+                modifier = Modifier.size(38.dp).align(Alignment.CenterHorizontally),
             )
-        },
-    )
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = ui.displayName,
+                style = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+    }
 }
 
 @Preview(widthDp = 380)
