@@ -1,6 +1,7 @@
 package com.degree.homedash.controls
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,6 +33,35 @@ internal fun EntityCard(
     labelMuted: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
+    HomeDashboardCard(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier,
+    ) {
+        Box(Modifier.align(Alignment.TopStart)) { leading() }
+        Text(
+            text = label,
+            modifier = Modifier.align(Alignment.Center),
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+            maxLines = 2,
+            fontStyle = if (labelItalic) FontStyle.Italic else FontStyle.Normal,
+            color = if (labelMuted) {
+                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+            } else {
+                Color.Unspecified
+            },
+        )
+    }
+}
+
+@Composable
+internal fun HomeDashboardCard(
+    onClick: () -> Unit,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit,
+) {
     Surface(
         onClick = onClick,
         enabled = enabled,
@@ -41,20 +71,7 @@ internal fun EntityCard(
         modifier = modifier.height(Dimens.EntityCardHeight),
     ) {
         Box(Modifier.fillMaxSize().padding(Dimens.EntityCardPadding)) {
-            Box(Modifier.align(Alignment.TopStart)) { leading() }
-            Text(
-                text = label,
-                modifier = Modifier.align(Alignment.Center),
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-                fontStyle = if (labelItalic) FontStyle.Italic else FontStyle.Normal,
-                color = if (labelMuted) {
-                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                } else {
-                    Color.Unspecified
-                },
-            )
+            content()
         }
     }
 }

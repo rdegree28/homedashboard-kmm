@@ -12,6 +12,7 @@ import com.degree.homedash.controls.EntityAction
 import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
+import com.degree.homedash.ui.icons.RoomIcons
 
 @Composable
 fun LivingRoomScreen(
@@ -47,6 +48,7 @@ fun LivingRoomContent(
             is EntityAction.Toggle -> onToggle(action.entityId)
             is EntityAction.OpenGraph -> Unit
             is EntityAction.SetSpeed -> Unit
+            is EntityAction.Navigate -> Unit
         }
     }
 
@@ -54,7 +56,8 @@ fun LivingRoomContent(
         modifier = modifier,
         title = "Living Room",
         onBack = onBack,
-        onOpenSettings = onOpenSettings
+        onOpenSettings = onOpenSettings,
+        icon = RoomIcons.Sofa,
     ) {
         // Living Room controls are gated behind the viewLivingRoomLights feature flag.
         if (showLights) {

@@ -27,6 +27,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
+import com.degree.homedash.ui.icons.RoomIcons
 
 @Composable
 fun OfficeScreen(
@@ -65,6 +66,7 @@ fun OfficeContent(
             is EntityAction.Toggle -> onToggle(action.entityId)
             is EntityAction.SetSpeed -> onSetFanSpeed(action.entityId, action.percentage)
             is EntityAction.OpenGraph -> Unit // Office has no graph navigation
+            is EntityAction.Navigate -> Unit // launcher-only
         }
     }
 
@@ -73,6 +75,7 @@ fun OfficeContent(
         onBack = onBack,
         onOpenSettings = onOpenSettings,
         connection = ui.connection,
+        icon = RoomIcons.Desk,
     ) {
         ControlGroup(
             title = "Lights",

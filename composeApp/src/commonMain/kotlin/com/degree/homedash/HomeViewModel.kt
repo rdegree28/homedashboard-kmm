@@ -17,13 +17,26 @@ enum class WarningSeverity { Warning, Critical }
 /** An at-a-glance warning shown at the top of the Home launcher. */
 data class HomeWarning(val message: String, val severity: WarningSeverity)
 
-/** Surfaces launcher warnings from live state (currently the cat water fountain level). */
+/**
+ * Backs the Home launcher: the dashboard cards it offers, plus any warnings drawn from live state
+ * (currently the cat water fountain level).
+ */
 class HomeViewModel(
     private val repo: HomeAssistantRepo,
     metadataRepo: EntityMetadataRepo,
 ) : ViewModel() {
 
     private val petEntities = metadataRepo.loadPetsEntityMetadataList()
+
+    /**
+     * The launcher cards. A plain `val`, not a flow — nothing about them depends on live state, so
+     * projecting against an empty state map is the whole story. Feature-flag filtering happens at the
+     * screen, which is where the flag set lives.
+     */
+    val navigation: List<EntityUi.Navigation> =
+        metadataRepo.loadHomeScreenMetadataList()
+            .toEntityUis(emptyMap())
+            .filterIsInstance<EntityUi.Navigation>()
 
     val warnings: StateFlow<List<HomeWarning>> =
         repo.states

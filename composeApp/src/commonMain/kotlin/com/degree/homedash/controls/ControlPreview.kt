@@ -72,6 +72,29 @@ internal fun previewFanUi(
     percentage = percentage,
 )
 
+internal fun previewNavigation(
+    target: NavigationMetadata.NavigationTarget,
+    label: String = target.name,
+    icon: NavigationMetadata.RoomIcon = defaultIconFor(target),
+    tint: Long = defaultTintFor(target),
+) = EntityUi.Navigation(NavigationMetadata(target, label, icon, tint))
+
+/** Mirrors the pairing the repo declares, so previews match the real launcher. */
+private fun defaultIconFor(target: NavigationMetadata.NavigationTarget) = when (target) {
+    NavigationMetadata.NavigationTarget.Office -> NavigationMetadata.RoomIcon.Desk
+    NavigationMetadata.NavigationTarget.Plants -> NavigationMetadata.RoomIcon.Plant
+    NavigationMetadata.NavigationTarget.LivingRoom -> NavigationMetadata.RoomIcon.Sofa
+    NavigationMetadata.NavigationTarget.Pets -> NavigationMetadata.RoomIcon.Paw
+}
+
+/** Likewise for tints — keeps preview cards coloured the way the launcher colours them. */
+private fun defaultTintFor(target: NavigationMetadata.NavigationTarget) = when (target) {
+    NavigationMetadata.NavigationTarget.Office -> 0xFFCCCCCC
+    NavigationMetadata.NavigationTarget.Plants -> 0xFFCCCCCC
+    NavigationMetadata.NavigationTarget.LivingRoom -> 0xFFCCCCCC
+    NavigationMetadata.NavigationTarget.Pets -> 0xFFCCCCCC
+}
+
 internal fun previewClimate(
     label: String,
     valueText: String,

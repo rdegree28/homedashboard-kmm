@@ -25,3 +25,6 @@ object AppColors {
     val ColumbiaBlue = Color(0xFF3458B2) // dashboard header background
     val ColumbiaBlueOn = Color(0xFFFFFFFF) // dark navy text/icons on the header
 }
+
+/** Resolves the tint token a launcher card declares to its palette entry. */
+fun roomTint(tint: Long): Color = Color(tint)

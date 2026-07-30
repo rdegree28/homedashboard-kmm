@@ -1,10 +1,5 @@
 package com.degree.homedash.di
 
-import com.degree.homedash.HomeViewModel
-import com.degree.homedash.livingroom.LivingRoomViewModel
-import com.degree.homedash.office.OfficeViewModel
-import com.degree.homedash.pets.PetsViewModel
-import com.degree.homedash.pets.WaterGraphViewModel
 import com.degree.homedash.plants.PlantGraphViewModel
 import com.degree.homedash.plants.PlantsViewModel
 import com.degree.homedash.shared.api.HaConfig
@@ -44,25 +39,21 @@ class AppModuleTest {
     fun tearDown() = Dispatchers.resetMain()
 
     /**
-     * Every screen ViewModel resolves and constructs from the real two-module graph.
+     * The ViewModels that can be built off-device resolve and construct from the real two-module graph.
      *
-     * `AppViewModel` is absent on purpose: it pulls `ConfigStore`/`AuthRepo`, which sit on
-     * multiplatform-settings' no-arg factory and need a real Android context. Its wiring is covered
-     * by [appModuleDefinitionsAreSatisfiable] instead, which never instantiates anything.
+     * Only Plants and its graph screen qualify. Everything else — Home, Office, Living Room, Pets,
+     * WaterGraph, and AppViewModel — reaches `EntityMetadataRepo` or `ConfigStore`, both of which lead
+     * to multiplatform-settings' no-arg factory and so need a real Android context. Covering those here
+     * would mean adding Robolectric; until then their wiring is checked by
+     * [appModuleDefinitionsAreSatisfiable], which never instantiates anything.
      */
     @Test
-    fun screenViewModelsResolve() {
+    fun contextFreeViewModelsResolve() {
         val koin = koinApplication { modules(sharedModule, appModule(defaultConfig = null)) }.koin
 
-        assertNotNull(koin.get<HomeViewModel>())
-        assertNotNull(koin.get<OfficeViewModel>())
-        assertNotNull(koin.get<LivingRoomViewModel>())
-        assertNotNull(koin.get<PetsViewModel>())
         assertNotNull(koin.get<PlantsViewModel>())
-
-        // The graph ViewModels take their entity id as a runtime parameter.
+        // Takes its entity id as a runtime parameter.
         assertNotNull(koin.get<PlantGraphViewModel> { parametersOf("sensor.louie_moisture_sensor_soil_moisture") })
-        assertNotNull(koin.get<WaterGraphViewModel> { parametersOf("sensor.cat_water_fountain_remaining_water_pct") })
     }
 
     /**

@@ -6,6 +6,7 @@ import com.degree.homedash.shared.model.entity.DoorMetadata
 import com.degree.homedash.shared.model.entity.EntityMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.LightMetadata
+import com.degree.homedash.shared.model.entity.NavigationMetadata
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
 import com.degree.homedash.shared.model.entity.WaterLevelMetadata
 import com.degree.homedash.ui.formatNumber
@@ -69,6 +70,9 @@ fun EntityMetadata.toEntityUi(state: EntityState?): EntityUi = when (this) {
             valueText = pct?.let { "${formatNumber(it, decimals = 0)} %" } ?: "—",
         )
     }
+
+    // Deliberately ignores [state]: a launcher card has no Home Assistant entity behind it.
+    is NavigationMetadata -> EntityUi.Navigation(this)
 }
 
 /** Projects a whole screen's roster against the current [states] map. */

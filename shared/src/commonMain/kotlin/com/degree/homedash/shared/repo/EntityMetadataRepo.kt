@@ -1,10 +1,16 @@
 package com.degree.homedash.shared.repo
 
+import com.degree.homedash.shared.dao.AuthRepo
+import com.degree.homedash.shared.dao.FeatureFlagDao
+import com.degree.homedash.shared.model.FeatureFlag
 import com.degree.homedash.shared.model.entity.ClimateMetadata
 import com.degree.homedash.shared.model.entity.DoorMetadata
 import com.degree.homedash.shared.model.entity.EntityMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.LightMetadata
+import com.degree.homedash.shared.model.entity.NavigationMetadata
+import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
+import com.degree.homedash.shared.model.entity.NavigationMetadata.RoomIcon
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
 import com.degree.homedash.shared.model.entity.WaterLevelMetadata
 
@@ -15,8 +21,32 @@ import com.degree.homedash.shared.model.entity.WaterLevelMetadata
  * for each. Entity ids are spelled out here rather than pulled from the `*Entities` objects in the
  * UI module, which this module cannot see — those objects still own the ids that have no metadata
  * type (scripts, raw sensors, switches).
+ *
+ * Rosters are also filtered to what the signed-in user is allowed to see, so screens receive a list
+ * they can render as-is without knowing about feature flags.
  */
-class EntityMetadataRepo {
+class EntityMetadataRepo(
+    private val featureFlagDao: FeatureFlagDao,
+    private val authRepo: AuthRepo,
+) {
+
+    /**
+     * The Home launcher's dashboard cards, in render order, minus any whose dashboard is gated behind
+     * a feature flag the current user doesn't hold.
+     *
+     * These carry no Home Assistant entity — see [NavigationMetadata]. The list is resolved per call
+     * against whoever is signed in at that moment.
+     */
+    fun loadHomeScreenMetadataList(): List<EntityMetadata> {
+        val flags = currentUserFlags()
+        return HOME_SCREEN_CARDS.filter { card ->
+            gatingFlag(card.destination)?.let { it in flags } ?: true
+        }
+    }
+
+    /** Flags for whoever is signed in; none when logged out. */
+    private fun currentUserFlags(): Set<FeatureFlag> =
+        authRepo.loadCurrentUser().value?.let(featureFlagDao::getFeatureFlagsForUser).orEmpty()
 
     /**
      * The Office lights, fans, climate sensors, and door.
@@ -72,4 +102,24 @@ class EntityMetadataRepo {
         SoilMoistureMetadata("sensor.louie_moisture_sensor_soil_moisture", "Louie"),
         SoilMoistureMetadata("sensor.living_room_orange_pot_moisture_sensor_soil_moisture", "Orange Pot"),
     )
+
+    private companion object {
+
+        /** Every launcher card, before feature-flag filtering. */
+        val HOME_SCREEN_CARDS: List<NavigationMetadata> = listOf(
+            NavigationMetadata(NavigationTarget.LivingRoom, "Living Room", RoomIcon.Sofa, 0xFFF0C930),
+            NavigationMetadata(NavigationTarget.Office, "Office", RoomIcon.Desk, 0xFF3298CE),
+            NavigationMetadata(NavigationTarget.Plants, "Plants", RoomIcon.Plant, 0xFF00FF00),
+            NavigationMetadata(NavigationTarget.Pets, "Pets", RoomIcon.Paw, 0xFFC29844),
+        )
+
+        /** The flag a dashboard sits behind, or null when it's available to everyone. */
+        fun gatingFlag(target: NavigationTarget): FeatureFlag? = when (target) {
+            NavigationTarget.Office -> FeatureFlag.ViewOfficeScreen
+            NavigationTarget.LivingRoom,
+            NavigationTarget.Plants,
+            NavigationTarget.Pets,
+            -> null
+        }
+    }
 }

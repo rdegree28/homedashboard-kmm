@@ -12,6 +12,7 @@ import com.degree.homedash.controls.EntityAction
 import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
+import com.degree.homedash.ui.icons.RoomIcons
 
 /** The Plants dashboard shows every entity whose id ends with this suffix. */
 object PlantEntities {
@@ -37,7 +38,7 @@ fun PlantsContent(
     onOpenSettings: () -> Unit,
     onOpenGraph: (String) -> Unit,
 ) {
-    DashboardScaffold(title = "Plants", onBack = onBack, onOpenSettings = onOpenSettings) {
+    DashboardScaffold(title = "Plants", onBack = onBack, onOpenSettings = onOpenSettings, icon = RoomIcons.Plant) {
         ControlGroup(
             title = "Soil Moisture",
             entities = ui.plants,

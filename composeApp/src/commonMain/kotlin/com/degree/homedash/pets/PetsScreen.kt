@@ -12,6 +12,7 @@ import com.degree.homedash.controls.EntityAction
 import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
+import com.degree.homedash.ui.icons.RoomIcons
 
 @Composable
 fun PetsScreen(
@@ -32,7 +33,7 @@ fun PetsContent(
     onOpenSettings: () -> Unit,
     onOpenGraph: (String) -> Unit,
 ) {
-    DashboardScaffold(title = "Pets", onBack = onBack, onOpenSettings = onOpenSettings) {
+    DashboardScaffold(title = "Pets", onBack = onBack, onOpenSettings = onOpenSettings, icon = RoomIcons.Paw) {
         ControlGroup(
             title = "Cat Water Fountain",
             entities = ui.items,

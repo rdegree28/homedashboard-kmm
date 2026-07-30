@@ -56,6 +56,12 @@ sealed interface EntityUi {
         val pct: Double?,
         val valueText: String,
     ) : EntityUi
+
+    /** A launcher card. Alone among these it has nothing that changes — the metadata is the whole state. */
+    @Immutable
+    data class Navigation(
+        override val metadata: NavigationMetadata,
+    ) : EntityUi
 }
 
 /** Convenience for list keys and actions — the underlying entity id. */

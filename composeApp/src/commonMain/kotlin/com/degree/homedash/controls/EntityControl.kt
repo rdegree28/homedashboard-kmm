@@ -1,6 +1,7 @@
 package com.degree.homedash.controls
 
 import com.degree.homedash.shared.model.entity.*
+import com.degree.homedash.shared.model.entity.NavigationMetadata
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
@@ -26,14 +27,18 @@ sealed interface EntityAction {
     data class Toggle(val entityId: String) : EntityAction
     data class SetSpeed(val entityId: String, val percentage: Int) : EntityAction
     data class OpenGraph(val entityId: String) : EntityAction
+
+    /** Carries the typed destination rather than an entity id — a nav card's id is synthetic. */
+    data class Navigate(val target: NavigationMetadata.NavigationTarget) : EntityAction
 }
 
 /** How a control should render. `ControlGroup` picks this per group; individual controls don't. */
 enum class ControlLayout { Row, Card }
 
-/** True for entity types that have a card rendering (currently lights, fans, and climate). */
+/** True for entity types that have a card rendering (lights, fans, climate, and launcher tiles). */
 fun EntityUi.hasCard(): Boolean =
-    this is EntityUi.Light || this is EntityUi.Fan || this is EntityUi.Climate
+    this is EntityUi.Light || this is EntityUi.Fan || this is EntityUi.Climate ||
+        this is EntityUi.Navigation
 
 /**
  * How many grid columns this entity's card should span (out of the grid's 2). A fan spans the full
@@ -126,6 +131,14 @@ fun EntityControl(
                 unavailable = entity.unavailable,
             ),
         )
+
+        is EntityUi.Navigation -> {
+            val onClick = { onAction(EntityAction.Navigate(entity.metadata.destination)) }
+            when (layout) {
+                ControlLayout.Row -> NavigationCard(entity, onClick, modifier)
+                ControlLayout.Card -> NavigationTile(entity, onClick, modifier)
+            }
+        }
 
         is EntityUi.SoilMoisture -> SoilMoistureControl(
             ui = entity,

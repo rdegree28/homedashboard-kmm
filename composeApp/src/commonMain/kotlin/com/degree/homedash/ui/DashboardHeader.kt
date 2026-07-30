@@ -35,10 +35,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.api.HaConnectionStatus
+import com.degree.homedash.ui.icons.RoomIcons
 
 /**
  * App-wide Home Assistant connection status, provided once at the app root so every
@@ -59,10 +61,11 @@ fun DashboardScaffold(
     onOpenSettings: (() -> Unit)? = null,
     connection: HaConnectionStatus = LocalHaConnectionStatus.current,
     versionLabel: String? = null,
+    icon: ImageVector? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
-        DashboardHeader(title, onBack, onOpenSettings, connection, versionLabel)
+        DashboardHeader(title, onBack, onOpenSettings, connection, versionLabel, icon)
         Column(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(Dimens.SectionSpacing),
@@ -78,7 +81,8 @@ fun DashboardScaffold(
  * it flush at the top of the screen, not inside content padding. [connection] defaults to
  * [LocalHaConnectionStatus].
  *
- * [versionLabel] is set by the Home launcher only, to make the running build identifiable.
+ * [versionLabel] is set by the Home launcher only, to make the running build identifiable. [icon] is
+ * the room glyph shown ahead of the title on each dashboard (see `RoomIcons`).
  */
 @Composable
 fun DashboardHeader(
@@ -87,6 +91,7 @@ fun DashboardHeader(
     onOpenSettings: (() -> Unit)? = null,
     connection: HaConnectionStatus = LocalHaConnectionStatus.current,
     versionLabel: String? = null,
+    icon: ImageVector? = null,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -105,9 +110,21 @@ fun DashboardHeader(
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                 }
             }
+            // Whichever comes first — icon or title — carries the leading inset the back arrow would
+            // otherwise provide.
+            val leadingInset = if (onBack != null) 0.dp else 16.dp
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.padding(start = leadingInset, end = 10.dp).size(26.dp),
+                )
+            }
             Text(
                 text = title,
-                modifier = Modifier.weight(1f).padding(start = if (onBack != null) 0.dp else 16.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = if (icon != null) 0.dp else leadingInset),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
             )
@@ -159,6 +176,11 @@ private fun DashboardHeaderPreview() {
                 connection = HaConnectionStatus.Connecting,
                 versionLabel = "v1.0",
             )
+            // The four room headers, each with its hand-drawn glyph.
+            DashboardHeader("Office", onBack = {}, onOpenSettings = {}, icon = RoomIcons.Desk)
+            DashboardHeader("Plants", onBack = {}, onOpenSettings = {}, icon = RoomIcons.Plant)
+            DashboardHeader("Living Room", onBack = {}, onOpenSettings = {}, icon = RoomIcons.Sofa)
+            DashboardHeader("Pets", onBack = {}, onOpenSettings = {}, icon = RoomIcons.Paw)
             // Root screen: gear only, connected.
             DashboardHeader("Office", onOpenSettings = {}, connection = HaConnectionStatus.Connected)
             // Nested screen: back + gear, connecting.
