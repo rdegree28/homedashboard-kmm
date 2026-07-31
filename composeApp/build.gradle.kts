@@ -107,7 +107,7 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
-        versionName = "1.0.1" // keep in step with AppInfo.VERSION, which the Home header displays
+        versionName = "1.1" // keep in step with AppInfo.VERSION, which the Home header displays
 
         buildConfigField("String", "HA_URL", "\"${localProps.getProperty("ha.url", "")}\"")
         buildConfigField("String", "HA_TOKEN", "\"${localProps.getProperty("ha.token", "")}\"")
