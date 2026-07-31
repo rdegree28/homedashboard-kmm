@@ -21,6 +21,7 @@ data class NavigationMetadata(
         Office,
         Plants,
         LivingRoom,
+        Bedroom,
         Pets
     }
 
@@ -33,6 +34,7 @@ data class NavigationMetadata(
         Desk,
         Plant,
         Sofa,
+        Bed,
         Paw
     }
 }

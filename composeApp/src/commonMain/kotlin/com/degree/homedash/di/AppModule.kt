@@ -2,6 +2,7 @@ package com.degree.homedash.di
 
 import com.degree.homedash.AppViewModel
 import com.degree.homedash.HomeViewModel
+import com.degree.homedash.bedroom.BedroomViewModel
 import com.degree.homedash.livingroom.LivingRoomViewModel
 import com.degree.homedash.office.OfficeViewModel
 import com.degree.homedash.pets.PetsViewModel
@@ -28,6 +29,7 @@ fun appModule(defaultConfig: HaConfig?) = module {
     viewModel { HomeViewModel(get(), get()) }
     viewModel { OfficeViewModel(get(), get()) }
     viewModel { LivingRoomViewModel(get(), get()) }
+    viewModel { BedroomViewModel(get(), get()) }
     viewModel { PetsViewModel(get(), get()) }
     viewModel { PlantsViewModel(get()) }
     viewModel { (entityId: String) -> PlantGraphViewModel(get(), entityId) }

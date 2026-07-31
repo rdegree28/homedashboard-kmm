@@ -29,4 +29,7 @@ data class FanMetadata(
                 if (levelCount >= 2) SpeedAdjustment(levelCount) else null
         }
     }
+
+    // Defined for factories
+    companion object
 }

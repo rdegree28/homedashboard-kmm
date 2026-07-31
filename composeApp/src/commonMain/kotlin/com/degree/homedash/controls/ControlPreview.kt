@@ -84,6 +84,7 @@ private fun defaultIconFor(target: NavigationMetadata.NavigationTarget) = when (
     NavigationMetadata.NavigationTarget.Office -> NavigationMetadata.RoomIcon.Desk
     NavigationMetadata.NavigationTarget.Plants -> NavigationMetadata.RoomIcon.Plant
     NavigationMetadata.NavigationTarget.LivingRoom -> NavigationMetadata.RoomIcon.Sofa
+    NavigationMetadata.NavigationTarget.Bedroom -> NavigationMetadata.RoomIcon.Bed
     NavigationMetadata.NavigationTarget.Pets -> NavigationMetadata.RoomIcon.Paw
 }
 
@@ -92,6 +93,7 @@ private fun defaultTintFor(target: NavigationMetadata.NavigationTarget) = when (
     NavigationMetadata.NavigationTarget.Office -> 0xFFCCCCCC
     NavigationMetadata.NavigationTarget.Plants -> 0xFFCCCCCC
     NavigationMetadata.NavigationTarget.LivingRoom -> 0xFFCCCCCC
+    NavigationMetadata.NavigationTarget.Bedroom -> 0xFFCCCCCC
     NavigationMetadata.NavigationTarget.Pets -> 0xFFCCCCCC
 }
 

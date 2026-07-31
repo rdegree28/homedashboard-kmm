@@ -13,6 +13,7 @@ import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarg
 import com.degree.homedash.shared.model.entity.NavigationMetadata.RoomIcon
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
 import com.degree.homedash.shared.model.entity.WaterLevelMetadata
+import com.degree.homedash.shared.model.entity.dellaTowerFan
 
 /**
  * Repository for providing EntityMetadata to the UI components.
@@ -58,7 +59,7 @@ class EntityMetadataRepo(
     fun loadOfficeEntityMetadataList(): List<EntityMetadata> = listOf(
         LightMetadata("light.office_light", "Office"),
         LightMetadata("light.office_small_light", "Small"),
-        FanMetadata("fan.office_fan_office_fan", "Office Fan", FanMetadata.SpeedAdjustment(12)),
+        FanMetadata.dellaTowerFan("fan.office_fan_office_fan", "Office Fan"),
         FanMetadata("fan.office_box_fan", "Box Fan"),
         // The misting fan reports no usable percentage_step; 6 is the count the dashboard has always used.
         FanMetadata("fan.misting_fan", "Misting Fan", FanMetadata.SpeedAdjustment(6)),
@@ -74,13 +75,26 @@ class EntityMetadataRepo(
         LightMetadata("light.homework_light", "Homework"),
         LightMetadata("light.dining_ceiling_light", "Dining Ceiling"),
         LightMetadata("light.kitchen_stove_light", "Kitchen Stove"),
-        FanMetadata("fan.living_room_fan", "Fan", FanMetadata.SpeedAdjustment(12)),
+        FanMetadata.dellaTowerFan("fan.living_room_fan", "Fan"),
         // A plain switch, so no speed control despite the name.
         FanMetadata("switch.living_room_acc_1", "Box Fan"),
         ClimateMetadata("sensor.living_room_thermostat_temperature", "Temperature", ClimateMetadata.ClimateKind.Temperature),
         // Unlike Office (humidity card with dew point as a subvalue), the Living Room shows a dew point
         // card computed from the temperature + humidity pair — keyed off the humidity entity id.
         ClimateMetadata("sensor.living_room_thermostat_humidity", "Dew Point", ClimateMetadata.ClimateKind.DewPoint),
+    )
+
+    /**
+     * The Bedroom entities.
+     *
+     * Empty for now — the room's card and screen exist, but nothing in Home Assistant is wired up to
+     * it yet. Add entries here and `BedroomScreen` can project them the way the other rooms do.
+     */
+    fun loadBedroomEntityMetadataList(): List<EntityMetadata> = listOf(
+        LightMetadata("light.bedroom_light_west", "West"),
+        LightMetadata("light.bedroom_light_east", "East"),
+        FanMetadata("fan.bedroom_box_fan", "Box Fan"),
+        FanMetadata.dellaTowerFan("fan.bedroom_fan_tower_fan", "Tower Fan"),
     )
 
     /** The Pets sensors — currently just the cat water fountain. */
@@ -107,6 +121,7 @@ class EntityMetadataRepo(
 
         /** Every launcher card, before feature-flag filtering. */
         val HOME_SCREEN_CARDS: List<NavigationMetadata> = listOf(
+            NavigationMetadata(NavigationTarget.Bedroom, "Bedroom", RoomIcon.Bed, 0xFF9575CD),
             NavigationMetadata(NavigationTarget.LivingRoom, "Living Room", RoomIcon.Sofa, 0xFFF0C930),
             NavigationMetadata(NavigationTarget.Office, "Office", RoomIcon.Desk, 0xFF3298CE),
             NavigationMetadata(NavigationTarget.Plants, "Plants", RoomIcon.Plant, 0xFF00FF00),
@@ -117,6 +132,7 @@ class EntityMetadataRepo(
         fun gatingFlag(target: NavigationTarget): FeatureFlag? = when (target) {
             NavigationTarget.Office -> FeatureFlag.ViewOfficeScreen
             NavigationTarget.LivingRoom,
+            NavigationTarget.Bedroom,
             NavigationTarget.Plants,
             NavigationTarget.Pets,
             -> null

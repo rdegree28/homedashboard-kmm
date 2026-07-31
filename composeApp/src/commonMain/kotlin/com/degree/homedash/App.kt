@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.degree.homedash.di.appModule
+import com.degree.homedash.bedroom.BedroomScreen
 import com.degree.homedash.livingroom.LivingRoomScreen
 import com.degree.homedash.office.OfficeScreen
 import com.degree.homedash.pets.PetsScreen
@@ -140,6 +141,11 @@ private fun AppContent() {
                             onBack = ::goBack,
                         )
 
+                        Screen.Bedroom -> BedroomScreen(
+                            onBack = ::goBack,
+                            onOpenSettings = { navigate(Screen.Settings) },
+                        )
+
                         Screen.LivingRoom -> LivingRoomScreen(
                             showLights = FeatureFlag.ViewLivingRoomLights in featureFlags,
                             onBack = ::goBack,
@@ -167,12 +173,13 @@ private fun AppContent() {
 }
 
 /** Top-level destinations; the launcher (Home) is the root of the back stack. */
-private enum class Screen { Home, Office, Plants, LivingRoom, Pets, Settings, Login, PlantGraph, WaterGraph }
+private enum class Screen { Home, Office, Plants, LivingRoom, Bedroom, Pets, Settings, Login, PlantGraph, WaterGraph }
 
 /** Maps a launcher card's destination onto this file's private [Screen] stack. */
 private fun NavigationTarget.toScreen(): Screen = when (this) {
     NavigationTarget.Office -> Screen.Office
     NavigationTarget.Plants -> Screen.Plants
     NavigationTarget.LivingRoom -> Screen.LivingRoom
+    NavigationTarget.Bedroom -> Screen.Bedroom
     NavigationTarget.Pets -> Screen.Pets
 }

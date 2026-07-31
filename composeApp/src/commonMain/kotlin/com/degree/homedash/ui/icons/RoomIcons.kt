@@ -66,6 +66,16 @@ object RoomIcons {
         }
     }
 
+    /** A bed seen from the side: headboard, pillow, mattress, feet. */
+    val Bed: ImageVector by lazy {
+        roomIcon("Bed") {
+            path(fill = SolidColor(Color.Black)) { roundedRect(2f, 5.5f, 4.6f, 18.6f, 1.2f) }
+            path(fill = SolidColor(Color.Black)) { roundedRect(5.4f, 8.8f, 10.6f, 12.8f, 1.3f) }
+            path(fill = SolidColor(Color.Black)) { roundedRect(4.6f, 12.6f, 22f, 17.2f, 1.6f) }
+            path(fill = SolidColor(Color.Black)) { roundedRect(19.6f, 17.2f, 22f, 19.9f, 0.4f) }
+        }
+    }
+
     /** A paw print: four toes over a pad. */
     val Paw: ImageVector by lazy {
         roomIcon("Paw") {
@@ -84,6 +94,7 @@ fun roomIcon(icon: RoomIcon): ImageVector = when (icon) {
     RoomIcon.Desk -> RoomIcons.Desk
     RoomIcon.Plant -> RoomIcons.Plant
     RoomIcon.Sofa -> RoomIcons.Sofa
+    RoomIcon.Bed -> RoomIcons.Bed
     RoomIcon.Paw -> RoomIcons.Paw
 }
 
