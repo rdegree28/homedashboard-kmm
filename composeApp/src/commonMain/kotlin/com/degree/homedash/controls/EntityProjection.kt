@@ -8,6 +8,7 @@ import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.LightMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
+import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
 import com.degree.homedash.shared.model.entity.WaterLevelMetadata
 import com.degree.homedash.ui.formatNumber
 import com.degree.homedash.ui.readingText
@@ -73,6 +74,9 @@ fun EntityMetadata.toEntityUi(state: EntityState?): EntityUi = when (this) {
 
     // Deliberately ignores [state]: a launcher card has no Home Assistant entity behind it.
     is NavigationMetadata -> EntityUi.Navigation(this)
+
+    // Likewise stateless — a trigger fires a service, it doesn't report anything.
+    is TriggerEntityMetadata -> EntityUi.Trigger(this)
 }
 
 /** Projects a whole screen's roster against the current [states] map. */

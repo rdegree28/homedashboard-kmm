@@ -53,6 +53,7 @@ fun BedroomContent(
             is EntityAction.Toggle -> onToggle(action.entityId)
             is EntityAction.SetSpeed -> Unit
             is EntityAction.OpenGraph -> Unit
+            is EntityAction.Activate -> Unit // no scene cards on this screen yet
             is EntityAction.Navigate -> Unit
         }
     }

@@ -66,6 +66,7 @@ fun OfficeContent(
             is EntityAction.Toggle -> onToggle(action.entityId)
             is EntityAction.SetSpeed -> onSetFanSpeed(action.entityId, action.percentage)
             is EntityAction.OpenGraph -> Unit // Office has no graph navigation
+            is EntityAction.Activate -> Unit // no scene cards on this screen yet
             is EntityAction.Navigate -> Unit // launcher-only
         }
     }

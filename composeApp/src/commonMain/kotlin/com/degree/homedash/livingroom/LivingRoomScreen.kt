@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.degree.homedash.controls.EntityAction
+import com.degree.homedash.controls.previewTrigger
+import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
 import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
@@ -29,6 +31,7 @@ fun LivingRoomScreen(
         onBack = onBack,
         onOpenSettings = onOpenSettings,
         onToggle = vm::toggle,
+        onActivate = vm::activate,
         showLights = showLights,
     )
 }
@@ -41,11 +44,13 @@ fun LivingRoomContent(
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
     onToggle: (String) -> Unit,
+    onActivate: (TriggerEntityMetadata.ServiceCall) -> Unit,
     showLights: Boolean = false,
 ) {
     val onAction: (EntityAction) -> Unit = { action ->
         when (action) {
             is EntityAction.Toggle -> onToggle(action.entityId)
+            is EntityAction.Activate -> onActivate(action.call)
             is EntityAction.OpenGraph -> Unit
             is EntityAction.SetSpeed -> Unit
             is EntityAction.Navigate -> Unit
@@ -61,6 +66,15 @@ fun LivingRoomContent(
     ) {
         // Living Room controls are gated behind the viewLivingRoomLights feature flag.
         if (showLights) {
+            if (ui.triggers.isNotEmpty()) {
+                ControlGroup(
+                    title = "Scenes",
+                    entities = ui.triggers,
+                    useCardUis = true,
+                    onAction = onAction,
+                )
+            }
+
             ControlGroup(
                 title = "Lights",
                 entities = ui.lights,
@@ -91,10 +105,16 @@ private fun LivingRoomScreenPreview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
             LivingRoomContent(
-                ui = LivingRoomUiState(lights = previewLights, fans = previewFans, climate = previewClimate),
+                ui = LivingRoomUiState(
+                    triggers = listOf(previewTrigger("Main Lights")),
+                    lights = previewLights,
+                    fans = previewFans,
+                    climate = previewClimate,
+                ),
                 onBack = {},
                 onOpenSettings = {},
                 onToggle = {},
+                onActivate = {},
                 showLights = true,
             )
         }

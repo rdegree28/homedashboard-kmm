@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 
 @Immutable
 data class LivingRoomUiState(
+    val triggers: List<EntityUi.Trigger>,
     val lights: List<EntityUi.Light>,
     val fans: List<EntityUi.Fan>,
     val climate: List<EntityUi.Climate>,
@@ -39,16 +40,26 @@ class LivingRoomViewModel(
             .map { states ->
                 val uis = entities.toEntityUis(states)
                 LivingRoomUiState(
+                    triggers = uis.filterIsInstance<EntityUi.Trigger>(),
                     lights = uis.filterIsInstance<EntityUi.Light>(),
                     fans = uis.filterIsInstance<EntityUi.Fan>(),
                     climate = uis.filterIsInstance<EntityUi.Climate>().withDewPoint(states),
                 )
             }
             .distinctUntilChanged()
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), LivingRoomUiState(emptyList(), emptyList(), emptyList()))
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000),
+                LivingRoomUiState(emptyList(), emptyList(), emptyList(), emptyList()),
+            )
 
     fun toggle(entityId: String) {
         viewModelScope.launch { repo.toggle(entityId) }
+    }
+
+    /** Fires a trigger card's service call — activating a scene, running a script. */
+    fun activate(call: TriggerEntityMetadata.ServiceCall) {
+        viewModelScope.launch { repo.callService(call.domain, call.service, call.entityId) }
     }
 }
 

@@ -62,6 +62,12 @@ sealed interface EntityUi {
     data class Navigation(
         override val metadata: NavigationMetadata,
     ) : EntityUi
+
+    /** A scene/script trigger card. Like [Navigation], nothing about it changes at runtime. */
+    @Immutable
+    data class Trigger(
+        override val metadata: TriggerEntityMetadata,
+    ) : EntityUi
 }
 
 /** Convenience for list keys and actions — the underlying entity id. */

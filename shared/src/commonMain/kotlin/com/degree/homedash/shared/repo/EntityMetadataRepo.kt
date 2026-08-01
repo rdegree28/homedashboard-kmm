@@ -12,8 +12,10 @@ import com.degree.homedash.shared.model.entity.NavigationMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
 import com.degree.homedash.shared.model.entity.NavigationMetadata.RoomIcon
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
+import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
 import com.degree.homedash.shared.model.entity.WaterLevelMetadata
 import com.degree.homedash.shared.model.entity.dellaTowerFan
+import com.degree.homedash.shared.model.entity.mainLights
 
 /**
  * Repository for providing EntityMetadata to the UI components.
@@ -70,6 +72,7 @@ class EntityMetadataRepo(
 
     /** The Living Room lights, fans, and climate sensors. */
     fun loadLivingRoomEntityMetadataList(): List<EntityMetadata> = listOf(
+        TriggerEntityMetadata.mainLights(),
         LightMetadata("light.living_room_light_west", "West"),
         LightMetadata("light.living_room_light_east", "East"),
         LightMetadata("light.homework_light", "Homework"),

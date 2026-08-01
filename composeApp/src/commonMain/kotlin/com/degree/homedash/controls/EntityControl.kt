@@ -30,6 +30,9 @@ sealed interface EntityAction {
 
     /** Carries the typed destination rather than an entity id — a nav card's id is synthetic. */
     data class Navigate(val target: NavigationMetadata.NavigationTarget) : EntityAction
+
+    /** Fire a scene/script/automation. Carries the whole call, since a trigger's id is synthetic. */
+    data class Activate(val call: TriggerEntityMetadata.ServiceCall) : EntityAction
 }
 
 /** How a control should render. `ControlGroup` picks this per group; individual controls don't. */
@@ -38,7 +41,7 @@ enum class ControlLayout { Row, Card }
 /** True for entity types that have a card rendering (lights, fans, climate, and launcher tiles). */
 fun EntityUi.hasCard(): Boolean =
     this is EntityUi.Light || this is EntityUi.Fan || this is EntityUi.Climate ||
-        this is EntityUi.Navigation
+        this is EntityUi.Navigation || this is EntityUi.Trigger
 
 /**
  * How many grid columns this entity's card should span (out of the grid's 2). A fan spans the full
@@ -139,6 +142,13 @@ fun EntityControl(
                 ControlLayout.Card -> NavigationTile(entity, onClick, modifier)
             }
         }
+
+        // One-shot action, so the same tile in either layout.
+        is EntityUi.Trigger -> TriggerCard(
+            ui = entity,
+            onActivate = { onAction(EntityAction.Activate(entity.metadata.action())) },
+            modifier = modifier,
+        )
 
         is EntityUi.SoilMoisture -> SoilMoistureControl(
             ui = entity,

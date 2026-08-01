@@ -97,6 +97,12 @@ private fun defaultTintFor(target: NavigationMetadata.NavigationTarget) = when (
     NavigationMetadata.NavigationTarget.Pets -> 0xFFCCCCCC
 }
 
+internal fun previewTrigger(label: String) = EntityUi.Trigger(
+    object : TriggerEntityMetadata("trigger.${label.lowercase().replace(' ', '_')}", label) {
+        override fun action() = ServiceCall.turnOn("scene.${label.lowercase().replace(' ', '_')}")
+    },
+)
+
 internal fun previewClimate(
     label: String,
     valueText: String,
