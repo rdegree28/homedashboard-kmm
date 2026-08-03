@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 
@@ -59,6 +60,7 @@ internal fun EntityCard(
 internal fun HomeDashboardCard(
     onClick: () -> Unit,
     enabled: Boolean,
+    height: Dp = Dimens.EntityCardHeight,
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit,
 ) {
@@ -68,7 +70,7 @@ internal fun HomeDashboardCard(
         shape = RoundedCornerShape(Dimens.CardCorner),
         color = AppColors.CardBackground,
         shadowElevation = Dimens.CardElevation,
-        modifier = modifier.height(Dimens.EntityCardHeight),
+        modifier = modifier.height(height),
     ) {
         Box(Modifier.fillMaxSize().padding(Dimens.EntityCardPadding)) {
             content()

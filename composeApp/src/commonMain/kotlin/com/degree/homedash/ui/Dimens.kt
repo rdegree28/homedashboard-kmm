@@ -6,6 +6,7 @@ import androidx.compose.ui.unit.dp
 /** Recurring layout dimensions shared across dashboards. */
 object Dimens {
     val EntityCardHeight: Dp = 100.dp
+    val SmallEntityCardHeight: Dp = 60.dp
     val EntityCardPadding: Dp = 14.dp
     val CardCorner: Dp = 12.dp
     val CardElevation: Dp = 1.dp
