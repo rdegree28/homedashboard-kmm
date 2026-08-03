@@ -16,6 +16,7 @@ import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
 import com.degree.homedash.shared.model.entity.WaterLevelMetadata
 import com.degree.homedash.shared.model.entity.dellaTowerFan
 import com.degree.homedash.shared.model.entity.mainLights
+import com.degree.homedash.shared.model.entity.testCard
 
 /**
  * Repository for providing EntityMetadata to the UI components.

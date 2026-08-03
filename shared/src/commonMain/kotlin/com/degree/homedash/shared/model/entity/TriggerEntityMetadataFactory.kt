@@ -7,6 +7,16 @@ package com.degree.homedash.shared.model.entity
  */
 
 /** Living Room "Main Lights" scene. */
+fun TriggerEntityMetadata.Companion.testCard(): TriggerEntityMetadata {
+    return object : TriggerEntityMetadata(
+        entityId = "trigger.testcard",
+        displayName = "TestCard",
+    ) {
+        override fun action() = ServiceCall(domain = "", service = "", entityId = "")
+    }
+}
+
+/** Living Room "Main Lights" scene. */
 fun TriggerEntityMetadata.Companion.mainLights(): TriggerEntityMetadata {
     return object : TriggerEntityMetadata(
         entityId = "trigger.main_lights",
