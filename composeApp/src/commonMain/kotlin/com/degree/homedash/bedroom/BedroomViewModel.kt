@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.toEntityUis
+import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,6 +17,7 @@ import kotlinx.coroutines.launch
 
 @Immutable
 data class BedroomUiState(
+    val triggers: List<EntityUi.Trigger>,
     val lights: List<EntityUi.Light>,
     val fans: List<EntityUi.Fan>,
     val climate: List<EntityUi.Climate>,
@@ -35,6 +37,7 @@ class BedroomViewModel(
             .map { states ->
                 val uis = entities.toEntityUis(states)
                 BedroomUiState(
+                    triggers = uis.filterIsInstance<EntityUi.Trigger>(),
                     lights = uis.filterIsInstance<EntityUi.Light>(),
                     fans = uis.filterIsInstance<EntityUi.Fan>(),
                     climate = uis.filterIsInstance<EntityUi.Climate>(),
@@ -47,7 +50,12 @@ class BedroomViewModel(
         viewModelScope.launch { repo.toggle(entityId) }
     }
 
+    /** Fires a trigger card's service call — running a script, activating a scene. */
+    fun activate(call: TriggerEntityMetadata.ServiceCall) {
+        viewModelScope.launch { repo.callService(call.domain, call.service, call.entityId) }
+    }
+
     private companion object {
-        val EMPTY = BedroomUiState(emptyList(), emptyList(), emptyList())
+        val EMPTY = BedroomUiState(emptyList(), emptyList(), emptyList(), emptyList())
     }
 }

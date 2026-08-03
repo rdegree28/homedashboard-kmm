@@ -12,6 +12,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.previewLight
+import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 import com.degree.homedash.ui.icons.RoomIcons
@@ -30,6 +31,7 @@ fun BedroomScreen(
         onBack = onBack,
         onOpenSettings = onOpenSettings,
         onToggle = vm::toggle,
+        onActivate = vm::activate,
         modifier = modifier,
     )
 }
@@ -46,14 +48,15 @@ fun BedroomContent(
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
     onToggle: (String) -> Unit,
+    onActivate: (TriggerEntityMetadata.ServiceCall) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val onAction: (EntityAction) -> Unit = { action ->
         when (action) {
             is EntityAction.Toggle -> onToggle(action.entityId)
+            is EntityAction.Activate -> onActivate(action.call)
             is EntityAction.SetSpeed -> Unit
             is EntityAction.OpenGraph -> Unit
-            is EntityAction.Activate -> Unit // no scene cards on this screen yet
             is EntityAction.Navigate -> Unit
         }
     }
@@ -65,6 +68,9 @@ fun BedroomContent(
         onOpenSettings = onOpenSettings,
         icon = RoomIcons.Bed,
     ) {
+        if (ui.triggers.isNotEmpty()) {
+            ControlGroup(title = "Scenes", entities = ui.triggers, useCardUis = true, onAction = onAction)
+        }
         if (ui.lights.isEmpty() && ui.fans.isEmpty() && ui.climate.isEmpty()) {
             ControlGroup("Devices") {
                 Text(
@@ -95,6 +101,7 @@ private fun BedroomScreenPreview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             BedroomContent(
                 ui = BedroomUiState(
+                    triggers = emptyList(),
                     lights = listOf(
                         previewLight("West", isOn = true),
                         previewLight("East", isOn = false),
@@ -105,6 +112,7 @@ private fun BedroomScreenPreview() {
                 onBack = {},
                 onOpenSettings = {},
                 onToggle = {},
+                onActivate = {},
             )
         }
     }
@@ -117,10 +125,11 @@ private fun BedroomEmptyPreview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
             BedroomContent(
-                ui = BedroomUiState(emptyList(), emptyList(), emptyList()),
+                ui = BedroomUiState(emptyList(), emptyList(), emptyList(), emptyList()),
                 onBack = {},
                 onOpenSettings = {},
                 onToggle = {},
+                onActivate = {},
             )
         }
     }

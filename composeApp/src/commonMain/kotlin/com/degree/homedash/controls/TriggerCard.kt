@@ -82,7 +82,7 @@ fun TriggerCard(
             Icon(
                 imageVector = Icons.Filled.PlayArrow,
                 contentDescription = null,
-                tint = AppColors.Accent,
+                tint = AppColors.PlayBlue,
                 modifier = Modifier
                     .size(Dimens.RowIconSize)
                     // graphicsLayer, not offset: this moves the icon without re-laying out the row,

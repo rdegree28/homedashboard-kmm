@@ -36,3 +36,33 @@ fun TriggerEntityMetadata.Companion.movieLights(): TriggerEntityMetadata {
     }
 }
 
+/** Living Room "Main Lights" scene. */
+fun TriggerEntityMetadata.Companion.bedroomLightsFull(): TriggerEntityMetadata {
+    return object : TriggerEntityMetadata(
+        entityId = "trigger.bedroom_lights_full",
+        displayName = "Full Lights",
+    ) {
+        override fun action() = ServiceCall.turnOn("script.bedroom_lights_full")
+    }
+}
+
+/** Living Room "Main Lights" scene. */
+fun TriggerEntityMetadata.Companion.bedroomLightsLow(): TriggerEntityMetadata {
+    return object : TriggerEntityMetadata(
+        entityId = "trigger.bedroom_lights_low",
+        displayName = "Low Lights",
+    ) {
+        override fun action() = ServiceCall.turnOn("script.bedroom_lights_low")
+    }
+}
+
+/** Living Room "Main Lights" scene. */
+fun TriggerEntityMetadata.Companion.bedroomLightsNight(): TriggerEntityMetadata {
+    return object : TriggerEntityMetadata(
+        entityId = "trigger.bedroom_lights_night",
+        displayName = "Night Lights",
+    ) {
+        override fun action() = ServiceCall.turnOn("script.bedroom_lights_night")
+    }
+}
+

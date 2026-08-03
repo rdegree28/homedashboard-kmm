@@ -23,6 +23,7 @@ object AppColors {
     val CardBackground = Color(0xFF211F26) // single background for all entity cards, regardless of state
     val GridLine = Color(0x22FFFFFF) // chart gridlines
     val ColumbiaBlue = Color(0xFF3458B2) // dashboard header background
+    val PlayBlue = Color(0xFF84A1ED) // dashboard header background
     val ColumbiaBlueOn = Color(0xFFFFFFFF) // dark navy text/icons on the header
 }
 

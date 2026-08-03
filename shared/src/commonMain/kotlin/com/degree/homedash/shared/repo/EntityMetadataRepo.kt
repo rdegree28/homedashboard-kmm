@@ -14,6 +14,9 @@ import com.degree.homedash.shared.model.entity.NavigationMetadata.RoomIcon
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
 import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
 import com.degree.homedash.shared.model.entity.WaterLevelMetadata
+import com.degree.homedash.shared.model.entity.bedroomLightsFull
+import com.degree.homedash.shared.model.entity.bedroomLightsLow
+import com.degree.homedash.shared.model.entity.bedroomLightsNight
 import com.degree.homedash.shared.model.entity.dellaTowerFan
 import com.degree.homedash.shared.model.entity.mainLights
 import com.degree.homedash.shared.model.entity.movieLights
@@ -97,6 +100,9 @@ class EntityMetadataRepo(
      * it yet. Add entries here and `BedroomScreen` can project them the way the other rooms do.
      */
     fun loadBedroomEntityMetadataList(): List<EntityMetadata> = listOf(
+        TriggerEntityMetadata.bedroomLightsFull(),
+        TriggerEntityMetadata.bedroomLightsLow(),
+        TriggerEntityMetadata.bedroomLightsNight(),
         LightMetadata("light.bedroom_light_west", "West"),
         LightMetadata("light.bedroom_light_east", "East"),
         FanMetadata("fan.bedroom_box_fan", "Box Fan"),
