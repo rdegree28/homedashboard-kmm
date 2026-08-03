@@ -16,6 +16,7 @@ import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
 import com.degree.homedash.shared.model.entity.WaterLevelMetadata
 import com.degree.homedash.shared.model.entity.dellaTowerFan
 import com.degree.homedash.shared.model.entity.mainLights
+import com.degree.homedash.shared.model.entity.movieLights
 import com.degree.homedash.shared.model.entity.testCard
 
 /**
@@ -74,6 +75,7 @@ class EntityMetadataRepo(
     /** The Living Room lights, fans, and climate sensors. */
     fun loadLivingRoomEntityMetadataList(): List<EntityMetadata> = listOf(
         TriggerEntityMetadata.mainLights(),
+        TriggerEntityMetadata.movieLights(),
         LightMetadata("light.living_room_light_west", "West"),
         LightMetadata("light.living_room_light_east", "East"),
         LightMetadata("light.homework_light", "Homework"),

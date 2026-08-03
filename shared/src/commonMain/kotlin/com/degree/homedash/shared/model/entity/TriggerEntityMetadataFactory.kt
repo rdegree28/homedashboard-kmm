@@ -25,3 +25,14 @@ fun TriggerEntityMetadata.Companion.mainLights(): TriggerEntityMetadata {
         override fun action() = ServiceCall.turnOn("scene.living_room_lights_main_lights")
     }
 }
+
+/** Living Room "Main Lights" scene. */
+fun TriggerEntityMetadata.Companion.movieLights(): TriggerEntityMetadata {
+    return object : TriggerEntityMetadata(
+        entityId = "trigger.movie_lights",
+        displayName = "Movie Lights",
+    ) {
+        override fun action() = ServiceCall.turnOn("scene.living_room_lights_movie_lights")
+    }
+}
+
