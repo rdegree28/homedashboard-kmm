@@ -1,14 +1,20 @@
 package com.degree.homedash
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -17,7 +23,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.degree.homedash.di.appModule
 import com.degree.homedash.bedroom.BedroomScreen
@@ -32,7 +42,11 @@ import com.degree.homedash.shared.api.HaConfig
 import com.degree.homedash.shared.di.sharedModule
 import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
 import com.degree.homedash.shared.repo.HomeAssistantRepo
+import com.degree.homedash.ui.AppColors
+import com.degree.homedash.ui.Dimens
 import com.degree.homedash.ui.LocalHaConnectionStatus
+import com.degree.homedash.update.rememberUpdateAvailable
+import com.degree.homedash.update.reloadApp
 import org.koin.compose.KoinApplication
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -83,6 +97,10 @@ private fun AppContent() {
                         WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
                     ),
                 ) {
+                    // Sits above the screen content so a tab left open for days can still be updated.
+                    if (rememberUpdateAvailable()) {
+                        UpdateBanner(onReload = ::reloadApp, modifier = Modifier.align(Alignment.BottomCenter).zIndex(1f))
+                    }
                     when (backStack.last()) {
                         Screen.Settings -> SettingsScreen(
                             initial = config,
@@ -168,6 +186,32 @@ private fun AppContent() {
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Offers a reload when a newer build has been deployed. Deliberately a prompt rather than an
+ * automatic reload — this runs on a wall tablet, and reloading under someone's finger is worse than
+ * being a version behind for a minute.
+ */
+@Composable
+private fun UpdateBanner(onReload: () -> Unit, modifier: Modifier = Modifier) {
+    Surface(
+        onClick = onReload,
+        modifier = modifier.fillMaxWidth().padding(12.dp),
+        shape = RoundedCornerShape(Dimens.CardCorner),
+        color = AppColors.ColumbiaBlue,
+        contentColor = AppColors.ColumbiaBlueOn,
+        shadowElevation = 6.dp,
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text("A new version is available", style = MaterialTheme.typography.bodyLarge)
+            Text("Reload", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
         }
     }
 }

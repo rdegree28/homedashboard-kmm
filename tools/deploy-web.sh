@@ -29,6 +29,11 @@ fi
 echo "==> Building wasmJs production distribution"
 "$REPO_ROOT/gradlew" -p "$REPO_ROOT" :composeApp:wasmJsBrowserDistribution
 
+# Stamp the build so already-open browser tabs can notice a new deploy and offer to reload.
+# Written here rather than at build time so it changes on every deploy by construction.
+date -u +%Y%m%dT%H%M%SZ > "$DIST/version.txt"
+echo "==> Build stamp: $(cat "$DIST/version.txt")"
+
 echo "==> Deploying $DIST/ -> $TARGET:$REMOTE_DIR/"
 rsync -av --delete "$DIST/" "$TARGET:$REMOTE_DIR/"
 
