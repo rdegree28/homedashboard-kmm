@@ -91,6 +91,8 @@ fun EntityControl(
                 percentage = entity.percentage,
                 canOscillate = entity.metadata.hasOscillationFeature,
                 oscillating = entity.oscillating,
+                canMist = entity.metadata.hasMistingFeature,
+                misting = entity.misting
             )
             val onSetSpeed = { pct: Int -> onAction(EntityAction.SetSpeed(entity.entityId, pct)) }
             val onSetOscillating = { on: Boolean ->

@@ -36,6 +36,9 @@ data class FanUi(
     /** Whether the fan can oscillate at all — drives whether the toggle is offered. */
     val canOscillate: Boolean = false,
     val oscillating: Boolean = false,
+    /** Whether the fan can mist at all — drives whether the toggle is offered. */
+    val canMist: Boolean = false,
+    val misting: Boolean = false,
 )
 
 @Immutable

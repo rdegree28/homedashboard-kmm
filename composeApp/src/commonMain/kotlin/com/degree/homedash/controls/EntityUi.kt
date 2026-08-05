@@ -27,6 +27,7 @@ sealed interface EntityUi {
         val offline: Boolean,
         val percentage: Int,
         val oscillating: Boolean = false,
+        val misting: Boolean = false,
     ) : EntityUi
 
     @Immutable

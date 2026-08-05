@@ -55,6 +55,8 @@ internal fun previewFan(
     levelCount: Int = 0,
     canOscillate: Boolean = false,
     oscillating: Boolean = false,
+    canMist: Boolean = false,
+    misting: Boolean = false,
 ) = FanUi(
     name = name,
     isOn = isOn,
@@ -63,6 +65,8 @@ internal fun previewFan(
     percentage = percentage,
     canOscillate = canOscillate,
     oscillating = oscillating,
+    canMist = canMist,
+    misting = misting,
 )
 
 internal fun previewFanUi(

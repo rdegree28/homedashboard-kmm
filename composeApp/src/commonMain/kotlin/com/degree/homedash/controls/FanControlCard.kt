@@ -95,12 +95,25 @@ internal fun FanControlCard(
                             maxLines = 2,
                         )
                         Spacer(modifier = Modifier.weight(1f))
-                        if (ui.canOscillate) {
-                            FanSpeedOscillationButton(
-                                onToggle = { onSetOscillating(!ui.oscillating) },
-                                isOn = ui.oscillating,
-                                modifier = Modifier
-                            )
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            if (ui.canOscillate) {
+                                FanControlButton(
+                                    text = "Oscillate",
+                                    icon = Icons.Filled.SwapHoriz,
+                                    onToggle = { onSetOscillating(!ui.oscillating) },
+                                    isOn = ui.oscillating,
+                                    modifier = Modifier
+                                )
+                            }
+                            if (ui.canMist) {
+                                FanControlButton(
+                                    text = "Mister",
+                                    icon = Icons.Filled.SwapHoriz,
+                                    onToggle = { /* TODO */ },
+                                    isOn = ui.misting,
+                                    modifier = Modifier
+                                )
+                            }
                         }
                     }
 
@@ -137,13 +150,6 @@ internal fun FanControlCard(
                         onSet = onSetSpeed,
                         modifier = Modifier.weight(1f),
                     )
-                    if (ui.canOscillate) {
-                        FanSpeedOscillationButton(
-                            onToggle = { onSetOscillating(!ui.oscillating) },
-                            isOn = ui.oscillating,
-                            modifier = Modifier
-                        )
-                    }
                 }
             }
         }
@@ -167,6 +173,19 @@ private fun FanControlCardPreview() = ControlPreview {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         FanControlCard(
             previewFan("Can oscillate", isOn = true, percentage = 25, levelCount = 12, canOscillate = true),
+            {}, {}, {}, Modifier.weight(1f),
+        )
+    }
+    // The oscillation toggle only appears on the wide card, and only for fans that support it.
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FanControlCard(
+            previewFan("Misting", isOn = true, percentage = 50, levelCount = 12, canOscillate = true, oscillating = true, misting = true, canMist = true),
+            {}, {}, {}, Modifier.weight(1f),
+        )
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FanControlCard(
+            previewFan("Can mist", isOn = true, percentage = 25, levelCount = 12, canOscillate = true, canMist = true),
             {}, {}, {}, Modifier.weight(1f),
         )
     }

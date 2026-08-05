@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.office.FanUi
@@ -199,27 +200,30 @@ internal fun FanIcon(
 }
 
 @Composable
-internal fun FanSpeedOscillationButton(
+internal fun FanControlButton(
     onToggle: () -> Unit,
     isOn: Boolean,
+    text: String,
+    icon: ImageVector,
+    color: Color = AppColors.Accent,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
-            .background(color = if (isOn) AppColors.Accent else Color.Transparent, shape = RoundedCornerShape(16.dp))
+            .background(color = if (isOn) color else Color.Transparent, shape = RoundedCornerShape(16.dp))
             .clickable(onClick = onToggle)
-            .border(width = 1.dp, color = AppColors.Accent, shape = RoundedCornerShape(16.dp))
+            .border(width = 1.dp, color = color, shape = RoundedCornerShape(16.dp))
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             modifier = Modifier.padding(end = 4.dp),
-            text = "Oscillate",
+            text = text,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface,
         )
         Icon(
-            imageVector = Icons.Filled.SwapHoriz,
+            imageVector = icon,
             contentDescription = if (isOn) "Stop oscillating" else "Oscillate",
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(Dimens.RowIconSize),
@@ -235,5 +239,5 @@ private fun FanControlPreview() = ControlPreview {
     FanControl(previewFan("Off", isOn = false)) {}
     FanControl(previewFan("Offline", offline = true)) {}
     FanControl(previewFan("Offline", offline = true, canOscillate = true, oscillating = true)) {}
-    FanSpeedOscillationButton(onToggle = {}, isOn = true, modifier = Modifier)
+    FanControlButton(text = "Demo", icon = Icons.Filled.SwapHoriz ,onToggle = {}, isOn = true, modifier = Modifier)
 }
