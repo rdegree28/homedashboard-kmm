@@ -43,6 +43,7 @@ fun OfficeScreen(
         onOpenSettings = onOpenSettings,
         onToggle = vm::toggle,
         onSetFanSpeed = vm::setFanSpeed,
+        onSetOscillating = vm::setOscillating,
         onSignal = vm::signal,
     )
 }
@@ -59,12 +60,14 @@ fun OfficeContent(
     onOpenSettings: () -> Unit,
     onToggle: (String) -> Unit,
     onSetFanSpeed: (String, Int) -> Unit,
+    onSetOscillating: (String, Boolean) -> Unit,
     onSignal: (SignalMode) -> Unit,
 ) {
     val onAction: (EntityAction) -> Unit = { action ->
         when (action) {
             is EntityAction.Toggle -> onToggle(action.entityId)
             is EntityAction.SetSpeed -> onSetFanSpeed(action.entityId, action.percentage)
+            is EntityAction.SetOscillating -> onSetOscillating(action.entityId, action.oscillating)
             is EntityAction.OpenGraph -> Unit // Office has no graph navigation
             is EntityAction.Activate -> Unit // no scene cards on this screen yet
             is EntityAction.Navigate -> Unit // launcher-only
@@ -179,6 +182,7 @@ private fun OfficeScreenPreview() {
                 onOpenSettings = {},
                 onToggle = {},
                 onSetFanSpeed = { _, _ -> },
+                onSetOscillating = { _, _ -> },
                 onSignal = {},
             )
         }

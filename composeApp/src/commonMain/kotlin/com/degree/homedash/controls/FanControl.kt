@@ -1,12 +1,19 @@
 package com.degree.homedash.controls
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -191,6 +198,35 @@ internal fun FanIcon(
     }
 }
 
+@Composable
+internal fun FanSpeedOscillationButton(
+    onToggle: () -> Unit,
+    isOn: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .background(color = if (isOn) AppColors.Accent else Color.Transparent, shape = RoundedCornerShape(16.dp))
+            .clickable(onClick = onToggle)
+            .border(width = 1.dp, color = AppColors.Accent, shape = RoundedCornerShape(16.dp))
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            modifier = Modifier.padding(end = 4.dp),
+            text = "Oscillate",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Icon(
+            imageVector = Icons.Filled.SwapHoriz,
+            contentDescription = if (isOn) "Stop oscillating" else "Oscillate",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(Dimens.RowIconSize),
+        )
+    }
+}
+
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
 @Composable
 private fun FanControlPreview() = ControlPreview {
@@ -198,4 +234,6 @@ private fun FanControlPreview() = ControlPreview {
     FanControl(previewFan("With speed", isOn = true, percentage = 75, levelCount = 12), onSetSpeed = {}) {}
     FanControl(previewFan("Off", isOn = false)) {}
     FanControl(previewFan("Offline", offline = true)) {}
+    FanControl(previewFan("Offline", offline = true, canOscillate = true, oscillating = true)) {}
+    FanSpeedOscillationButton(onToggle = {}, isOn = true, modifier = Modifier)
 }

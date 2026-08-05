@@ -3,6 +3,7 @@ package com.degree.homedash.shared.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.intOrNull
@@ -28,4 +29,5 @@ data class EntityState(
     fun attrString(key: String): String? = attributes[key]?.jsonPrimitive?.contentOrNull
     fun attrDouble(key: String): Double? = attributes[key]?.jsonPrimitive?.doubleOrNull
     fun attrInt(key: String): Int? = attributes[key]?.jsonPrimitive?.intOrNull
+    fun attrBoolean(key: String): Boolean? = attributes[key]?.jsonPrimitive?.booleanOrNull
 }

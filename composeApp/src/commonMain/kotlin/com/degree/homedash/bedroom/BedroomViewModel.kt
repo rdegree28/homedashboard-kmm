@@ -50,6 +50,14 @@ class BedroomViewModel(
         viewModelScope.launch { repo.toggle(entityId) }
     }
 
+    fun setFanSpeed(entityId: String, percentage: Int) {
+        viewModelScope.launch { repo.setFanPercentage(entityId, percentage) }
+    }
+
+    fun setOscillating(entityId: String, oscillating: Boolean) {
+        viewModelScope.launch { repo.setFanOscillating(entityId, oscillating) }
+    }
+
     /** Fires a trigger card's service call — running a script, activating a scene. */
     fun activate(call: TriggerEntityMetadata.ServiceCall) {
         viewModelScope.launch { repo.callService(call.domain, call.service, call.entityId) }

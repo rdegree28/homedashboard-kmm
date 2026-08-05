@@ -13,6 +13,7 @@ fun FanMetadata.Companion.dellaTowerFan(
     return FanMetadata(
         entityId = entityId,
         displayName = displayName,
-        speedAdjustment = FanMetadata.SpeedAdjustment(12)
+        speedAdjustment = FanMetadata.SpeedAdjustment(12),
+        hasOscillationFeature = true,
     )
 }

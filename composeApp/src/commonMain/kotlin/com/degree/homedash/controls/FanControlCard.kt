@@ -2,18 +2,25 @@ package com.degree.homedash.controls
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +43,7 @@ import com.degree.homedash.ui.Dimens
 internal fun FanControlCard(
     ui: FanUi,
     onSetSpeed: (Int) -> Unit,
+    onSetOscillating: (Boolean) -> Unit,
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -60,40 +68,84 @@ internal fun FanControlCard(
             iconContent = fanIcon,
             modifier = modifier,
         )
-        return
-    }
+    } else {
+        val isTwoHigh = remember(ui.canOscillate) { ui.canOscillate }
+        val height = if (isTwoHigh) Dimens.TwoRowEntityCardHeight else Dimens.EntityCardHeight
 
-    Surface(
-        shape = RoundedCornerShape(Dimens.CardCorner),
-        color = AppColors.CardBackground,
-        shadowElevation = Dimens.CardElevation,
-        modifier = modifier.height(Dimens.EntityCardHeight),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxSize().padding(Dimens.EntityCardPadding),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        HomeDashboardCard(
+            onClick = onToggle,
+            enabled = true,
+            height = height,
+            modifier = modifier,
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .clickable(onClick = onToggle),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                fanIcon(AppColors.Accent)
-                Text(
-                    text = ui.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 2,
-                )
+            if (isTwoHigh) {
+                Column(
+                    modifier = Modifier.fillMaxSize().clickable(onClick = onToggle),
+                    verticalArrangement = Arrangement.SpaceAround
+                ) {
+                    Row(
+                        modifier = Modifier,
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        fanIcon(AppColors.Accent)
+                        Text(
+                            text = ui.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            maxLines = 2,
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        if (ui.canOscillate) {
+                            FanSpeedOscillationButton(
+                                onToggle = { onSetOscillating(!ui.oscillating) },
+                                isOn = ui.oscillating,
+                                modifier = Modifier
+                            )
+                        }
+                    }
+
+                    FanSpeedSlider(
+                        percentage = ui.percentage,
+                        levelCount = ui.levelCount,
+                        onSet = onSetSpeed,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .clickable(onClick = onToggle),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        fanIcon(AppColors.Accent)
+                        Text(
+                            text = ui.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            maxLines = 2,
+                        )
+                    }
+                    FanSpeedSlider(
+                        percentage = ui.percentage,
+                        levelCount = ui.levelCount,
+                        onSet = onSetSpeed,
+                        modifier = Modifier.weight(1f),
+                    )
+                    if (ui.canOscillate) {
+                        FanSpeedOscillationButton(
+                            onToggle = { onSetOscillating(!ui.oscillating) },
+                            isOn = ui.oscillating,
+                            modifier = Modifier
+                        )
+                    }
+                }
             }
-            FanSpeedSlider(
-                percentage = ui.percentage,
-                levelCount = ui.levelCount,
-                onSet = onSetSpeed,
-                modifier = Modifier.weight(1f),
-            )
         }
     }
 }
@@ -103,15 +155,28 @@ internal fun FanControlCard(
 private fun FanControlCardPreview() = ControlPreview {
     // "With speed" is the 2-wide state (on + multi-level): shown full-width, as the grid packs it.
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        FanControlCard(previewFan("With speed", isOn = true, percentage = 75, levelCount = 12), {}, {}, Modifier.weight(1f))
+        FanControlCard(previewFan("With speed", isOn = true, percentage = 75, levelCount = 12), {}, {}, {}, Modifier.weight(1f))
+    }
+    // The oscillation toggle only appears on the wide card, and only for fans that support it.
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FanControlCard(
+            previewFan("Oscillating", isOn = true, percentage = 50, levelCount = 12, canOscillate = true, oscillating = true),
+            {}, {}, {}, Modifier.weight(1f),
+        )
+    }
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FanControlCard(
+            previewFan("Can oscillate", isOn = true, percentage = 25, levelCount = 12, canOscillate = true),
+            {}, {}, {}, Modifier.weight(1f),
+        )
     }
     // The slider-less states are 1-wide toggle tiles, so they pair up half-width like other cards.
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        FanControlCard(previewFan("On", isOn = true), {}, {}, Modifier.weight(1f))
-        FanControlCard(previewFan("Off", isOn = false), {}, {}, Modifier.weight(1f))
+        FanControlCard(previewFan("On", isOn = true), {}, {}, {}, Modifier.weight(1f))
+        FanControlCard(previewFan("Off", isOn = false), {}, {}, {}, Modifier.weight(1f))
     }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        FanControlCard(previewFan("Offline", offline = true), {}, {}, Modifier.weight(1f))
+        FanControlCard(previewFan("Offline", offline = true), {}, {}, {}, Modifier.weight(1f))
         Spacer(Modifier.weight(1f))
     }
 }

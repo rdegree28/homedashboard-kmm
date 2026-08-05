@@ -33,6 +33,9 @@ data class FanUi(
     val offline: Boolean,
     val levelCount: Int,
     val percentage: Int,
+    /** Whether the fan can oscillate at all — drives whether the toggle is offered. */
+    val canOscillate: Boolean = false,
+    val oscillating: Boolean = false,
 )
 
 @Immutable
@@ -95,6 +98,10 @@ class OfficeViewModel(
 
     fun setFanSpeed(entityId: String, percentage: Int) {
         viewModelScope.launch { repo.setFanPercentage(entityId, percentage) }
+    }
+
+    fun setOscillating(entityId: String, oscillating: Boolean) {
+        viewModelScope.launch { repo.setFanOscillating(entityId, oscillating) }
     }
 
     fun signal(mode: SignalMode) {

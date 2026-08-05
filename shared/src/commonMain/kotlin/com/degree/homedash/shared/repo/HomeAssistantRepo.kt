@@ -51,6 +51,13 @@ class HomeAssistantRepo internal constructor(
     ) = api.callService("fan", "set_percentage", entityId,
         buildJsonObject { put("percentage", percentage) })
 
+    /** Turn a fan's oscillation on or off. The value arrives back via the `oscillating` attribute. */
+    suspend fun setFanOscillating(
+        entityId: String,
+        oscillating: Boolean,
+    ) = api.callService("fan", "oscillate", entityId,
+        buildJsonObject { put("oscillating", oscillating) })
+
     suspend fun callService(
         domain: String,
         service: String,

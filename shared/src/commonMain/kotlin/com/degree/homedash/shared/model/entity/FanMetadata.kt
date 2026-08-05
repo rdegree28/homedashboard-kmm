@@ -10,6 +10,7 @@ data class FanMetadata(
     override val entityId: String,
     override val displayName: String,
     val speedAdjustment: SpeedAdjustment? = null,
+    val hasOscillationFeature: Boolean = false,
 ) : EntityMetadata {
 
     /**

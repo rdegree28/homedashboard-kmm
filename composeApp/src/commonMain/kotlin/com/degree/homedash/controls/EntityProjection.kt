@@ -33,6 +33,7 @@ fun EntityMetadata.toEntityUi(state: EntityState?): EntityUi = when (this) {
         isOn = state?.isOn == true,
         offline = state.isOffline(),
         percentage = state?.attrDouble("percentage")?.roundToInt() ?: 0,
+        oscillating = state?.attrBoolean("oscillating") == true,
     )
 
     is ClimateMetadata -> EntityUi.Climate(

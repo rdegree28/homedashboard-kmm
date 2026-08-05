@@ -26,6 +26,7 @@ import com.degree.homedash.ui.Dimens
 sealed interface EntityAction {
     data class Toggle(val entityId: String) : EntityAction
     data class SetSpeed(val entityId: String, val percentage: Int) : EntityAction
+    data class SetOscillating(val entityId: String, val oscillating: Boolean) : EntityAction
     data class OpenGraph(val entityId: String) : EntityAction
 
     /** Carries the typed destination rather than an entity id — a nav card's id is synthetic. */
@@ -50,7 +51,9 @@ fun EntityUi.hasCard(): Boolean =
  * `ControlGroup` packs rows to a total width of 2 using this, so cards reflow as fans toggle.
  */
 fun EntityUi.cardSpan(): Int =
-    if (this is EntityUi.Fan && isOn && metadata.speedAdjustment != null) 2 else 1
+    // Oscillation counts too: without it, an oscillating fan with no speed control would never get
+    // the wide card its toggle lives on, leaving the control unreachable.
+    if (this is EntityUi.Fan && isOn && (metadata.speedAdjustment != null || metadata.hasOscillationFeature)) 2 else 1
 
 /**
  * Central renderer: maps an [EntityUi] to the right control, in the requested [layout], routing user
@@ -86,8 +89,13 @@ fun EntityControl(
                 offline = entity.offline,
                 levelCount = entity.metadata.speedAdjustment?.levelCount ?: 0,
                 percentage = entity.percentage,
+                canOscillate = entity.metadata.hasOscillationFeature,
+                oscillating = entity.oscillating,
             )
             val onSetSpeed = { pct: Int -> onAction(EntityAction.SetSpeed(entity.entityId, pct)) }
+            val onSetOscillating = { on: Boolean ->
+                onAction(EntityAction.SetOscillating(entity.entityId, on))
+            }
             when (layout) {
                 ControlLayout.Row -> FanControl(
                     ui = fanUi,
@@ -97,6 +105,7 @@ fun EntityControl(
                 ControlLayout.Card -> FanControlCard(
                     ui = fanUi,
                     onSetSpeed = onSetSpeed,
+                    onSetOscillating = onSetOscillating,
                     onToggle = onToggle,
                     modifier = modifier,
                 )

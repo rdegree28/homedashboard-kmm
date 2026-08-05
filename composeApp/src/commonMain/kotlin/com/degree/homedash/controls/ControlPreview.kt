@@ -53,7 +53,17 @@ internal fun previewFan(
     offline: Boolean = false,
     percentage: Int = 0,
     levelCount: Int = 0,
-) = FanUi(name = name, isOn = isOn, offline = offline, levelCount = levelCount, percentage = percentage)
+    canOscillate: Boolean = false,
+    oscillating: Boolean = false,
+) = FanUi(
+    name = name,
+    isOn = isOn,
+    offline = offline,
+    levelCount = levelCount,
+    percentage = percentage,
+    canOscillate = canOscillate,
+    oscillating = oscillating,
+)
 
 internal fun previewFanUi(
     name: String,
