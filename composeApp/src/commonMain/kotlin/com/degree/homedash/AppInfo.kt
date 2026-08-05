@@ -6,5 +6,5 @@ package com.degree.homedash
  * Keep [VERSION] in step with `versionName` in composeApp/build.gradle.kts.
  */
 object AppInfo {
-    const val VERSION = "1.2"
+    const val VERSION = "1.3"
 }
