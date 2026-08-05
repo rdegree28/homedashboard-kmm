@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -59,7 +60,7 @@ fun FanControl(
     Column {
         EntityToggleRow(
             ui = ToggleUi(ui.name, ui.isOn, ui.offline),
-            onTint = AppColors.Accent,
+            onTint = AppColors.FanBlue,
             onToggle = onToggle
         ) { tint ->
             FanIcon(
@@ -113,6 +114,11 @@ internal fun FanSpeedSlider(
             valueRange = 0f..levelCount.toFloat(),
             steps = (levelCount - 1).coerceAtLeast(0),
             modifier = Modifier.weight(1f),
+            colors = SliderDefaults.colors(
+                thumbColor = AppColors.FanBlue,
+                activeTrackColor = AppColors.FanBlue,
+                activeTickColor = AppColors.FanBlue.copy(alpha = 0.6f),
+            ),
         )
         Text(
             text = "${level.roundToInt()} / $levelCount",
@@ -205,7 +211,7 @@ internal fun FanControlButton(
     isOn: Boolean,
     text: String,
     icon: ImageVector,
-    color: Color = AppColors.Accent,
+    color: Color = AppColors.FanBlue,
     modifier: Modifier = Modifier,
 ) {
     Row(

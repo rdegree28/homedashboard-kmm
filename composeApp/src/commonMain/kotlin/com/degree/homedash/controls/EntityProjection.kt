@@ -20,8 +20,15 @@ import kotlin.math.roundToInt
  *
  * This is the one place raw [EntityState] becomes an [EntityUi]; screens supply metadata (usually from
  * `EntityMetadataRepo`) and never touch attributes themselves.
+ *
+ * [allStates] is only needed by entities that are composites of more than one Home Assistant entity —
+ * a fan's mister is its own `humidifier.*` entity, so its on/off can't come from [state]. Defaults to
+ * empty for the single-entity callers.
  */
-fun EntityMetadata.toEntityUi(state: EntityState?): EntityUi = when (this) {
+fun EntityMetadata.toEntityUi(
+    state: EntityState?,
+    allStates: Map<String, EntityState> = emptyMap(),
+): EntityUi = when (this) {
     is LightMetadata -> EntityUi.Light(
         metadata = this,
         isOn = state?.isOn == true,
@@ -34,6 +41,8 @@ fun EntityMetadata.toEntityUi(state: EntityState?): EntityUi = when (this) {
         offline = state.isOffline(),
         percentage = state?.attrDouble("percentage")?.roundToInt() ?: 0,
         oscillating = state?.attrBoolean("oscillating") == true,
+        // Read off the mister's own entity, not the fan's.
+        misting = misting?.let { allStates[it.entityId]?.isOn == true } == true,
     )
 
     is ClimateMetadata -> EntityUi.Climate(
@@ -82,7 +91,7 @@ fun EntityMetadata.toEntityUi(state: EntityState?): EntityUi = when (this) {
 
 /** Projects a whole screen's roster against the current [states] map. */
 fun List<EntityMetadata>.toEntityUis(states: Map<String, EntityState>): List<EntityUi> =
-    map { it.toEntityUi(states[it.entityId]) }
+    map { it.toEntityUi(states[it.entityId], states) }
 
 /** Missing and unavailable are the same thing to a control: nothing to show. */
 private fun EntityState?.isOffline(): Boolean = this == null || this.isUnavailable

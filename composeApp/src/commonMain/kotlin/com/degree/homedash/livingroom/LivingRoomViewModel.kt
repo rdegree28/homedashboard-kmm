@@ -65,6 +65,11 @@ class LivingRoomViewModel(
         viewModelScope.launch { repo.setFanOscillating(entityId, oscillating) }
     }
 
+    /** [entityId] is the mister's own humidifier entity, not the fan's. */
+    fun setMisting(entityId: String, misting: Boolean) {
+        viewModelScope.launch { repo.setMisting(entityId, misting) }
+    }
+
     /** Fires a trigger card's service call — activating a scene, running a script. */
     fun activate(call: TriggerEntityMetadata.ServiceCall) {
         viewModelScope.launch { repo.callService(call.domain, call.service, call.entityId) }

@@ -16,7 +16,9 @@ object AppColors {
     val Healthy = Color(0xFF66BB6A) // plants card, healthy soil
     val Wet = Color(0xFF4FC3F7) // humidity, very-wet soil, office card
     val TempWarm = Color(0xFFFF8A65) // temperature
-    val Accent = Color(0xFF4C8DFF) // chart line/fill, fan on
+    val Accent = Color(0xFF4C8DFF) // chart line/fill
+    val FanBlue = Color(0xFF3A6FD0) // fan icon + speed slider; a shade darker than Accent
+    val FanMisting = Color(0xFF3994B0) // fan icon + speed slider; a shade darker than Accent
     val PowerPeak = Color(0xFFFFA726) // hourly peak power line (orange)
     val LightOn = Color(0xFFFFC107) // light bulb on (amber)
     val WorkstationOn = Color(0xFFFFE135) // workstation on (banana)

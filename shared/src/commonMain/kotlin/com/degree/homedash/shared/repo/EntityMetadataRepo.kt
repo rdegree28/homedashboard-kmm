@@ -69,7 +69,13 @@ class EntityMetadataRepo(
         FanMetadata.dellaTowerFan("fan.office_fan_office_fan", "Office Fan"),
         FanMetadata("fan.office_box_fan", "Box Fan"),
         // The misting fan reports no usable percentage_step; 6 is the count the dashboard has always used.
-        FanMetadata("fan.misting_fan", "Misting Fan", FanMetadata.SpeedAdjustment(6), hasOscillationFeature = true, hasMistingFeature = true),
+        FanMetadata(
+            "fan.misting_fan",
+            "Misting Fan",
+            FanMetadata.SpeedAdjustment(6),
+            hasOscillationFeature = true,
+            misting = FanMetadata.MistingControl("humidifier.misting_fan_humidifier"),
+        ),
         ClimateMetadata("sensor.sonoff_snzb_02d_temperature", "Temperature", ClimateMetadata.ClimateKind.Temperature),
         ClimateMetadata("sensor.sonoff_snzb_02d_humidity", "Humidity", ClimateMetadata.ClimateKind.Humidity),
         DoorMetadata("binary_sensor.office_door_sensor", "Office Door"),

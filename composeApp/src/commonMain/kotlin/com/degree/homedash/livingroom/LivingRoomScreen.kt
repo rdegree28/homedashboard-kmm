@@ -33,6 +33,7 @@ fun LivingRoomScreen(
         onToggle = vm::toggle,
         onSetFanSpeed = vm::setFanSpeed,
         onSetOscillating = vm::setOscillating,
+        onSetMisting = vm::setMisting,
         onActivate = vm::activate,
         showLights = showLights,
     )
@@ -48,6 +49,7 @@ fun LivingRoomContent(
     onToggle: (String) -> Unit,
     onSetFanSpeed: (String, Int) -> Unit,
     onSetOscillating: (String, Boolean) -> Unit,
+    onSetMisting: (String, Boolean) -> Unit,
     onActivate: (TriggerEntityMetadata.ServiceCall) -> Unit,
     showLights: Boolean = false,
 ) {
@@ -58,6 +60,7 @@ fun LivingRoomContent(
             is EntityAction.OpenGraph -> Unit
             is EntityAction.SetSpeed -> onSetFanSpeed(action.entityId, action.percentage)
             is EntityAction.SetOscillating -> onSetOscillating(action.entityId, action.oscillating)
+            is EntityAction.SetMisting -> onSetMisting(action.entityId, action.misting)
             is EntityAction.Navigate -> Unit
         }
     }
@@ -121,6 +124,7 @@ private fun LivingRoomScreenPreview() {
                 onToggle = {},
                 onSetFanSpeed = { _, _ -> },
                 onSetOscillating = { _, _ -> },
+                onSetMisting = { _, _ -> },
                 onActivate = {},
                 showLights = true,
             )

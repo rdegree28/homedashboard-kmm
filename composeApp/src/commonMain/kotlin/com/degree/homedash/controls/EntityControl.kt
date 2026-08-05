@@ -27,6 +27,9 @@ sealed interface EntityAction {
     data class Toggle(val entityId: String) : EntityAction
     data class SetSpeed(val entityId: String, val percentage: Int) : EntityAction
     data class SetOscillating(val entityId: String, val oscillating: Boolean) : EntityAction
+
+    /** [entityId] is the mister's own `humidifier.*` entity, not the fan's. */
+    data class SetMisting(val entityId: String, val misting: Boolean) : EntityAction
     data class OpenGraph(val entityId: String) : EntityAction
 
     /** Carries the typed destination rather than an entity id — a nav card's id is synthetic. */
@@ -91,12 +94,17 @@ fun EntityControl(
                 percentage = entity.percentage,
                 canOscillate = entity.metadata.hasOscillationFeature,
                 oscillating = entity.oscillating,
-                canMist = entity.metadata.hasMistingFeature,
-                misting = entity.misting
+                canMist = entity.metadata.misting != null,
+                misting = entity.misting,
             )
             val onSetSpeed = { pct: Int -> onAction(EntityAction.SetSpeed(entity.entityId, pct)) }
             val onSetOscillating = { on: Boolean ->
                 onAction(EntityAction.SetOscillating(entity.entityId, on))
+            }
+            // Targets the mister entity, so a fan without one can't emit this at all.
+            val onSetMisting = { on: Boolean ->
+                entity.metadata.misting?.let { onAction(EntityAction.SetMisting(it.entityId, on)) }
+                Unit
             }
             when (layout) {
                 ControlLayout.Row -> FanControl(
@@ -108,6 +116,7 @@ fun EntityControl(
                     ui = fanUi,
                     onSetSpeed = onSetSpeed,
                     onSetOscillating = onSetOscillating,
+                    onSetMisting = onSetMisting,
                     onToggle = onToggle,
                     modifier = modifier,
                 )

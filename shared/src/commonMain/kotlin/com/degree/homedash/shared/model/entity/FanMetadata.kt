@@ -11,8 +11,19 @@ data class FanMetadata(
     override val displayName: String,
     val speedAdjustment: SpeedAdjustment? = null,
     val hasOscillationFeature: Boolean = false,
-    val hasMistingFeature: Boolean = false,
+    val misting: MistingControl? = null,
 ) : EntityMetadata {
+
+    /**
+     * A fan's built-in mister, or null when it has none.
+     *
+     * Home Assistant models the mister as a *separate* entity rather than a fan feature — the misting
+     * fan exposes `humidifier.misting_fan_humidifier` alongside `fan.misting_fan` — so the id has to be
+     * carried explicitly. Everything about the card's mister button reads from [entityId], not the fan's.
+     */
+    data class MistingControl(
+        val entityId: String,
+    )
 
     /**
      * How many discrete speeds a fan has. Derived from Home Assistant's `percentage_step`

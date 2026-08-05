@@ -33,6 +33,7 @@ fun BedroomScreen(
         onToggle = vm::toggle,
         onSetFanSpeed = vm::setFanSpeed,
         onSetOscillating = vm::setOscillating,
+        onSetMisting = vm::setMisting,
         onActivate = vm::activate,
         modifier = modifier,
     )
@@ -52,6 +53,7 @@ fun BedroomContent(
     onToggle: (String) -> Unit,
     onSetFanSpeed: (String, Int) -> Unit,
     onSetOscillating: (String, Boolean) -> Unit,
+    onSetMisting: (String, Boolean) -> Unit,
     onActivate: (TriggerEntityMetadata.ServiceCall) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -61,6 +63,7 @@ fun BedroomContent(
             is EntityAction.Activate -> onActivate(action.call)
             is EntityAction.SetSpeed -> onSetFanSpeed(action.entityId, action.percentage)
             is EntityAction.SetOscillating -> onSetOscillating(action.entityId, action.oscillating)
+            is EntityAction.SetMisting -> onSetMisting(action.entityId, action.misting)
             is EntityAction.OpenGraph -> Unit
             is EntityAction.Navigate -> Unit
         }
@@ -119,6 +122,7 @@ private fun BedroomScreenPreview() {
                 onToggle = {},
                 onSetFanSpeed = { _, _ -> },
                 onSetOscillating = { _, _ -> },
+                onSetMisting = { _, _ -> },
                 onActivate = {},
             )
         }
@@ -138,6 +142,7 @@ private fun BedroomEmptyPreview() {
                 onToggle = {},
                 onSetFanSpeed = { _, _ -> },
                 onSetOscillating = { _, _ -> },
+                onSetMisting = { _, _ -> },
                 onActivate = {},
             )
         }

@@ -51,6 +51,17 @@ class HomeAssistantRepo internal constructor(
     ) = api.callService("fan", "set_percentage", entityId,
         buildJsonObject { put("percentage", percentage) })
 
+    /**
+     * Turn a fan's mister on or off.
+     *
+     * [entityId] is the mister's own `humidifier.*` entity, not the fan's — Home Assistant models the
+     * two separately (see `FanMetadata.MistingControl`).
+     */
+    suspend fun setMisting(
+        entityId: String,
+        misting: Boolean,
+    ) = if (misting) turnOn(entityId) else turnOff(entityId)
+
     /** Turn a fan's oscillation on or off. The value arrives back via the `oscillating` attribute. */
     suspend fun setFanOscillating(
         entityId: String,

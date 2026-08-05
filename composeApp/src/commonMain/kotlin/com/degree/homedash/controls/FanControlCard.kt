@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.degree.homedash.App
 import com.degree.homedash.office.FanUi
 import com.degree.homedash.office.ToggleUi
 import com.degree.homedash.ui.AppColors
@@ -44,6 +46,7 @@ internal fun FanControlCard(
     ui: FanUi,
     onSetSpeed: (Int) -> Unit,
     onSetOscillating: (Boolean) -> Unit,
+    onSetMisting: (Boolean) -> Unit,
     onToggle: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -63,13 +66,13 @@ internal fun FanControlCard(
     if (!(ui.isOn && ui.levelCount >= 2)) {
         EntityToggleCard(
             ui = ToggleUi(ui.name, ui.isOn, ui.offline),
-            onTint = AppColors.Accent,
+            onTint = AppColors.FanBlue,
             onToggle = onToggle,
             iconContent = fanIcon,
             modifier = modifier,
         )
     } else {
-        val isTwoHigh = remember(ui.canOscillate) { ui.canOscillate }
+        val isTwoHigh = remember(ui.canOscillate, ui.canMist) { ui.canOscillate || ui.canMist }
         val height = if (isTwoHigh) Dimens.TwoRowEntityCardHeight else Dimens.EntityCardHeight
 
         HomeDashboardCard(
@@ -88,7 +91,7 @@ internal fun FanControlCard(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
-                        fanIcon(AppColors.Accent)
+                        fanIcon(if (ui.misting) AppColors.FanMisting else AppColors.FanBlue)
                         Text(
                             text = ui.name,
                             style = MaterialTheme.typography.titleMedium,
@@ -107,9 +110,10 @@ internal fun FanControlCard(
                             }
                             if (ui.canMist) {
                                 FanControlButton(
-                                    text = "Mister",
-                                    icon = Icons.Filled.SwapHoriz,
-                                    onToggle = { /* TODO */ },
+                                    text = "Mist",
+                                    icon = Icons.Filled.WaterDrop,
+                                    color = AppColors.FanMisting,
+                                    onToggle = { onSetMisting(!ui.misting) },
                                     isOn = ui.misting,
                                     modifier = Modifier
                                 )
@@ -137,7 +141,7 @@ internal fun FanControlCard(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
-                        fanIcon(AppColors.Accent)
+                        fanIcon(AppColors.FanBlue)
                         Text(
                             text = ui.name,
                             style = MaterialTheme.typography.titleMedium,
@@ -161,41 +165,41 @@ internal fun FanControlCard(
 private fun FanControlCardPreview() = ControlPreview {
     // "With speed" is the 2-wide state (on + multi-level): shown full-width, as the grid packs it.
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        FanControlCard(previewFan("With speed", isOn = true, percentage = 75, levelCount = 12), {}, {}, {}, Modifier.weight(1f))
+        FanControlCard(previewFan("With speed", isOn = true, percentage = 75, levelCount = 12), {}, {}, {}, {}, Modifier.weight(1f))
     }
     // The oscillation toggle only appears on the wide card, and only for fans that support it.
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         FanControlCard(
             previewFan("Oscillating", isOn = true, percentage = 50, levelCount = 12, canOscillate = true, oscillating = true),
-            {}, {}, {}, Modifier.weight(1f),
+            {}, {}, {}, {}, Modifier.weight(1f),
         )
     }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         FanControlCard(
             previewFan("Can oscillate", isOn = true, percentage = 25, levelCount = 12, canOscillate = true),
-            {}, {}, {}, Modifier.weight(1f),
+            {}, {}, {}, {}, Modifier.weight(1f),
         )
     }
     // The oscillation toggle only appears on the wide card, and only for fans that support it.
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         FanControlCard(
             previewFan("Misting", isOn = true, percentage = 50, levelCount = 12, canOscillate = true, oscillating = true, misting = true, canMist = true),
-            {}, {}, {}, Modifier.weight(1f),
+            {}, {}, {}, {}, Modifier.weight(1f),
         )
     }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         FanControlCard(
             previewFan("Can mist", isOn = true, percentage = 25, levelCount = 12, canOscillate = true, canMist = true),
-            {}, {}, {}, Modifier.weight(1f),
+            {}, {}, {}, {}, Modifier.weight(1f),
         )
     }
     // The slider-less states are 1-wide toggle tiles, so they pair up half-width like other cards.
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        FanControlCard(previewFan("On", isOn = true), {}, {}, {}, Modifier.weight(1f))
-        FanControlCard(previewFan("Off", isOn = false), {}, {}, {}, Modifier.weight(1f))
+        FanControlCard(previewFan("On", isOn = true), {}, {}, {}, {}, Modifier.weight(1f))
+        FanControlCard(previewFan("Off", isOn = false), {}, {}, {}, {}, Modifier.weight(1f))
     }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        FanControlCard(previewFan("Offline", offline = true), {}, {}, {}, Modifier.weight(1f))
+        FanControlCard(previewFan("Offline", offline = true), {}, {}, {}, {}, Modifier.weight(1f))
         Spacer(Modifier.weight(1f))
     }
 }
