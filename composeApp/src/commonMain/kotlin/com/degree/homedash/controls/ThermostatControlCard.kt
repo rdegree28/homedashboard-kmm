@@ -17,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -42,6 +41,7 @@ import com.degree.homedash.shared.model.entity.ThermostatMetadata
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 import com.degree.homedash.ui.formatNumber
+import com.degree.homedash.ui.icons.ControlIcons
 import kotlinx.coroutines.delay
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -134,7 +134,7 @@ internal fun ThermostatControlCard(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Thermostat,
+                    imageVector = ControlIcons.Thermostat,
                     contentDescription = null,
                     tint = tint,
                     modifier = Modifier.size(Dimens.RowIconSize),
