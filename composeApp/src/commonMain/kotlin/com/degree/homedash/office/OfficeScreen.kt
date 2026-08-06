@@ -71,6 +71,11 @@ fun OfficeContent(
             is EntityAction.SetSpeed -> onSetFanSpeed(action.entityId, action.percentage)
             is EntityAction.SetOscillating -> onSetOscillating(action.entityId, action.oscillating)
             is EntityAction.SetMisting -> onSetMisting(action.entityId, action.misting)
+            // The office heater has no metadata entry yet, so no thermostat reaches this screen.
+            is EntityAction.SetTargetTemperature -> Unit
+            is EntityAction.SetHvacMode -> Unit
+            is EntityAction.SetThermostatFanMode -> Unit
+            is EntityAction.SetPresetMode -> Unit
             is EntityAction.OpenGraph -> Unit // Office has no graph navigation
             is EntityAction.Activate -> Unit // no scene cards on this screen yet
             is EntityAction.Navigate -> Unit // launcher-only

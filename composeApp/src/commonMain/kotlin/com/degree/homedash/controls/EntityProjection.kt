@@ -5,9 +5,12 @@ import com.degree.homedash.shared.model.entity.ClimateMetadata
 import com.degree.homedash.shared.model.entity.DoorMetadata
 import com.degree.homedash.shared.model.entity.EntityMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
+import com.degree.homedash.shared.model.entity.HvacAction
+import com.degree.homedash.shared.model.entity.HvacMode
 import com.degree.homedash.shared.model.entity.LightMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
+import com.degree.homedash.shared.model.entity.ThermostatMetadata
 import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
 import com.degree.homedash.shared.model.entity.WaterLevelMetadata
 import com.degree.homedash.ui.formatNumber
@@ -49,6 +52,25 @@ fun EntityMetadata.toEntityUi(
         metadata = this,
         valueText = state.readingText(decimals = 1),
     )
+
+    is ThermostatMetadata -> {
+        val offline = state.isOffline()
+        EntityUi.Thermostat(
+            metadata = this,
+            offline = offline,
+            // An unavailable entity's state is literally "unavailable", so this already lands on null.
+            hvacMode = HvacMode.fromHa(state?.state),
+            // The attributes are guarded anyway: some integrations keep stale ones around while
+            // the device is gone, which would show a live-looking readout for an offline unit.
+            hvacAction = if (offline) null else HvacAction.fromHa(state?.attrString("hvac_action")),
+            // Null in heat_cool, where HA publishes target_temp_low/high instead — the stepper reads
+            // "—" and disables rather than pretending to drive a setpoint that isn't there.
+            targetTemperature = if (offline) null else state?.attrDouble("temperature"),
+            currentTemperature = if (offline) null else state?.attrDouble("current_temperature"),
+            fanMode = if (offline) null else state?.attrString("fan_mode"),
+            presetMode = if (offline) null else state?.attrString("preset_mode"),
+        )
+    }
 
     is DoorMetadata -> {
         val open = state?.state == "on" // device_class opening: on = open

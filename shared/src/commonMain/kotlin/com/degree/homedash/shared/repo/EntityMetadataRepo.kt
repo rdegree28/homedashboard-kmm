@@ -12,12 +12,14 @@ import com.degree.homedash.shared.model.entity.NavigationMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
 import com.degree.homedash.shared.model.entity.NavigationMetadata.RoomIcon
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
+import com.degree.homedash.shared.model.entity.ThermostatMetadata
 import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
 import com.degree.homedash.shared.model.entity.WaterLevelMetadata
 import com.degree.homedash.shared.model.entity.bedroomLightsFull
 import com.degree.homedash.shared.model.entity.bedroomLightsLow
 import com.degree.homedash.shared.model.entity.bedroomLightsNight
 import com.degree.homedash.shared.model.entity.dellaTowerFan
+import com.degree.homedash.shared.model.entity.livingRoomThermostat
 import com.degree.homedash.shared.model.entity.mainLights
 import com.degree.homedash.shared.model.entity.movieLights
 import com.degree.homedash.shared.model.entity.testCard
@@ -93,6 +95,8 @@ class EntityMetadataRepo(
         FanMetadata.dellaTowerFan("fan.living_room_fan", "Fan"),
         // A plain switch, so no speed control despite the name.
         FanMetadata("switch.living_room_acc_1", "Box Fan"),
+        // Spans the full grid row, so it takes the head of the Climate group ahead of the sensors.
+        ThermostatMetadata.livingRoomThermostat("climate.living_room_thermostat", "Thermostat"),
         ClimateMetadata("sensor.living_room_thermostat_temperature", "Temperature", ClimateMetadata.ClimateKind.Temperature),
         // Unlike Office (humidity card with dew point as a subvalue), the Living Room shows a dew point
         // card computed from the temperature + humidity pair — keyed off the humidity entity id.

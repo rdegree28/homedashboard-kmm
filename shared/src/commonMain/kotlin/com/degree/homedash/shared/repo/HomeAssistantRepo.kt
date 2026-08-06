@@ -7,6 +7,7 @@ import com.degree.homedash.shared.api.HomeAssistantApi
 import com.degree.homedash.shared.api.WebSocketHomeAssistantApi
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
+import com.degree.homedash.shared.model.entity.HvacMode
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -68,6 +69,40 @@ class HomeAssistantRepo internal constructor(
         oscillating: Boolean,
     ) = api.callService("fan", "oscillate", entityId,
         buildJsonObject { put("oscillating", oscillating) })
+
+    /** Set a thermostat's setpoint. The value arrives back via the entity's `temperature` attribute. */
+    suspend fun setTargetTemperature(
+        entityId: String,
+        temperature: Double,
+    ) = api.callService("climate", "set_temperature", entityId,
+        buildJsonObject { put("temperature", temperature) })
+
+    /** Set a thermostat's mode. The value arrives back as the entity's own state, not an attribute. */
+    suspend fun setHvacMode(
+        entityId: String,
+        mode: HvacMode,
+    ) = api.callService("climate", "set_hvac_mode", entityId,
+        buildJsonObject { put("hvac_mode", mode.haValue) })
+
+    /**
+     * Set a thermostat's fan mode. [fanMode] is one of the vendor strings the entity reports in
+     * `fan_modes`, which `ThermostatMetadata` declares.
+     *
+     * Named for thermostats rather than plain `setFanMode` because [setFanPercentage] and
+     * [setFanOscillating] next door act on `fan.*` entities, which these do not.
+     */
+    suspend fun setThermostatFanMode(
+        entityId: String,
+        fanMode: String,
+    ) = api.callService("climate", "set_fan_mode", entityId,
+        buildJsonObject { put("fan_mode", fanMode) })
+
+    /** Set a thermostat's preset. [presetMode] is one of the entity's reported `preset_modes`. */
+    suspend fun setPresetMode(
+        entityId: String,
+        presetMode: String,
+    ) = api.callService("climate", "set_preset_mode", entityId,
+        buildJsonObject { put("preset_mode", presetMode) })
 
     suspend fun callService(
         domain: String,

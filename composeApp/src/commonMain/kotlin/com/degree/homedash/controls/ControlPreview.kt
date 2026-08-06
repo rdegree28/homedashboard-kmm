@@ -117,6 +117,37 @@ internal fun previewTrigger(label: String) = EntityUi.Trigger(
     },
 )
 
+/** Defaults mirror the live Living Room thermostat, so previews match what the app really shows. */
+internal fun previewThermostat(
+    name: String,
+    offline: Boolean = false,
+    mode: HvacMode? = HvacMode.Cool,
+    action: HvacAction? = HvacAction.Idle,
+    target: Double? = 72.0,
+    current: Double? = 70.0,
+    hvacModes: List<HvacMode> = listOf(HvacMode.Off, HvacMode.Heat, HvacMode.Cool),
+    fanModes: List<String> = listOf("on", "off"),
+    fanMode: String? = "off",
+    presetModes: List<String> = listOf("none", "eco"),
+    presetMode: String? = "none",
+) = EntityUi.Thermostat(
+    metadata = ThermostatMetadata(
+        entityId = "climate.${name.lowercase().replace(' ', '_')}",
+        displayName = name,
+        targetTemperature = ThermostatMetadata.TargetTemperature(min = 50.0, max = 90.0, step = 1.0),
+        hvacModes = hvacModes,
+        fanModes = fanModes,
+        presetModes = presetModes,
+    ),
+    offline = offline,
+    hvacMode = if (offline) null else mode,
+    hvacAction = if (offline) null else action,
+    targetTemperature = if (offline) null else target,
+    currentTemperature = if (offline) null else current,
+    fanMode = if (offline) null else fanMode,
+    presetMode = if (offline) null else presetMode,
+)
+
 internal fun previewClimate(
     label: String,
     valueText: String,

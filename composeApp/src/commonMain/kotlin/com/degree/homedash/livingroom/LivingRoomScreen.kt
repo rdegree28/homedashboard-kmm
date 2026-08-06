@@ -10,6 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.previewTrigger
+import com.degree.homedash.shared.model.entity.HvacMode
 import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
 import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.ControlGroup
@@ -34,6 +35,10 @@ fun LivingRoomScreen(
         onSetFanSpeed = vm::setFanSpeed,
         onSetOscillating = vm::setOscillating,
         onSetMisting = vm::setMisting,
+        onSetTargetTemperature = vm::setTargetTemperature,
+        onSetHvacMode = vm::setHvacMode,
+        onSetThermostatFanMode = vm::setThermostatFanMode,
+        onSetPresetMode = vm::setPresetMode,
         onActivate = vm::activate,
         showLights = showLights,
     )
@@ -50,6 +55,10 @@ fun LivingRoomContent(
     onSetFanSpeed: (String, Int) -> Unit,
     onSetOscillating: (String, Boolean) -> Unit,
     onSetMisting: (String, Boolean) -> Unit,
+    onSetTargetTemperature: (String, Double) -> Unit,
+    onSetHvacMode: (String, HvacMode) -> Unit,
+    onSetThermostatFanMode: (String, String) -> Unit,
+    onSetPresetMode: (String, String) -> Unit,
     onActivate: (TriggerEntityMetadata.ServiceCall) -> Unit,
     showLights: Boolean = false,
 ) {
@@ -61,6 +70,10 @@ fun LivingRoomContent(
             is EntityAction.SetSpeed -> onSetFanSpeed(action.entityId, action.percentage)
             is EntityAction.SetOscillating -> onSetOscillating(action.entityId, action.oscillating)
             is EntityAction.SetMisting -> onSetMisting(action.entityId, action.misting)
+            is EntityAction.SetTargetTemperature -> onSetTargetTemperature(action.entityId, action.temperature)
+            is EntityAction.SetHvacMode -> onSetHvacMode(action.entityId, action.mode)
+            is EntityAction.SetThermostatFanMode -> onSetThermostatFanMode(action.entityId, action.mode)
+            is EntityAction.SetPresetMode -> onSetPresetMode(action.entityId, action.mode)
             is EntityAction.Navigate -> Unit
         }
     }
@@ -99,7 +112,9 @@ fun LivingRoomContent(
 
             ControlGroup(
                 title = "Climate",
-                entities = ui.climate,
+                // The thermostat spans the full grid row, so listing it first gives it the top row
+                // and leaves the sensor cards to pair up beneath it.
+                entities = ui.thermostats + ui.climate,
                 useCardUis = true,
                 onAction = onAction,
             )
@@ -117,6 +132,7 @@ private fun LivingRoomScreenPreview() {
                     triggers = listOf(previewTrigger("Main Lights")),
                     lights = previewLights,
                     fans = previewFans,
+                    thermostats = previewThermostats,
                     climate = previewClimate,
                 ),
                 onBack = {},
@@ -125,6 +141,10 @@ private fun LivingRoomScreenPreview() {
                 onSetFanSpeed = { _, _ -> },
                 onSetOscillating = { _, _ -> },
                 onSetMisting = { _, _ -> },
+                onSetTargetTemperature = { _, _ -> },
+                onSetHvacMode = { _, _ -> },
+                onSetThermostatFanMode = { _, _ -> },
+                onSetPresetMode = { _, _ -> },
                 onActivate = {},
                 showLights = true,
             )

@@ -23,6 +23,7 @@ data class LivingRoomUiState(
     val triggers: List<EntityUi.Trigger>,
     val lights: List<EntityUi.Light>,
     val fans: List<EntityUi.Fan>,
+    val thermostats: List<EntityUi.Thermostat>,
     val climate: List<EntityUi.Climate>,
 )
 
@@ -43,6 +44,7 @@ class LivingRoomViewModel(
                     triggers = uis.filterIsInstance<EntityUi.Trigger>(),
                     lights = uis.filterIsInstance<EntityUi.Light>(),
                     fans = uis.filterIsInstance<EntityUi.Fan>(),
+                    thermostats = uis.filterIsInstance<EntityUi.Thermostat>(),
                     climate = uis.filterIsInstance<EntityUi.Climate>().withDewPoint(states),
                 )
             }
@@ -50,7 +52,7 @@ class LivingRoomViewModel(
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5_000),
-                LivingRoomUiState(emptyList(), emptyList(), emptyList(), emptyList()),
+                LivingRoomUiState(emptyList(), emptyList(), emptyList(), emptyList(), emptyList()),
             )
 
     fun toggle(entityId: String) {
@@ -68,6 +70,23 @@ class LivingRoomViewModel(
     /** [entityId] is the mister's own humidifier entity, not the fan's. */
     fun setMisting(entityId: String, misting: Boolean) {
         viewModelScope.launch { repo.setMisting(entityId, misting) }
+    }
+
+    fun setTargetTemperature(entityId: String, temperature: Double) {
+        viewModelScope.launch { repo.setTargetTemperature(entityId, temperature) }
+    }
+
+    fun setHvacMode(entityId: String, mode: HvacMode) {
+        viewModelScope.launch { repo.setHvacMode(entityId, mode) }
+    }
+
+    /** [mode] is one of the thermostat's own `fan_modes`, not a `fan.*` entity speed. */
+    fun setThermostatFanMode(entityId: String, mode: String) {
+        viewModelScope.launch { repo.setThermostatFanMode(entityId, mode) }
+    }
+
+    fun setPresetMode(entityId: String, mode: String) {
+        viewModelScope.launch { repo.setPresetMode(entityId, mode) }
     }
 
     /** Fires a trigger card's service call — activating a scene, running a script. */

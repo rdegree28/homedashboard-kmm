@@ -15,7 +15,8 @@ object AppColors {
     val SignalOff = Color(0xFFB6B6B6) // signal "off"
     val Healthy = Color(0xFF66BB6A) // plants card, healthy soil
     val Wet = Color(0xFF4FC3F7) // humidity, very-wet soil, office card
-    val TempWarm = Color(0xFFFF8A65) // temperature
+    val TempWarm = Color(0xFFFF8A65) // temperature; thermostat actively heating
+    val TempCool = Color(0xFF64B5F6) // thermostat actively cooling — TempWarm's partner
     val Accent = Color(0xFF4C8DFF) // chart line/fill
     val FanBlue = Color(0xFF3A6FD0) // fan icon + speed slider; a shade darker than Accent
     val FanMisting = Color(0xFF3994B0) // fan icon + speed slider; a shade darker than Accent
