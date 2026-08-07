@@ -168,11 +168,12 @@ internal fun ThermostatControlCard(
             if (metadata.hvacModes.isNotEmpty()) {
                 LabeledSelectorRow(
                     label = "Mode",
-                    options = metadata.hvacModes.map { it.label },
+                    // Each mode pill carries its own tone, so Heat reads warm and Cool reads cool
+                    // whichever one is currently selected.
+                    options = metadata.hvacModes.map { it.label to it.tone.color },
                     // -1 when HA reports a mode we don't offer — heat_cool set from the HA app, say.
                     // Nothing highlights, rather than lying about which pill is active.
                     selectedIndex = metadata.hvacModes.indexOf(shownHvacMode),
-                    tint = tint,
                     enabled = enabled,
                 ) { index ->
                     val mode = metadata.hvacModes[index]
@@ -184,9 +185,8 @@ internal fun ThermostatControlCard(
             if (metadata.fanModes.isNotEmpty()) {
                 LabeledSelectorRow(
                     label = "Fan",
-                    options = metadata.fanModes.map { it.modeLabel() },
+                    options = metadata.fanModes.map { it.modeLabel() to tint },
                     selectedIndex = metadata.fanModes.indexOf(shownFanMode),
-                    tint = tint,
                     enabled = enabled,
                 ) { index ->
                     val mode = metadata.fanModes[index]
@@ -198,9 +198,8 @@ internal fun ThermostatControlCard(
             if (metadata.presetModes.isNotEmpty()) {
                 LabeledSelectorRow(
                     label = "Preset",
-                    options = metadata.presetModes.map { it.modeLabel() },
+                    options = metadata.presetModes.map { it.modeLabel() to tint },
                     selectedIndex = metadata.presetModes.indexOf(shownPresetMode),
-                    tint = tint,
                     enabled = enabled,
                 ) { index ->
                     val mode = metadata.presetModes[index]
@@ -345,9 +344,8 @@ private fun StepperButton(
 @Composable
 private fun LabeledSelectorRow(
     label: String,
-    options: List<String>,
+    options: List<Pair<String, Color>>,
     selectedIndex: Int,
-    tint: Color,
     enabled: Boolean,
     onSelect: (Int) -> Unit,
 ) {
@@ -372,11 +370,11 @@ private fun LabeledSelectorRow(
         ) {
             options.forEachIndexed { index, option ->
                 PillButton(
-                    text = option,
+                    text = option.first,
                     isOn = index == selectedIndex,
                     onClick = { onSelect(index) },
                     modifier = Modifier.weight(1f),
-                    color = tint,
+                    color = option.second,
                     enabled = enabled,
                 )
             }
@@ -388,6 +386,44 @@ private fun LabeledSelectorRow(
 private fun rowsFor(count: Int): Int = ceil(count / ModesPerRow.toFloat()).toInt()
 
 /**
+ * What a mode or an action *means* to the eye, and the single place that meaning becomes a colour.
+ *
+ * [HvacMode] and [HvacAction] overlap in meaning but not in values — only one of them can be sent to
+ * Home Assistant, and `idle`/`heat_cool` exist on one side each — so they stay separate types. This
+ * is the one thing they genuinely share, factored out so the palette isn't spelled twice.
+ */
+private enum class HvacTone(val color: Color) {
+    Warm(AppColors.TempWarm),
+    Cool(AppColors.TempCool),
+    Damp(AppColors.Wet),
+    Air(AppColors.FanBlue),
+    Neutral(AppColors.StatusGray),
+}
+
+private val HvacMode.tone: HvacTone
+    get() = when (this) {
+        HvacMode.Heat -> HvacTone.Warm
+        HvacMode.Cool -> HvacTone.Cool
+        HvacMode.Dry -> HvacTone.Damp
+        HvacMode.FanOnly -> HvacTone.Air
+        // Genuinely ambiguous until hvac_action says which way it's driving; warm is the safer read
+        // of a mode whose whole point is that it might heat.
+        HvacMode.HeatCool, HvacMode.Auto -> HvacTone.Warm
+        HvacMode.Off -> HvacTone.Neutral
+    }
+
+/** null is "no opinion": an idle unit isn't doing anything, so the mode it's set to decides. */
+private val HvacAction.tone: HvacTone?
+    get() = when (this) {
+        HvacAction.Heating, HvacAction.Preheating, HvacAction.Defrosting -> HvacTone.Warm
+        HvacAction.Cooling -> HvacTone.Cool
+        HvacAction.Drying -> HvacTone.Damp
+        HvacAction.Fan -> HvacTone.Air
+        HvacAction.Off -> HvacTone.Neutral
+        HvacAction.Idle -> null
+    }
+
+/**
  * What the card tints itself by: the live [action] while the unit is actually doing something,
  * otherwise the [mode] it's set to.
  *
@@ -396,21 +432,8 @@ private fun rowsFor(count: Int): Int = ceil(count / ModesPerRow.toFloat()).toInt
  * what carries that, while the colour says what the thermostat is *for*. Grey is reserved for a
  * unit that really is off or offline.
  */
-private fun statusTint(action: HvacAction?, mode: HvacMode?): Color = when (action) {
-    HvacAction.Heating, HvacAction.Preheating, HvacAction.Defrosting -> AppColors.TempWarm
-    HvacAction.Cooling -> AppColors.TempCool
-    HvacAction.Drying -> AppColors.Wet
-    HvacAction.Fan -> AppColors.FanBlue
-    HvacAction.Off -> AppColors.StatusGray
-    HvacAction.Idle, null -> when (mode) {
-        HvacMode.Heat -> AppColors.TempWarm
-        HvacMode.Cool -> AppColors.TempCool
-        HvacMode.Dry -> AppColors.Wet
-        HvacMode.FanOnly -> AppColors.FanBlue
-        HvacMode.HeatCool, HvacMode.Auto -> AppColors.TempWarm
-        HvacMode.Off, null -> AppColors.StatusGray
-    }
-}
+private fun statusTint(action: HvacAction?, mode: HvacMode?): Color =
+    (action?.tone ?: mode?.tone ?: HvacTone.Neutral).color
 
 /** The badge in the card's top-right: what it's doing, or failing that what it's set to. */
 private fun statusText(ui: EntityUi.Thermostat): String = when {
