@@ -22,6 +22,9 @@ object Dimens {
 
     val EntityRowHeight: Dp = 52.dp
     val RowIconSize: Dp = 26.dp
+
+    /** Glyph inside a pill button — smaller than [RowIconSize], which crowds a pill's label. */
+    val PillIconSize: Dp = 18.dp
     val RowLabelGap: Dp = 16.dp
     val ChartHeight: Dp = 150.dp
     val SectionSpacing: Dp = 16.dp

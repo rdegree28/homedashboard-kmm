@@ -60,6 +60,85 @@ object ControlIcons {
             path(fill = SolidColor(Color.Black)) { circle(12f, 12.5f, 2.4f) }
         }
     }
+
+    /**
+     * The HVAC mode glyphs — the universal thermostat set, so they read without their labels.
+     *
+     * Stroked rather than filled (the flame excepted), which keeps them legible at the 18dp the mode
+     * pills draw them, where a filled silhouette would close up into a blob.
+     */
+
+    /** Power symbol: a ring broken at the top with a bar through the gap. */
+    val HvacOff: ImageVector by lazy {
+        iconVector("HvacOff") {
+            // Radius 7 about (12, 12.5), swept 290° clockwise so the 70° gap lands at the top.
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.1f,
+                strokeLineCap = StrokeCap.Round,
+            ) {
+                moveTo(16.02f, 6.77f)
+                arcTo(7f, 7f, 0f, true, true, 7.98f, 6.77f)
+            }
+            // The bar overshoots the ring's top edge, which is what makes it read as a power symbol
+            // rather than a broken circle.
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2.1f,
+                strokeLineCap = StrokeCap.Round,
+            ) {
+                moveTo(12f, 4.2f)
+                lineTo(12f, 11.6f)
+            }
+        }
+    }
+
+    /** A flame. Filled, with the left side kinked inward so it doesn't read as a plain teardrop. */
+    val HvacHeat: ImageVector by lazy {
+        iconVector("HvacHeat") {
+            path(fill = SolidColor(Color.Black)) {
+                moveTo(12f, 2.8f)
+                // Right side: out to the widest point, then in to the base.
+                curveTo(12f, 7.2f, 17.8f, 9.4f, 17.8f, 14.2f)
+                curveTo(17.8f, 17.8f, 15.2f, 20.9f, 12f, 20.9f)
+                curveTo(8.8f, 20.9f, 6.2f, 17.8f, 6.2f, 14.2f)
+                // Left side back to the tip, pinched in at the shoulder for the flicker.
+                curveTo(6.2f, 11.4f, 8.6f, 10.4f, 9.6f, 8.2f)
+                curveTo(10.5f, 6.2f, 10.6f, 4.4f, 12f, 2.8f)
+                close()
+            }
+        }
+    }
+
+    /** A six-armed snowflake: three arms crossing at the centre, each tipped with a pair of barbs. */
+    val HvacCool: ImageVector by lazy {
+        iconVector("HvacCool") {
+            // Three full-length arms through (12, 12) at 90°, 30° and 150°.
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+            ) {
+                moveTo(12f, 4f); lineTo(12f, 20f)
+                moveTo(18.93f, 8f); lineTo(5.07f, 16f)
+                moveTo(18.93f, 16f); lineTo(5.07f, 8f)
+            }
+            // Barbs: a shallow V on each of the six arms, thinner than the arms so the star still
+            // reads as the dominant shape at small sizes.
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 1.8f,
+                strokeLineCap = StrokeCap.Round,
+            ) {
+                moveTo(10.09f, 5.79f); lineTo(12f, 7.4f); lineTo(13.92f, 5.79f)
+                moveTo(13.92f, 18.21f); lineTo(12f, 16.6f); lineTo(10.09f, 18.21f)
+                moveTo(16.42f, 7.24f); lineTo(15.98f, 9.7f); lineTo(18.33f, 10.56f)
+                moveTo(7.59f, 16.76f); lineTo(8.02f, 14.3f); lineTo(5.67f, 13.44f)
+                moveTo(18.33f, 13.44f); lineTo(15.98f, 14.3f); lineTo(16.42f, 16.76f)
+                moveTo(5.67f, 10.56f); lineTo(8.02f, 9.7f); lineTo(7.59f, 7.24f)
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
@@ -78,7 +157,22 @@ private fun ControlIconsPreview() {
                     Icon(ControlIcons.Thermostat, null, Modifier.size(26.dp), AppColors.TempWarm)
                     Icon(ControlIcons.Thermostat, null, Modifier.size(26.dp), AppColors.StatusGray)
                 }
-                Icon(ControlIcons.Thermostat, null, Modifier.size(96.dp), AppColors.TempCool)
+                // The mode glyphs at the 18dp the pills draw them, in their own tones.
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(ControlIcons.HvacOff, null, Modifier.size(18.dp), AppColors.StatusGray)
+                    Icon(ControlIcons.HvacHeat, null, Modifier.size(18.dp), AppColors.TempWarm)
+                    Icon(ControlIcons.HvacCool, null, Modifier.size(18.dp), AppColors.TempCool)
+                }
+                // Blown up for drawing work.
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Icon(ControlIcons.Thermostat, null, Modifier.size(80.dp), AppColors.TempCool)
+                    Icon(ControlIcons.HvacOff, null, Modifier.size(80.dp), AppColors.StatusGray)
+                    Icon(ControlIcons.HvacHeat, null, Modifier.size(80.dp), AppColors.TempWarm)
+                    Icon(ControlIcons.HvacCool, null, Modifier.size(80.dp), AppColors.TempCool)
+                }
             }
         }
     }

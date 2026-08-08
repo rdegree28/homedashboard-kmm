@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -126,7 +127,7 @@ internal fun ThermostatControlCard(
     ) {
         Column(
             modifier = Modifier.fillMaxSize().padding(Dimens.EntityCardPadding),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -171,12 +172,13 @@ internal fun ThermostatControlCard(
                 )
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
             if (metadata.hvacModes.isNotEmpty()) {
                 LabeledSelectorRow(
                     label = "Mode",
                     // Each mode pill carries its own tone, so Heat reads warm and Cool reads cool
                     // whichever one is currently selected.
-                    options = metadata.hvacModes.map { it.label to it.tone.color },
+                    options = metadata.hvacModes.map { ModeOption(it.label, it.tone.color, it.icon) },
                     // -1 when HA reports a mode we don't offer — heat_cool set from the HA app, say.
                     // Nothing highlights, rather than lying about which pill is active.
                     selectedIndex = metadata.hvacModes.indexOf(shownHvacMode),
@@ -191,7 +193,7 @@ internal fun ThermostatControlCard(
             if (metadata.fanModes.isNotEmpty()) {
                 LabeledSelectorRow(
                     label = "Fan",
-                    options = metadata.fanModes.map { it.modeLabel() to tint },
+                    options = metadata.fanModes.map { ModeOption(it.modeLabel(), tint) },
                     selectedIndex = metadata.fanModes.indexOf(shownFanMode),
                     enabled = enabled,
                 ) { index ->
@@ -204,7 +206,7 @@ internal fun ThermostatControlCard(
             if (metadata.presetModes.isNotEmpty()) {
                 LabeledSelectorRow(
                     label = "Preset",
-                    options = metadata.presetModes.map { it.modeLabel() to tint },
+                    options = metadata.presetModes.map { ModeOption(it.modeLabel(), tint) },
                     selectedIndex = metadata.presetModes.indexOf(shownPresetMode),
                     enabled = enabled,
                 ) { index ->
@@ -346,11 +348,21 @@ private fun StepperButton(
     }
 }
 
+/**
+ * One choice in a selector row. A data class rather than a `Pair`/`Triple` because the hvac row
+ * carries a glyph and its own tone while the fan and preset rows carry neither.
+ */
+private data class ModeOption(
+    val label: String,
+    val color: Color,
+    val icon: ImageVector? = null,
+)
+
 /** A caption plus its pills, so an "On/Off" row can't be mistaken for the mode row next to it. */
 @Composable
 private fun LabeledSelectorRow(
     label: String,
-    options: List<Pair<String, Color>>,
+    options: List<ModeOption>,
     selectedIndex: Int,
     enabled: Boolean,
     onSelect: (Int) -> Unit,
@@ -376,11 +388,13 @@ private fun LabeledSelectorRow(
         ) {
             options.forEachIndexed { index, option ->
                 PillButton(
-                    text = option.first,
+                    text = option.label,
                     isOn = index == selectedIndex,
                     onClick = { onSelect(index) },
                     modifier = Modifier.weight(1f),
-                    color = option.second,
+                    icon = option.icon,
+                    iconSize = Dimens.PillIconSize,
+                    color = option.color,
                     enabled = enabled,
                 )
             }
@@ -464,6 +478,20 @@ private val HvacMode.label: String
         HvacMode.Auto -> "Auto"
         HvacMode.Dry -> "Dry"
         HvacMode.FanOnly -> "Fan"
+    }
+
+/**
+ * The glyph on a mode's pill, where one carries its meaning on its own.
+ *
+ * null for the compound and less common modes: `heat_cool`/`auto` have no single honest symbol, and
+ * a wrong glyph is worse than none when the label is right there beside it.
+ */
+private val HvacMode.icon: ImageVector?
+    get() = when (this) {
+        HvacMode.Off -> ControlIcons.HvacOff
+        HvacMode.Heat -> ControlIcons.HvacHeat
+        HvacMode.Cool -> ControlIcons.HvacCool
+        HvacMode.HeatCool, HvacMode.Auto, HvacMode.Dry, HvacMode.FanOnly -> null
     }
 
 private val HvacAction.label: String

@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
@@ -29,7 +30,8 @@ private val PillCorner = 16.dp
 /**
  * The dashboard's pill button: outlined in [color] when off, filled with it when on.
  *
- * [icon] is optional — fan controls pair a label with a glyph, thermostat mode pills are text only.
+ * [icon] is optional, and [iconSize] defaults to the row size the fan controls use; the thermostat's
+ * mode pills pass the smaller [Dimens.PillIconSize] so the glyph doesn't crowd a short label.
  * A disabled pill keeps its shape but stops responding, which is what an offline entity needs.
  */
 @Composable
@@ -39,6 +41,7 @@ internal fun PillButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
+    iconSize: Dp = Dimens.RowIconSize,
     color: Color = AppColors.FanBlue,
     enabled: Boolean = true,
     contentDescription: String? = null,
@@ -70,7 +73,7 @@ internal fun PillButton(
                 imageVector = icon,
                 contentDescription = contentDescription,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(Dimens.RowIconSize),
+                modifier = Modifier.size(iconSize),
             )
         }
     }
