@@ -151,6 +151,12 @@ internal fun ThermostatControlCard(
                     color = tint,
                     maxLines = 1,
                 )
+                FanIcon(
+                    spinning = isFanSpinning(ui),
+                    tint = tint,
+                    durationMs = 1500,
+                    modifier = Modifier.size(24.dp)
+                )
             }
 
             metadata.targetTemperature?.let { range ->
@@ -441,6 +447,12 @@ private fun statusText(ui: EntityUi.Thermostat): String = when {
     ui.hvacAction != null -> ui.hvacAction.label
     ui.hvacMode != null -> ui.hvacMode.label
     else -> "—"
+}
+
+/** The badge in the card's top-right: what it's doing, or failing that what it's set to. */
+private fun isFanSpinning(ui: EntityUi.Thermostat): Boolean = when (ui.hvacAction) {
+    null, HvacAction.Off, HvacAction.Idle -> false
+    else -> true
 }
 
 private val HvacMode.label: String
