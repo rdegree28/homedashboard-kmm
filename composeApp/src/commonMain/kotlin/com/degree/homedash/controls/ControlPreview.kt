@@ -126,8 +126,10 @@ internal fun previewThermostat(
     target: Double? = 72.0,
     current: Double? = 70.0,
     hvacModes: List<HvacMode> = listOf(HvacMode.Off, HvacMode.Heat, HvacMode.Cool),
-    fanModes: List<String> = listOf("on", "off"),
-    fanMode: String? = "off",
+    // The Living Room roster declares no fan modes, so the default carries none either — the office
+    // heater preview passes its own to keep the fan row itself covered.
+    fanModes: List<String> = emptyList(),
+    fanMode: String? = null,
     presetModes: List<String> = listOf("none", "eco"),
     presetMode: String? = "none",
 ) = EntityUi.Thermostat(

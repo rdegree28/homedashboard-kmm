@@ -26,6 +26,10 @@ fun FanMetadata.Companion.dellaTowerFan(
  * offers it: it supports TARGET_TEMPERATURE_RANGE, so in that mode Home Assistant stops publishing
  * `temperature` and publishes `target_temp_low`/`target_temp_high` instead, which a single setpoint
  * stepper can't drive. The card still degrades gracefully if the mode is set from the HA app.
+ *
+ * The unit's `fan_modes` (`on`/`off`) are left out too. On a whole-house system that only forces the
+ * blower to run continuously — rarely wanted, and not worth a permanent row on the card. Declaring
+ * [ThermostatMetadata.fanModes] brings the row back with no other change.
  */
 fun ThermostatMetadata.Companion.livingRoomThermostat(
     entityId: String,
@@ -36,7 +40,6 @@ fun ThermostatMetadata.Companion.livingRoomThermostat(
         displayName = displayName,
         targetTemperature = ThermostatMetadata.TargetTemperature(min = 50.0, max = 90.0, step = 1.0),
         hvacModes = listOf(HvacMode.Off, HvacMode.Heat, HvacMode.Cool),
-        fanModes = listOf("on", "off"),
         presetModes = listOf("none", "eco"),
     )
 }
