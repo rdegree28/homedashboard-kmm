@@ -69,6 +69,7 @@ fun BedroomContent(
             is EntityAction.SetHvacMode -> Unit
             is EntityAction.SetThermostatFanMode -> Unit
             is EntityAction.SetPresetMode -> Unit
+            is EntityAction.SetExtremeTemperatures -> Unit
             is EntityAction.OpenGraph -> Unit
             is EntityAction.Navigate -> Unit
         }

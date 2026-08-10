@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -139,6 +140,131 @@ object ControlIcons {
             }
         }
     }
+
+    /**
+     * The temperature-preset glyphs. These pills carry no label, so each has to stand alone —
+     * house / moon / leaf is the conventional set, which is most of why it reads.
+     */
+
+    /** Comfort: a house — the normal, at-home setting. */
+    val PresetComfort: ImageVector by lazy {
+        iconVector("PresetComfort") {
+            path(fill = SolidColor(Color.Black)) {
+                // Roof: a broad triangle, eaves overhanging the walls either side.
+                moveTo(12f, 3.4f)
+                lineTo(22f, 11.6f)
+                lineTo(20.2f, 13.8f)
+                lineTo(12f, 7.1f)
+                lineTo(3.8f, 13.8f)
+                lineTo(2f, 11.6f)
+                close()
+            }
+            path(fill = SolidColor(Color.Black)) {
+                // Walls, with a doorway cut out of the base rather than drawn over it, so the
+                // silhouette still reads as a house when it's filled with a single colour.
+                moveTo(5.2f, 12.9f)
+                lineTo(12f, 7.3f)
+                lineTo(18.8f, 12.9f)
+                lineTo(18.8f, 20.6f)
+                lineTo(14.1f, 20.6f)
+                lineTo(14.1f, 15.2f)
+                lineTo(9.9f, 15.2f)
+                lineTo(9.9f, 20.6f)
+                lineTo(5.2f, 20.6f)
+                close()
+            }
+        }
+    }
+
+    /**
+     * Sleep: a crescent moon, drawn as two arcs between the same pair of horns — a deep one out to
+     * the left for the outer edge, a shallower one back for the inner.
+     *
+     * Not two circles in an even-odd path: even-odd is a symmetric difference, not a subtraction, so
+     * the part of the biting circle hanging outside the disc survives and the result is a blob
+     * rather than a crescent.
+     */
+    val PresetSleep: ImageVector by lazy {
+        iconVector("PresetSleep") {
+            path(fill = SolidColor(Color.Black)) {
+                moveTo(14.5f, 3.2f)
+                // Outer edge: radius 9, bulging left, down to the lower horn.
+                arcTo(9f, 9f, 0f, false, false, 10.2f, 20.6f)
+                // Inner edge: radius 11, so it cuts back across more gently than the outer edge.
+                arcTo(11f, 11f, 0f, false, true, 14.5f, 3.2f)
+                close()
+            }
+        }
+    }
+
+    /**
+     * Economy: a leaf with a stem and central vein.
+     *
+     * Stroked rather than filled, which is what leaves room for the vein — on a filled blade the
+     * vein would have to be a hole, and at 18dp a hairline hole closes up.
+     */
+    val PresetEconomy: ImageVector by lazy {
+        iconVector("PresetEconomy") {
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 1.9f,
+                strokeLineCap = StrokeCap.Round,
+            ) {
+                // Blade: a pointed oval leaning up-right, tip at top-right, base at bottom-left.
+                moveTo(19.8f, 4.2f)
+                curveTo(8.8f, 3.4f, 4.6f, 9.6f, 5.8f, 14.6f)
+                curveTo(6.8f, 18.8f, 12.4f, 20.6f, 16f, 17.4f)
+                curveTo(19.4f, 14.4f, 20.4f, 9.4f, 19.8f, 4.2f)
+                close()
+            }
+            // Stem running out past the base, with the vein continuing the same line up the blade.
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 1.7f,
+                strokeLineCap = StrokeCap.Round,
+            ) {
+                moveTo(3.4f, 20.8f)
+                lineTo(15.2f, 9f)
+            }
+        }
+    }
+
+    /**
+     * Extreme: a lightning bolt with a slash cut through it — cutting power, not boosting it.
+     *
+     * The slash carries the whole meaning: a bare bolt reads as "boost", the opposite of what this
+     * does. The bolt and a wide diagonal bar share one even-odd path so their overlap punches a real
+     * gap, and the thinner slash then sits inside that gap instead of merging into the bolt.
+     */
+    val PresetExtreme: ImageVector by lazy {
+        iconVector("PresetExtreme") {
+            path(fill = SolidColor(Color.Black), pathFillType = PathFillType.EvenOdd) {
+                moveTo(13.6f, 2.2f)
+                lineTo(5.4f, 13.2f)
+                lineTo(10.8f, 13.2f)
+                lineTo(10.4f, 21.8f)
+                lineTo(18.6f, 10.6f)
+                lineTo(13.2f, 10.6f)
+                close()
+                // The gap: a 4.4-wide bar along the slash, overshooting both ends so it cuts clean.
+                // Runs "\", across the bolt rather than along it — a slash on the other diagonal
+                // lies almost parallel to the bolt and shreds it into slivers instead of cutting it.
+                moveTo(1.53f, 4.65f)
+                lineTo(4.65f, 1.53f)
+                lineTo(22.47f, 19.35f)
+                lineTo(19.35f, 22.47f)
+                close()
+            }
+            path(
+                stroke = SolidColor(Color.Black),
+                strokeLineWidth = 2f,
+                strokeLineCap = StrokeCap.Round,
+            ) {
+                moveTo(4.5f, 4.5f)
+                lineTo(19.5f, 19.5f)
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
@@ -166,12 +292,26 @@ private fun ControlIconsPreview() {
                     Icon(ControlIcons.HvacHeat, null, Modifier.size(18.dp), AppColors.TempWarm)
                     Icon(ControlIcons.HvacCool, null, Modifier.size(18.dp), AppColors.TempCool)
                 }
+                // The preset glyphs at 18dp, where they carry no label to lean on.
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(ControlIcons.PresetComfort, null, Modifier.size(18.dp), AppColors.TempWarm)
+                    Icon(ControlIcons.PresetSleep, null, Modifier.size(18.dp), AppColors.PlayBlue)
+                    Icon(ControlIcons.PresetEconomy, null, Modifier.size(18.dp), AppColors.Healthy)
+                    Icon(ControlIcons.PresetExtreme, null, Modifier.size(18.dp), AppColors.StatusAmber)
+                }
                 // Blown up for drawing work.
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Icon(ControlIcons.Thermostat, null, Modifier.size(80.dp), AppColors.TempCool)
-                    Icon(ControlIcons.HvacOff, null, Modifier.size(80.dp), AppColors.StatusGray)
-                    Icon(ControlIcons.HvacHeat, null, Modifier.size(80.dp), AppColors.TempWarm)
-                    Icon(ControlIcons.HvacCool, null, Modifier.size(80.dp), AppColors.TempCool)
+                    Icon(ControlIcons.Thermostat, null, Modifier.size(72.dp), AppColors.TempCool)
+                    Icon(ControlIcons.PresetComfort, null, Modifier.size(72.dp), AppColors.TempWarm)
+                    Icon(ControlIcons.PresetSleep, null, Modifier.size(72.dp), AppColors.PlayBlue)
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Icon(ControlIcons.PresetEconomy, null, Modifier.size(72.dp), AppColors.Healthy)
+                    Icon(ControlIcons.PresetExtreme, null, Modifier.size(72.dp), AppColors.StatusAmber)
+                    Icon(ControlIcons.HvacCool, null, Modifier.size(72.dp), AppColors.TempCool)
                 }
             }
         }

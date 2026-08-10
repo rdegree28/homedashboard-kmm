@@ -97,6 +97,17 @@ class HomeAssistantRepo internal constructor(
     ) = api.callService("climate", "set_fan_mode", entityId,
         buildJsonObject { put("fan_mode", fanMode) })
 
+    /**
+     * Turn the extreme-setpoint mode on or off.
+     *
+     * [entityId] is the `input_boolean.*` helper the thermostat's metadata names, not the thermostat
+     * — the same composite-entity shape as [setMisting].
+     */
+    suspend fun setExtremeTemperatures(
+        entityId: String,
+        extreme: Boolean,
+    ) = if (extreme) turnOn(entityId) else turnOff(entityId)
+
     /** Set a thermostat's preset. [presetMode] is one of the entity's reported `preset_modes`. */
     suspend fun setPresetMode(
         entityId: String,

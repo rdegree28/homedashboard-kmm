@@ -11,12 +11,6 @@ object Dimens {
     val EntityCardPadding: Dp = 14.dp
     val CardCorner: Dp = 12.dp
     val CardElevation: Dp = 1.dp
-    /** A thermostat card's header + setpoint stepper, before any selector rows are added. */
-    val ThermostatCardHeight: Dp = 132.dp
-
-    /** Each mode/fan/preset pill row a thermostat card adds on top of [ThermostatCardHeight]. */
-    val ThermostatSelectorRowHeight: Dp = 40.dp
-
     /** The −/+ setpoint buttons — sized to stay hittable on the wall tablet. */
     val StepperButtonSize: Dp = 44.dp
 

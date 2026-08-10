@@ -89,6 +89,11 @@ class LivingRoomViewModel(
         viewModelScope.launch { repo.setPresetMode(entityId, mode) }
     }
 
+    /** [entityId] is the `input_boolean.*` helper, not the thermostat. */
+    fun setExtremeTemperatures(entityId: String, extreme: Boolean) {
+        viewModelScope.launch { repo.setExtremeTemperatures(entityId, extreme) }
+    }
+
     /** Fires a trigger card's service call — activating a scene, running a script. */
     fun activate(call: TriggerEntityMetadata.ServiceCall) {
         viewModelScope.launch { repo.callService(call.domain, call.service, call.entityId) }

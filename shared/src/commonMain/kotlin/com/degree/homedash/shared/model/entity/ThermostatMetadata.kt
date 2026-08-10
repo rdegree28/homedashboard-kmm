@@ -18,9 +18,29 @@ data class ThermostatMetadata(
     val fanModes: List<String> = emptyList(),
     /** Vendor strings ("none"/"eco"). Empty = no selector. */
     val presetModes: List<String> = emptyList(),
+    /**
+     * The dashboard's own temperature presets, in the order their pills render. Empty = no row.
+     *
+     * Not Home Assistant's `preset_mode` (that's [presetModes]) — these are ours: each one just
+     * writes a setpoint, so a preset is "active" purely because the thermostat happens to sit on its
+     * temperature. Nothing to store, and it stays correct when the setpoint is changed from the HA
+     * app or the physical unit.
+     */
+    val temperaturePresets: List<TemperaturePreset> = emptyList(),
+    /** Non-null when an `input_boolean` gates the extreme setpoints. */
+    val extremeToggle: ExtremeToggle? = null,
     /** Suffix on both readouts. Not an attribute — `climate.*` entities publish no unit. */
     val unitLabel: String = "°",
 ) : EntityMetadata {
+
+    /**
+     * The Home Assistant helper holding whether extreme setpoints are in force.
+     *
+     * Its own `input_boolean.*` entity rather than app state, so the wall tablet, phone and web all
+     * agree and an automation can flip it. The composite-entity shape mirrors
+     * `FanMetadata.MistingControl`.
+     */
+    data class ExtremeToggle(val entityId: String)
 
     /**
      * The setpoint's bounds and increment.
@@ -39,6 +59,44 @@ data class ThermostatMetadata(
     // Defined for factories
     companion object
 }
+
+/**
+ * One of the dashboard's temperature presets: tapping its pill writes a setpoint, and the pill fills
+ * whenever the thermostat already sits on that setpoint.
+ *
+ * Four numbers rather than one because a setpoint means opposite things in the two hvac modes — 66°
+ * is frugal when heating and extravagant when cooling — and [extreme] declares its own pair outright
+ * rather than deriving from an offset, so each combination can be tuned on its own.
+ */
+data class TemperaturePreset(
+    val kind: PresetKind,
+    val normal: SetpointPair,
+    val extreme: SetpointPair,
+) {
+    /**
+     * The setpoint this preset writes right now, or null when the mode makes it meaningless.
+     *
+     * Null for everything but heat and cool: `off` has nothing to target, and `heat_cool`/`auto`
+     * drive a low/high pair that a single setpoint can't express (the same reason the stepper backs
+     * off in that mode).
+     */
+    fun setpointFor(mode: HvacMode?, extremeActive: Boolean): Double? {
+        val pair = if (extremeActive) extreme else normal
+        return when (mode) {
+            HvacMode.Heat -> pair.heat
+            HvacMode.Cool -> pair.cool
+            else -> null
+        }
+    }
+
+    companion object
+}
+
+/** A preset's two setpoints — which one applies depends on the thermostat's current hvac mode. */
+data class SetpointPair(val heat: Double, val cool: Double)
+
+/** The presets the dashboard offers. [Extreme] is not one of these — it's a modifier, not a target. */
+enum class PresetKind { Comfort, Sleep, Economy }
 
 /**
  * Home Assistant's `climate` state values — a thermostat's `state` *is* its hvac mode.

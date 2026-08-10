@@ -39,6 +39,7 @@ fun LivingRoomScreen(
         onSetHvacMode = vm::setHvacMode,
         onSetThermostatFanMode = vm::setThermostatFanMode,
         onSetPresetMode = vm::setPresetMode,
+        onSetExtremeTemperatures = vm::setExtremeTemperatures,
         onActivate = vm::activate,
         showLights = showLights,
     )
@@ -59,6 +60,7 @@ fun LivingRoomContent(
     onSetHvacMode: (String, HvacMode) -> Unit,
     onSetThermostatFanMode: (String, String) -> Unit,
     onSetPresetMode: (String, String) -> Unit,
+    onSetExtremeTemperatures: (String, Boolean) -> Unit,
     onActivate: (TriggerEntityMetadata.ServiceCall) -> Unit,
     showLights: Boolean = false,
 ) {
@@ -74,6 +76,8 @@ fun LivingRoomContent(
             is EntityAction.SetHvacMode -> onSetHvacMode(action.entityId, action.mode)
             is EntityAction.SetThermostatFanMode -> onSetThermostatFanMode(action.entityId, action.mode)
             is EntityAction.SetPresetMode -> onSetPresetMode(action.entityId, action.mode)
+            is EntityAction.SetExtremeTemperatures ->
+                onSetExtremeTemperatures(action.entityId, action.extreme)
             is EntityAction.Navigate -> Unit
         }
     }
@@ -145,6 +149,7 @@ private fun LivingRoomScreenPreview() {
                 onSetHvacMode = { _, _ -> },
                 onSetThermostatFanMode = { _, _ -> },
                 onSetPresetMode = { _, _ -> },
+                onSetExtremeTemperatures = { _, _ -> },
                 onActivate = {},
                 showLights = true,
             )

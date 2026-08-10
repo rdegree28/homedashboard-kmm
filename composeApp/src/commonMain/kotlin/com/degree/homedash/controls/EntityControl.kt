@@ -38,6 +38,9 @@ sealed interface EntityAction {
     data class SetThermostatFanMode(val entityId: String, val mode: String) : EntityAction
     data class SetPresetMode(val entityId: String, val mode: String) : EntityAction
 
+    /** [entityId] is the `input_boolean.*` helper the thermostat names, not the thermostat itself. */
+    data class SetExtremeTemperatures(val entityId: String, val extreme: Boolean) : EntityAction
+
     data class OpenGraph(val entityId: String) : EntityAction
 
     /** Carries the typed destination rather than an entity id — a nav card's id is synthetic. */
@@ -168,6 +171,13 @@ fun EntityControl(
             onSetHvacMode = { mode -> onAction(EntityAction.SetHvacMode(entity.entityId, mode)) },
             onSetFanMode = { mode -> onAction(EntityAction.SetThermostatFanMode(entity.entityId, mode)) },
             onSetPresetMode = { mode -> onAction(EntityAction.SetPresetMode(entity.entityId, mode)) },
+            // Targets the helper entity, so a thermostat without one can't emit this at all.
+            onSetExtreme = { on ->
+                entity.metadata.extremeToggle?.let {
+                    onAction(EntityAction.SetExtremeTemperatures(it.entityId, on))
+                }
+                Unit
+            },
             modifier = modifier,
         )
 

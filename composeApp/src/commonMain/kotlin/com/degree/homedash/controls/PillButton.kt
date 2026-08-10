@@ -36,7 +36,7 @@ private val PillCorner = 16.dp
  */
 @Composable
 internal fun PillButton(
-    text: String,
+    text: String?,
     isOn: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -56,18 +56,21 @@ internal fun PillButton(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            modifier = if (icon != null) Modifier.padding(end = 4.dp) else Modifier,
-            text = text,
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            color = if (enabled) {
-                MaterialTheme.colorScheme.onSurface
-            } else {
-                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
-            },
-        )
+        // Null text is an icon-only pill (the thermostat presets), where the glyph is the whole label.
+        if (text != null) {
+            Text(
+                modifier = if (icon != null) Modifier.padding(end = 4.dp) else Modifier,
+                text = text,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                color = if (enabled) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                },
+            )
+        }
         if (icon != null) {
             Icon(
                 imageVector = icon,

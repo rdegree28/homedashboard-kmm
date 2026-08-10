@@ -57,6 +57,11 @@ sealed interface EntityUi {
         /** Raw Home Assistant strings, matched against the lists the metadata declares. */
         val fanMode: String?,
         val presetMode: String?,
+        /**
+         * Whether the extreme setpoints are in force. Read off the `input_boolean` the metadata
+         * names, not the thermostat — the same second-entity arrangement as a fan's mister.
+         */
+        val extremeActive: Boolean = false,
     ) : EntityUi
 
     @Immutable

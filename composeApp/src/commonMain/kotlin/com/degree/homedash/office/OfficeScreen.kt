@@ -76,6 +76,7 @@ fun OfficeContent(
             is EntityAction.SetHvacMode -> Unit
             is EntityAction.SetThermostatFanMode -> Unit
             is EntityAction.SetPresetMode -> Unit
+            is EntityAction.SetExtremeTemperatures -> Unit
             is EntityAction.OpenGraph -> Unit // Office has no graph navigation
             is EntityAction.Activate -> Unit // no scene cards on this screen yet
             is EntityAction.Navigate -> Unit // launcher-only

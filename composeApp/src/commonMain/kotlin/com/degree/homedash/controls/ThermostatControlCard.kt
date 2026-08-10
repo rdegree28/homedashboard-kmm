@@ -38,6 +38,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.shared.model.entity.HvacAction
 import com.degree.homedash.shared.model.entity.HvacMode
+import com.degree.homedash.shared.model.entity.PresetKind
+import com.degree.homedash.shared.model.entity.TemperaturePreset
 import com.degree.homedash.shared.model.entity.ThermostatMetadata
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
@@ -80,6 +82,7 @@ internal fun ThermostatControlCard(
     onSetHvacMode: (HvacMode) -> Unit,
     onSetFanMode: (String) -> Unit,
     onSetPresetMode: (String) -> Unit,
+    onSetExtreme: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val metadata = ui.metadata
@@ -89,12 +92,11 @@ internal fun ThermostatControlCard(
     // not a burst, so there is nothing to coalesce.
     var pendingHvacMode by remember { mutableStateOf<HvacMode?>(null) }
     var pendingFanMode by remember { mutableStateOf<String?>(null) }
-    var pendingPresetMode by remember { mutableStateOf<String?>(null) }
+    var pendingPreset by remember { mutableStateOf<PresetKind?>(null) }
 
     // Any change HA reports settles the tap, whether it agreed with us or not — HA always wins.
     LaunchedEffect(ui.hvacMode) { pendingHvacMode = null }
     LaunchedEffect(ui.fanMode) { pendingFanMode = null }
-    LaunchedEffect(ui.presetMode) { pendingPresetMode = null }
     // …and give up if it never reports one, so a dropped call can't strand the highlight.
     LaunchedEffect(pendingHvacMode) {
         if (pendingHvacMode != null) { delay(EchoTimeoutMs); pendingHvacMode = null }
@@ -102,31 +104,62 @@ internal fun ThermostatControlCard(
     LaunchedEffect(pendingFanMode) {
         if (pendingFanMode != null) { delay(EchoTimeoutMs); pendingFanMode = null }
     }
-    LaunchedEffect(pendingPresetMode) {
-        if (pendingPresetMode != null) { delay(EchoTimeoutMs); pendingPresetMode = null }
-    }
 
     val shownHvacMode = pendingHvacMode ?: ui.hvacMode
     val shownFanMode = pendingFanMode ?: ui.fanMode
-    val shownPresetMode = pendingPresetMode ?: ui.presetMode
     val tint = statusTint(ui.hvacAction, shownHvacMode)
 
-    val selectorRows = rowsFor(metadata.hvacModes.size) +
-        rowsFor(metadata.fanModes.size) +
-        rowsFor(metadata.presetModes.size)
+    val presets = metadata.temperaturePresets
+
+    // Which preset the thermostat is *actually* sitting on. Derived from the setpoint rather than
+    // stored, so it stays right when the temperature is changed from the HA app or the unit itself.
+    val activePreset = presets.firstOrNull { preset ->
+        val setpoint = preset.setpointFor(shownHvacMode, ui.extremeActive)
+        setpoint != null && ui.targetTemperature != null &&
+            abs(setpoint - ui.targetTemperature) < TemperatureEpsilon
+    }
+    // A tapped preset fills straight away rather than waiting on the round trip, and gives way as
+    // soon as Home Assistant reports a setpoint.
+    LaunchedEffect(ui.targetTemperature) { pendingPreset = null }
+    LaunchedEffect(pendingPreset) {
+        if (pendingPreset != null) { delay(EchoTimeoutMs); pendingPreset = null }
+    }
+    val shownPreset = pendingPreset ?: activePreset?.kind
+
+    val presetOptions = presets.map { preset ->
+        ModeOption(
+            label = null,
+            color = preset.kind.tone.color,
+            isOn = preset.kind == shownPreset,
+            icon = preset.kind.icon,
+            contentDescription = preset.kind.name,
+        )
+    } + listOfNotNull(
+        metadata.extremeToggle?.let {
+            ModeOption(
+                label = null,
+                color = AppColors.HvacExtreme,
+                isOn = ui.extremeActive,
+                icon = ControlIcons.PresetExtreme,
+                contentDescription = "Extreme temperatures",
+            )
+        },
+    )
 
     // The plain Surface rather than HomeDashboardCard: the card body isn't tappable — every control
     // is its own target — and ClimateCard already takes this route for the same reason.
+    //
+    // Height wraps the content rather than being computed from the option counts. The card is always
+    // alone on its grid row (see [cardSpan]), so nothing needs it to be a predictable size — and a
+    // formula silently clips the bottom row the moment the spacing or the content changes.
     Surface(
         shape = RoundedCornerShape(Dimens.CardCorner),
         color = AppColors.CardBackground,
         shadowElevation = Dimens.CardElevation,
-        modifier = modifier.height(
-            Dimens.ThermostatCardHeight + Dimens.ThermostatSelectorRowHeight * selectorRows,
-        ),
+        modifier = modifier,
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(Dimens.EntityCardPadding),
+            modifier = Modifier.fillMaxWidth().padding(Dimens.EntityCardPadding),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(
@@ -178,10 +211,11 @@ internal fun ThermostatControlCard(
                     label = "Mode",
                     // Each mode pill carries its own tone, so Heat reads warm and Cool reads cool
                     // whichever one is currently selected.
-                    options = metadata.hvacModes.map { ModeOption(it.label, it.tone.color, it.icon) },
-                    // -1 when HA reports a mode we don't offer — heat_cool set from the HA app, say.
-                    // Nothing highlights, rather than lying about which pill is active.
-                    selectedIndex = metadata.hvacModes.indexOf(shownHvacMode),
+                    options = metadata.hvacModes.map {
+                        // Nothing fills when HA reports a mode we don't offer — heat_cool set from
+                        // the HA app, say — rather than lying about which pill is active.
+                        ModeOption(it.label, it.tone.color, isOn = it == shownHvacMode, icon = it.icon)
+                    },
                     enabled = enabled,
                 ) { index ->
                     val mode = metadata.hvacModes[index]
@@ -193,8 +227,9 @@ internal fun ThermostatControlCard(
             if (metadata.fanModes.isNotEmpty()) {
                 LabeledSelectorRow(
                     label = "Fan",
-                    options = metadata.fanModes.map { ModeOption(it.modeLabel(), tint) },
-                    selectedIndex = metadata.fanModes.indexOf(shownFanMode),
+                    options = metadata.fanModes.map {
+                        ModeOption(it.modeLabel(), tint, isOn = it == shownFanMode)
+                    },
                     enabled = enabled,
                 ) { index ->
                     val mode = metadata.fanModes[index]
@@ -203,16 +238,35 @@ internal fun ThermostatControlCard(
                 }
             }
 
-            if (metadata.presetModes.isNotEmpty()) {
+            if (presets.isNotEmpty() || metadata.extremeToggle != null) {
                 LabeledSelectorRow(
                     label = "Preset",
-                    options = metadata.presetModes.map { ModeOption(it.modeLabel(), tint) },
-                    selectedIndex = metadata.presetModes.indexOf(shownPresetMode),
-                    enabled = enabled,
+                    options = presetOptions,
+                    // The temperature pills need a mode to resolve against; Extreme doesn't, but a
+                    // row that half-disables reads as broken, so the whole row goes together.
+                    enabled = enabled && shownHvacMode.resolvesPresets(),
                 ) { index ->
-                    val mode = metadata.presetModes[index]
-                    pendingPresetMode = mode
-                    onSetPresetMode(mode)
+                    if (index in presets.indices) {
+                        val preset = presets[index]
+                        preset.setpointFor(shownHvacMode, ui.extremeActive)?.let { setpoint ->
+                            pendingPreset = preset.kind
+                            onSetTarget(setpoint)
+                        }
+                    } else {
+                        val nowExtreme = !ui.extremeActive
+                        onSetExtreme(nowExtreme)
+                        // Toggling doesn't just change what the pills *would* write — the setpoint
+                        // in force moves with them, so a thermostat sitting on Comfort follows
+                        // Comfort to its new value instead of silently falling off the preset.
+                        // Only on a tap here: reacting to the helper changing would have every open
+                        // dashboard write the same setpoint at once.
+                        activePreset?.let { preset ->
+                            preset.setpointFor(shownHvacMode, nowExtreme)?.let { setpoint ->
+                                pendingPreset = preset.kind
+                                onSetTarget(setpoint)
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -349,13 +403,18 @@ private fun StepperButton(
 }
 
 /**
- * One choice in a selector row. A data class rather than a `Pair`/`Triple` because the hvac row
- * carries a glyph and its own tone while the fan and preset rows carry neither.
+ * One choice in a selector row.
+ *
+ * [isOn] sits on the option rather than the row holding a selected index, because the preset row
+ * isn't a radio group: its three temperature pills are mutually exclusive but Extreme fills
+ * independently of them. A null [label] is an icon-only pill.
  */
 private data class ModeOption(
-    val label: String,
+    val label: String?,
     val color: Color,
+    val isOn: Boolean,
     val icon: ImageVector? = null,
+    val contentDescription: String? = null,
 )
 
 /** A caption plus its pills, so an "On/Off" row can't be mistaken for the mode row next to it. */
@@ -363,7 +422,6 @@ private data class ModeOption(
 private fun LabeledSelectorRow(
     label: String,
     options: List<ModeOption>,
-    selectedIndex: Int,
     enabled: Boolean,
     onSelect: (Int) -> Unit,
 ) {
@@ -389,21 +447,20 @@ private fun LabeledSelectorRow(
             options.forEachIndexed { index, option ->
                 PillButton(
                     text = option.label,
-                    isOn = index == selectedIndex,
+                    isOn = option.isOn,
                     onClick = { onSelect(index) },
                     modifier = Modifier.weight(1f),
                     icon = option.icon,
                     iconSize = Dimens.PillIconSize,
                     color = option.color,
                     enabled = enabled,
+                    contentDescription = option.contentDescription,
                 )
             }
         }
     }
 }
 
-/** Rows a selector of [count] options occupies; 0 when it has none, so it costs no height. */
-private fun rowsFor(count: Int): Int = ceil(count / ModesPerRow.toFloat()).toInt()
 
 /**
  * What a mode or an action *means* to the eye, and the single place that meaning becomes a colour.
@@ -418,6 +475,11 @@ private enum class HvacTone(val color: Color) {
     Damp(AppColors.Wet),
     Air(AppColors.FanBlue),
     Neutral(AppColors.StatusGray),
+
+    /** Preset-only tones — no hvac mode or action maps to these. */
+    Comfort(AppColors.HvacComfort),
+    Night(AppColors.HvacNight),
+    Thrift(AppColors.HvacEco),
 }
 
 private val HvacMode.tone: HvacTone
@@ -481,6 +543,29 @@ private val HvacMode.label: String
     }
 
 /**
+ * True for the modes a preset can resolve a setpoint in.
+ *
+ * Mirrors [TemperaturePreset.setpointFor] returning null everywhere else — `off` has no target, and
+ * `heat_cool`/`auto` drive a low/high pair no single setpoint can express.
+ */
+private fun HvacMode?.resolvesPresets(): Boolean = this == HvacMode.Heat || this == HvacMode.Cool
+
+/** Preset pills are icon-only, so the glyph is the entire label. */
+private val PresetKind.icon: ImageVector
+    get() = when (this) {
+        PresetKind.Comfort -> ControlIcons.PresetComfort
+        PresetKind.Sleep -> ControlIcons.PresetSleep
+        PresetKind.Economy -> ControlIcons.PresetEconomy
+    }
+
+private val PresetKind.tone: HvacTone
+    get() = when (this) {
+        PresetKind.Comfort -> HvacTone.Comfort
+        PresetKind.Sleep -> HvacTone.Night
+        PresetKind.Economy -> HvacTone.Thrift
+    }
+
+/**
  * The glyph on a mode's pill, where one carries its meaning on its own.
  *
  * null for the compound and less common modes: `heat_cool`/`auto` have no single honest symbol, and
@@ -513,15 +598,39 @@ private fun String.modeLabel(): String =
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F, widthDp = 380)
 @Composable
 private fun ThermostatControlCardPreview() = ControlPreview {
-    // The Living Room thermostat as Home Assistant actually reports it.
-    ThermostatControlCard(previewThermostat("Thermostat"), {}, {}, {}, {})
+    // The Living Room thermostat as Home Assistant actually reports it. 72° in cool is Comfort's
+    // cool setpoint, so that pill fills — the match is derived, never stored.
+    ThermostatControlCard(previewThermostat("Comfort"), {}, {}, {}, {}, {})
+    // 69° in cool is Sleep's, so the same card fills a different pill on the strength of the
+    // temperature alone.
+    ThermostatControlCard(previewThermostat("Sleep", target = 69.0), {}, {}, {}, {}, {})
+    // Heating: the presets resolve against their heat setpoints instead, and 60° is Economy's.
     ThermostatControlCard(
-        previewThermostat("Heating", mode = HvacMode.Heat, action = HvacAction.Heating, target = 74.0),
-        {}, {}, {}, {},
+        previewThermostat("Economy heating", mode = HvacMode.Heat, action = HvacAction.Heating, target = 60.0),
+        {}, {}, {}, {}, {},
     )
+    // A setpoint matching no preset — nothing fills rather than guessing at the nearest.
+    ThermostatControlCard(previewThermostat("Off preset", target = 73.0), {}, {}, {}, {}, {})
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1B1B1F, widthDp = 380)
+@Composable
+private fun ThermostatControlCardExtremePreview() = ControlPreview {
+    // Extreme on: its pill fills, and the three presets now resolve against their extreme pairs —
+    // 75° is Comfort's extreme cool setpoint, where 72° would have been its normal one.
     ThermostatControlCard(
-        previewThermostat("Off", mode = HvacMode.Off, action = HvacAction.Off),
-        {}, {}, {}, {},
+        previewThermostat("Extreme comfort", extremeActive = true, target = 75.0),
+        {}, {}, {}, {}, {},
+    )
+    // The same 72° that reads as Comfort above matches nothing once Extreme is on.
+    ThermostatControlCard(
+        previewThermostat("Extreme, no match", extremeActive = true, target = 72.0),
+        {}, {}, {}, {}, {},
+    )
+    // A thermostat with presets but no helper entity: three pills, no Extreme.
+    ThermostatControlCard(
+        previewThermostat("No extreme toggle", hasExtremeToggle = false, target = 70.0),
+        {}, {}, {}, {}, {},
     )
 }
 
@@ -529,19 +638,26 @@ private fun ThermostatControlCardPreview() = ControlPreview {
 @Composable
 private fun ThermostatControlCardEdgeCasePreview() = ControlPreview {
     // Offline: readouts dash out and every control disables.
-    ThermostatControlCard(previewThermostat("Offline", offline = true), {}, {}, {}, {})
+    ThermostatControlCard(previewThermostat("Offline", offline = true), {}, {}, {}, {}, {})
     // heat_cool set from the Home Assistant app — a mode the roster deliberately doesn't offer.
     // No pill highlights and the setpoint is absent, because HA publishes a low/high pair instead.
     ThermostatControlCard(
         previewThermostat("Heat/Cool", mode = HvacMode.HeatCool, action = HvacAction.Idle, target = null),
-        {}, {}, {}, {},
+        {}, {}, {}, {}, {},
     )
-    // Setpoint only — no selector rows, so the card is at its shortest.
+    // Setpoint only — no selector rows at all, so the card is at its shortest.
     ThermostatControlCard(
-        previewThermostat("Setpoint only", hvacModes = emptyList(), fanModes = emptyList(), presetModes = emptyList()),
-        {}, {}, {}, {},
+        previewThermostat(
+            "Setpoint only",
+            hvacModes = emptyList(),
+            fanModes = emptyList(),
+            presetModes = emptyList(),
+            temperaturePresets = emptyList(),
+            hasExtremeToggle = false,
+        ),
+        {}, {}, {}, {}, {},
     )
-    // The office heater's shape: two modes, three fan modes, no presets.
+    // The office heater's shape: two modes, three fan modes, no presets of either kind.
     ThermostatControlCard(
         previewThermostat(
             "Office Heater",
@@ -551,8 +667,10 @@ private fun ThermostatControlCardEdgeCasePreview() = ControlPreview {
             fanModes = listOf("auto", "low", "high"),
             fanMode = "low",
             presetModes = emptyList(),
+            temperaturePresets = emptyList(),
+            hasExtremeToggle = false,
         ),
-        {}, {}, {}, {},
+        {}, {}, {}, {}, {},
     )
     // Six modes: proves the FlowRow wrap and the height formula agree.
     ThermostatControlCard(
@@ -563,6 +681,6 @@ private fun ThermostatControlCardEdgeCasePreview() = ControlPreview {
                 HvacMode.HeatCool, HvacMode.Auto, HvacMode.FanOnly,
             ),
         ),
-        {}, {}, {}, {},
+        {}, {}, {}, {}, {},
     )
 }

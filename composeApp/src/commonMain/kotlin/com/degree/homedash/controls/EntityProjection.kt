@@ -69,6 +69,9 @@ fun EntityMetadata.toEntityUi(
             currentTemperature = if (offline) null else state?.attrDouble("current_temperature"),
             fanMode = if (offline) null else state?.attrString("fan_mode"),
             presetMode = if (offline) null else state?.attrString("preset_mode"),
+            // Its own input_boolean, so it survives the thermostat being unavailable — the preset
+            // pills still need to show which setpoints they would write.
+            extremeActive = extremeToggle?.let { allStates[it.entityId]?.isOn == true } == true,
         )
     }
 
