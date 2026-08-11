@@ -49,9 +49,10 @@ import com.degree.homedash.ui.icons.RoomIcons
 val LocalHaConnectionStatus = compositionLocalOf<HaConnectionStatus> { HaConnectionStatus.Disconnected }
 
 /**
- * Standard dashboard page layout: a flush, full-bleed [DashboardHeader] above a vertically
- * scrolling, 16dp-padded [content] column (sections spaced by [Dimens.SectionSpacing]). Keeps the
- * header out of the content padding so its Columbia-blue bar spans edge to edge.
+ * Standard dashboard page layout: a flush, full-bleed [DashboardHeader] pinned to the top of the
+ * screen above a vertically scrolling, 16dp-padded [content] column (sections spaced by
+ * [Dimens.SectionSpacing]). Only the content scrolls — the header stays put — and the header sits
+ * outside the content padding so its Columbia-blue bar spans edge to edge.
  */
 @Composable
 fun DashboardScaffold(
@@ -64,10 +65,14 @@ fun DashboardScaffold(
     icon: ImageVector? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Column(modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+    Column(modifier = modifier.fillMaxSize()) {
         DashboardHeader(title, onBack, onOpenSettings, connection, versionLabel, icon)
         Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = Dimens.ScrollBottomPadding),
             verticalArrangement = Arrangement.spacedBy(Dimens.SectionSpacing),
             content = content,
         )
