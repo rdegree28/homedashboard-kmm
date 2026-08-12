@@ -9,6 +9,30 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+// The app version, in one place. Keep in step with AppInfo.VERSION, which the Home header displays;
+// tools/deploy-web.sh refuses to publish an APK if the two have drifted apart.
+val appVersionName = "1.3.1"
+
+/**
+ * versionCode derived from [appVersionName] as major*10000 + minor*100 + patch, so 1.3.1 -> 10301
+ * and 1.4 -> 10400. Two digits each for minor and patch means both cap at 99: 1.3.100 would other-
+ * wise produce 10400 and collide with 1.4, so an out-of-range part fails the build instead of
+ * shipping a code that sorts wrong. Android compares versionCode (not versionName) to decide what
+ * counts as an upgrade, so a wrong value here silently blocks installs.
+ */
+fun versionCodeOf(name: String): Int {
+    val parts = name.split(".")
+    require(parts.size <= 3) { "Version '$name' has more than three parts (major.minor.patch)." }
+    val (major, minor, patch) = List(3) { i ->
+        val part = parts.getOrNull(i) ?: "0"
+        part.toIntOrNull() ?: error("Version '$name' has a non-numeric part '$part'.")
+    }
+    require(minor in 0..99) { "Version '$name': minor $minor is outside 0..99." }
+    require(patch in 0..99) { "Version '$name': patch $patch is outside 0..99." }
+    require(major >= 0) { "Version '$name': major $major is negative." }
+    return major * 10_000 + minor * 100 + patch
+}
+
 // HA connection config is injected from the gitignored local.properties (keeps secrets out of source).
 val localProps = Properties().apply {
     val f = rootProject.file("local.properties")
@@ -106,8 +130,8 @@ android {
         applicationId = "com.degree.homedash"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.3.1" // keep in step with AppInfo.VERSION, which the Home header displays
+        versionCode = versionCodeOf(appVersionName)
+        versionName = appVersionName
 
         buildConfigField("String", "HA_URL", "\"${localProps.getProperty("ha.url", "")}\"")
         buildConfigField("String", "HA_TOKEN", "\"${localProps.getProperty("ha.token", "")}\"")
