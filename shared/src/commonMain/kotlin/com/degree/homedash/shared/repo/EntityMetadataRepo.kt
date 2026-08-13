@@ -12,12 +12,14 @@ import com.degree.homedash.shared.model.entity.NavigationMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
 import com.degree.homedash.shared.model.entity.NavigationMetadata.RoomIcon
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
+import com.degree.homedash.shared.model.entity.ThermostatMetadata
 import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
 import com.degree.homedash.shared.model.entity.WaterLevelMetadata
 import com.degree.homedash.shared.model.entity.bedroomLightsFull
 import com.degree.homedash.shared.model.entity.bedroomLightsLow
 import com.degree.homedash.shared.model.entity.bedroomLightsNight
 import com.degree.homedash.shared.model.entity.dellaTowerFan
+import com.degree.homedash.shared.model.entity.livingRoomThermostat
 import com.degree.homedash.shared.model.entity.mainLights
 import com.degree.homedash.shared.model.entity.movieLights
 import com.degree.homedash.shared.model.entity.testCard
@@ -52,6 +54,20 @@ class EntityMetadataRepo(
         }
     }
 
+    /**
+     * The thermostat the Home launcher puts above its cards.
+     *
+     * It lives here rather than in a room's roster because it drives the whole house: the unit is
+     * bolted to a living room wall, but nothing about what it does belongs to that room, and burying
+     * it a tap deep in a dashboard the rest of the household can't open made it look like it did.
+     *
+     * Its own method rather than an entry in [loadHomeScreenMetadataList], which is navigation cards
+     * only — those carry no Home Assistant entity and are projected against an empty state map.
+     */
+    fun loadHomeThermostatMetadataList(): List<EntityMetadata> = listOf(
+        ThermostatMetadata.livingRoomThermostat("climate.living_room_thermostat", "Thermostat"),
+    )
+
     /** Flags for whoever is signed in; none when logged out. */
     private fun currentUserFlags(): Set<FeatureFlag> =
         authRepo.loadCurrentUser().value?.let(featureFlagDao::getFeatureFlagsForUser).orEmpty()
@@ -81,7 +97,13 @@ class EntityMetadataRepo(
         DoorMetadata("binary_sensor.office_door_sensor", "Office Door"),
     )
 
-    /** The Living Room lights, fans, and climate sensors. */
+    /**
+     * The Living Room lights, fans, and climate sensors.
+     *
+     * The thermostat is deliberately not here — see [loadHomeThermostatMetadataList]. The two sensor
+     * cards below stay: they are the thermostat's own readings, but what they measure really is this
+     * room.
+     */
     fun loadLivingRoomEntityMetadataList(): List<EntityMetadata> = listOf(
         TriggerEntityMetadata.mainLights(),
         TriggerEntityMetadata.movieLights(),

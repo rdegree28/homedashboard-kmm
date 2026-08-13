@@ -30,6 +30,17 @@ sealed interface EntityAction {
 
     /** [entityId] is the mister's own `humidifier.*` entity, not the fan's. */
     data class SetMisting(val entityId: String, val misting: Boolean) : EntityAction
+
+    data class SetTargetTemperature(val entityId: String, val temperature: Double) : EntityAction
+    data class SetHvacMode(val entityId: String, val mode: HvacMode) : EntityAction
+
+    /** [mode] is one of the vendor strings the thermostat's metadata declares, not a `fan.*` speed. */
+    data class SetThermostatFanMode(val entityId: String, val mode: String) : EntityAction
+    data class SetPresetMode(val entityId: String, val mode: String) : EntityAction
+
+    /** [entityId] is the `input_boolean.*` helper the thermostat names, not the thermostat itself. */
+    data class SetExtremeTemperatures(val entityId: String, val extreme: Boolean) : EntityAction
+
     data class OpenGraph(val entityId: String) : EntityAction
 
     /** Carries the typed destination rather than an entity id — a nav card's id is synthetic. */
@@ -45,18 +56,24 @@ enum class ControlLayout { Row, Card }
 /** True for entity types that have a card rendering (lights, fans, climate, and launcher tiles). */
 fun EntityUi.hasCard(): Boolean =
     this is EntityUi.Light || this is EntityUi.Fan || this is EntityUi.Climate ||
-        this is EntityUi.Navigation || this is EntityUi.Trigger
+        this is EntityUi.Thermostat || this is EntityUi.Navigation || this is EntityUi.Trigger
 
 /**
- * How many grid columns this entity's card should span (out of the grid's 2). A fan spans the full
- * row only while it is showing its speed slider (on + multi-level) — the same condition
- * `FanControlCard` uses for `showSlider`; otherwise it's a single-column toggle tile like the rest.
+ * How many grid columns this entity's card should span (out of the grid's 2). Two types go wide:
+ * a thermostat always (its stepper and mode pills need the room, and a card that changed width as
+ * the mode changed would shuffle the grid under the user's finger), and a fan only while it is
+ * showing its speed slider — the same condition `FanControlCard` uses for `showSlider`; otherwise
+ * a fan is a single-column toggle tile like the rest.
  * `ControlGroup` packs rows to a total width of 2 using this, so cards reflow as fans toggle.
  */
-fun EntityUi.cardSpan(): Int =
+fun EntityUi.cardSpan(): Int = when {
+    this is EntityUi.Thermostat -> 2
     // Oscillation counts too: without it, an oscillating fan with no speed control would never get
     // the wide card its toggle lives on, leaving the control unreachable.
-    if (this is EntityUi.Fan && isOn && (metadata.speedAdjustment != null || metadata.hasOscillationFeature)) 2 else 1
+    this is EntityUi.Fan && isOn &&
+        (metadata.speedAdjustment != null || metadata.hasOscillationFeature) -> 2
+    else -> 1
+}
 
 /**
  * Central renderer: maps an [EntityUi] to the right control, in the requested [layout], routing user
@@ -146,6 +163,24 @@ fun EntityControl(
             }
         }
 
+        // The card is the only form a thermostat has, so both layouts render it — the controls need
+        // more room than an entity row gives, and every group that shows one uses cards anyway.
+        is EntityUi.Thermostat -> ThermostatControlCard(
+            ui = entity,
+            onSetTarget = { temp -> onAction(EntityAction.SetTargetTemperature(entity.entityId, temp)) },
+            onSetHvacMode = { mode -> onAction(EntityAction.SetHvacMode(entity.entityId, mode)) },
+            onSetFanMode = { mode -> onAction(EntityAction.SetThermostatFanMode(entity.entityId, mode)) },
+            onSetPresetMode = { mode -> onAction(EntityAction.SetPresetMode(entity.entityId, mode)) },
+            // Targets the helper entity, so a thermostat without one can't emit this at all.
+            onSetExtreme = { on ->
+                entity.metadata.extremeToggle?.let {
+                    onAction(EntityAction.SetExtremeTemperatures(it.entityId, on))
+                }
+                Unit
+            },
+            modifier = modifier,
+        )
+
         is EntityUi.Door -> DoorRow(
             DoorUi(
                 label = entity.displayName,
@@ -208,6 +243,12 @@ private fun EntityFanCardPreview() = ControlPreview {
         EntityControl(previewFanUi("Off", isOn = false), ControlLayout.Card, {}, Modifier.weight(1f))
         EntityControl(previewFanUi("Offline", offline = true), ControlLayout.Card, {}, Modifier.weight(1f))
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF1B1B1F, widthDp = 380)
+@Composable
+private fun EntityThermostatCardPreview() = ControlPreview {
+    EntityControl(previewThermostat("Thermostat"), ControlLayout.Card, {})
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)

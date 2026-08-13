@@ -16,4 +16,12 @@ object LivingRoomEntities {
     // Placeholder climate sensor ids — replace with the real Home Assistant entity ids.
     const val TEMPERATURE = "sensor.living_room_thermostat_temperature"
     const val HUMIDITY = "sensor.living_room_thermostat_humidity"
+
+    /**
+     * The thermostat itself, as opposed to the two sensors above that it publishes.
+     *
+     * Its card lives on the Home launcher now, not this screen — it drives the whole house. The id
+     * stays here because the sensors above are its, and the three belong together.
+     */
+    const val THERMOSTAT = "climate.living_room_thermostat"
 }

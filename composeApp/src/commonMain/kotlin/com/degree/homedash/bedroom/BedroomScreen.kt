@@ -64,6 +64,12 @@ fun BedroomContent(
             is EntityAction.SetSpeed -> onSetFanSpeed(action.entityId, action.percentage)
             is EntityAction.SetOscillating -> onSetOscillating(action.entityId, action.oscillating)
             is EntityAction.SetMisting -> onSetMisting(action.entityId, action.misting)
+            // No thermostat on this screen.
+            is EntityAction.SetTargetTemperature -> Unit
+            is EntityAction.SetHvacMode -> Unit
+            is EntityAction.SetThermostatFanMode -> Unit
+            is EntityAction.SetPresetMode -> Unit
+            is EntityAction.SetExtremeTemperatures -> Unit
             is EntityAction.OpenGraph -> Unit
             is EntityAction.Navigate -> Unit
         }

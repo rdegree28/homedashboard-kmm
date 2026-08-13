@@ -11,8 +11,17 @@ object Dimens {
     val EntityCardPadding: Dp = 14.dp
     val CardCorner: Dp = 12.dp
     val CardElevation: Dp = 1.dp
+    /** The −/+ setpoint buttons — sized to stay hittable on the wall tablet. */
+    val StepperButtonSize: Dp = 44.dp
+
     val EntityRowHeight: Dp = 52.dp
     val RowIconSize: Dp = 26.dp
+
+    /** Glyph inside a pill button — smaller than [RowIconSize], which crowds a pill's label. */
+    val PillIconSize: Dp = 18.dp
+
+    /** Glyph sitting inline with body text, sized to the text rather than to its row. */
+    val InlineIconSize: Dp = 14.dp
     val RowLabelGap: Dp = 16.dp
     val ChartHeight: Dp = 150.dp
     val SectionSpacing: Dp = 16.dp

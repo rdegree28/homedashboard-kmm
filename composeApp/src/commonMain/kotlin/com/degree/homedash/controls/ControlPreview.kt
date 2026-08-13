@@ -117,6 +117,54 @@ internal fun previewTrigger(label: String) = EntityUi.Trigger(
     },
 )
 
+/** Defaults mirror the live Living Room thermostat, so previews match what the app really shows. */
+/**
+ * Built from the real Living Room roster entry rather than a hand-assembled [ThermostatMetadata], so
+ * a preview can't quietly disagree with what the app ships — every null override below inherits
+ * whatever the factory declares, including capabilities added to it later.
+ */
+internal fun previewThermostat(
+    name: String,
+    offline: Boolean = false,
+    mode: HvacMode? = HvacMode.Cool,
+    action: HvacAction? = HvacAction.Idle,
+    target: Double? = 72.0,
+    current: Double? = 70.0,
+    humidity: Double? = 59.0,
+    extremeActive: Boolean = false,
+    hvacModes: List<HvacMode>? = null,
+    fanModes: List<String>? = null,
+    fanMode: String? = null,
+    presetModes: List<String>? = null,
+    presetMode: String? = null,
+    temperaturePresets: List<TemperaturePreset>? = null,
+    // A flag rather than a nullable override, since null already means "inherit from the roster".
+    hasExtremeToggle: Boolean = true,
+): EntityUi.Thermostat {
+    val roster = ThermostatMetadata.livingRoomThermostat(
+        entityId = "climate.${name.lowercase().replace(' ', '_')}",
+        displayName = name,
+    )
+    return EntityUi.Thermostat(
+        metadata = roster.copy(
+            hvacModes = hvacModes ?: roster.hvacModes,
+            fanModes = fanModes ?: roster.fanModes,
+            presetModes = presetModes ?: roster.presetModes,
+            temperaturePresets = temperaturePresets ?: roster.temperaturePresets,
+            extremeToggle = if (hasExtremeToggle) roster.extremeToggle else null,
+        ),
+        offline = offline,
+        hvacMode = if (offline) null else mode,
+        hvacAction = if (offline) null else action,
+        targetTemperature = if (offline) null else target,
+        currentTemperature = if (offline) null else current,
+        currentHumidity = if (offline) null else humidity,
+        fanMode = if (offline) null else fanMode,
+        presetMode = if (offline) null else presetMode,
+        extremeActive = extremeActive,
+    )
+}
+
 internal fun previewClimate(
     label: String,
     valueText: String,

@@ -1,19 +1,14 @@
 package com.degree.homedash.controls
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -205,6 +200,7 @@ internal fun FanIcon(
     }
 }
 
+/** A fan's labelled toggle pill (oscillate, mist) — [PillButton] with the icon always present. */
 @Composable
 internal fun FanControlButton(
     onToggle: () -> Unit,
@@ -214,27 +210,15 @@ internal fun FanControlButton(
     color: Color = AppColors.FanBlue,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier
-            .background(color = if (isOn) color else Color.Transparent, shape = RoundedCornerShape(16.dp))
-            .clickable(onClick = onToggle)
-            .border(width = 1.dp, color = color, shape = RoundedCornerShape(16.dp))
-            .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            modifier = Modifier.padding(end = 4.dp),
-            text = text,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        Icon(
-            imageVector = icon,
-            contentDescription = if (isOn) "Stop oscillating" else "Oscillate",
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(Dimens.RowIconSize),
-        )
-    }
+    PillButton(
+        text = text,
+        isOn = isOn,
+        onClick = onToggle,
+        modifier = modifier,
+        icon = icon,
+        color = color,
+        contentDescription = if (isOn) "Turn off $text" else "Turn on $text",
+    )
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)

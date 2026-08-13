@@ -61,7 +61,14 @@ fun LivingRoomContent(
             is EntityAction.SetSpeed -> onSetFanSpeed(action.entityId, action.percentage)
             is EntityAction.SetOscillating -> onSetOscillating(action.entityId, action.oscillating)
             is EntityAction.SetMisting -> onSetMisting(action.entityId, action.misting)
-            is EntityAction.Navigate -> Unit
+            // The thermostat moved to the Home launcher, so nothing here emits these any more.
+            is EntityAction.SetTargetTemperature,
+            is EntityAction.SetHvacMode,
+            is EntityAction.SetThermostatFanMode,
+            is EntityAction.SetPresetMode,
+            is EntityAction.SetExtremeTemperatures,
+            is EntityAction.Navigate,
+            -> Unit
         }
     }
 
