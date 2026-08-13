@@ -54,6 +54,20 @@ class EntityMetadataRepo(
         }
     }
 
+    /**
+     * The thermostat the Home launcher puts above its cards.
+     *
+     * It lives here rather than in a room's roster because it drives the whole house: the unit is
+     * bolted to a living room wall, but nothing about what it does belongs to that room, and burying
+     * it a tap deep in a dashboard the rest of the household can't open made it look like it did.
+     *
+     * Its own method rather than an entry in [loadHomeScreenMetadataList], which is navigation cards
+     * only — those carry no Home Assistant entity and are projected against an empty state map.
+     */
+    fun loadHomeThermostatMetadataList(): List<EntityMetadata> = listOf(
+        ThermostatMetadata.livingRoomThermostat("climate.living_room_thermostat", "Thermostat"),
+    )
+
     /** Flags for whoever is signed in; none when logged out. */
     private fun currentUserFlags(): Set<FeatureFlag> =
         authRepo.loadCurrentUser().value?.let(featureFlagDao::getFeatureFlagsForUser).orEmpty()
@@ -83,7 +97,13 @@ class EntityMetadataRepo(
         DoorMetadata("binary_sensor.office_door_sensor", "Office Door"),
     )
 
-    /** The Living Room lights, fans, and climate sensors. */
+    /**
+     * The Living Room lights, fans, and climate sensors.
+     *
+     * The thermostat is deliberately not here — see [loadHomeThermostatMetadataList]. The two sensor
+     * cards below stay: they are the thermostat's own readings, but what they measure really is this
+     * room.
+     */
     fun loadLivingRoomEntityMetadataList(): List<EntityMetadata> = listOf(
         TriggerEntityMetadata.mainLights(),
         TriggerEntityMetadata.movieLights(),
@@ -95,8 +115,6 @@ class EntityMetadataRepo(
         FanMetadata.dellaTowerFan("fan.living_room_fan", "Fan"),
         // A plain switch, so no speed control despite the name.
         FanMetadata("switch.living_room_acc_1", "Box Fan"),
-        // Spans the full grid row, so it takes the head of the Climate group ahead of the sensors.
-        ThermostatMetadata.livingRoomThermostat("climate.living_room_thermostat", "Thermostat"),
         ClimateMetadata("sensor.living_room_thermostat_temperature", "Temperature", ClimateMetadata.ClimateKind.Temperature),
         // Unlike Office (humidity card with dew point as a subvalue), the Living Room shows a dew point
         // card computed from the temperature + humidity pair — keyed off the humidity entity id.

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -32,8 +33,10 @@ import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.EntityControl
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.previewNavigation
+import com.degree.homedash.controls.previewThermostat
 import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
 import com.degree.homedash.ui.AppColors
+import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 
 @Composable
@@ -43,20 +46,41 @@ fun HomeScreen(
 ) {
     val vm: HomeViewModel = koinViewModel()
     val warnings by vm.warnings.collectAsStateWithLifecycle()
+    val thermostats by vm.thermostats.collectAsStateWithLifecycle()
+
+    // The launcher is the one screen whose controls aren't all navigation, so it maps the two kinds
+    // here rather than taking a lambda per thermostat action the way the room screens do.
+    val onAction: (EntityAction) -> Unit = { action ->
+        when (action) {
+            is EntityAction.Navigate -> onNavigate(action.target)
+            is EntityAction.SetTargetTemperature ->
+                vm.setTargetTemperature(action.entityId, action.temperature)
+            is EntityAction.SetHvacMode -> vm.setHvacMode(action.entityId, action.mode)
+            is EntityAction.SetThermostatFanMode ->
+                vm.setThermostatFanMode(action.entityId, action.mode)
+            is EntityAction.SetPresetMode -> vm.setPresetMode(action.entityId, action.mode)
+            is EntityAction.SetExtremeTemperatures ->
+                vm.setExtremeTemperatures(action.entityId, action.extreme)
+            else -> Unit
+        }
+    }
+
     HomeContent(
         warnings = warnings,
+        thermostats = thermostats,
         navigation = vm.navigation,
-        onNavigate = onNavigate,
+        onAction = onAction,
         onOpenSettings = onOpenSettings,
     )
 }
 
-/** App launcher: any active warnings, then one tappable card per dashboard. */
+/** App launcher: any active warnings, the house thermostat, then one tappable card per dashboard. */
 @Composable
 fun HomeContent(
     warnings: List<HomeWarning>,
+    thermostats: List<EntityUi.Thermostat>,
     navigation: List<EntityUi.Navigation>,
-    onNavigate: (NavigationTarget) -> Unit,
+    onAction: (EntityAction) -> Unit,
     onOpenSettings: () -> Unit,
 ) {
     DashboardScaffold(
@@ -67,9 +91,6 @@ fun HomeContent(
         // Warnings stay full-width above the grid.
         warnings.forEach { WarningCard(it) }
 
-        val onAction: (EntityAction) -> Unit = { action ->
-            if (action is EntityAction.Navigate) onNavigate(action.target)
-        }
         // A 2-column tile grid, laid out here rather than via ControlGroup so the launcher keeps its
         // bare look — no group wrapper, no section title. Its own 8dp spacing makes the grid read as
         // one block instead of inheriting the scaffold's wider section gaps.
@@ -86,6 +107,18 @@ fun HomeContent(
                 }
             }
         }
+
+        // Above the launcher tiles: it's the control most likely to be the reason someone walked up
+        // to the tablet, and it belongs to no room, so it reads as the house's own rather than as
+        // another thing to go find. Full width, like the warnings — the card is built to span both
+        // grid columns anyway (see `cardSpan`).
+        Spacer(modifier = Modifier.height(16.dp))
+        ControlGroup(
+            title = "Climate",
+            useCardUis = true,
+            entities = thermostats,
+            onAction = onAction,
+        )
     }
 }
 
@@ -123,15 +156,16 @@ private val previewNavigationCards: List<EntityUi.Navigation> = listOf(
     previewNavigation(NavigationTarget.Pets, "Pets"),
 )
 
-@Preview(widthDp = 380, heightDp = 560)
+@Preview(widthDp = 380)
 @Composable
 private fun HomeScreenPreview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
             HomeContent(
                 warnings = listOf(HomeWarning("Cat water running low — 24 %", WarningSeverity.Warning)),
+                thermostats = listOf(previewThermostat("Thermostat")),
                 navigation = previewNavigationCards,
-                onNavigate = {},
+                onAction = {},
                 onOpenSettings = {},
             )
         }

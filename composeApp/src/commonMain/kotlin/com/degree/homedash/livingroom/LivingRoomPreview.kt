@@ -38,20 +38,6 @@ internal val previewFans: List<EntityUi.Fan> = listOf(
     ),
 )
 
-internal val previewThermostats: List<EntityUi.Thermostat> = listOf(
-    EntityUi.Thermostat(
-        metadata = ThermostatMetadata.livingRoomThermostat(LivingRoomEntities.THERMOSTAT, "Thermostat"),
-        offline = false,
-        hvacMode = HvacMode.Cool,
-        hvacAction = HvacAction.Idle,
-        targetTemperature = 72.0,
-        currentTemperature = 70.0,
-        currentHumidity = 59.0,
-        fanMode = "off",
-        presetMode = "none",
-    ),
-)
-
 internal val previewClimate: List<EntityUi.Climate> = listOf(
     EntityUi.Climate(
         metadata = ClimateMetadata(LivingRoomEntities.TEMPERATURE, "Temperature", ClimateMetadata.ClimateKind.Temperature),
