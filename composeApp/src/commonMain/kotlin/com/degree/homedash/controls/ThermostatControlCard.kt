@@ -20,10 +20,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Opacity
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Thermostat
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -87,9 +89,37 @@ internal fun ThermostatControlCard(
     onSetPresetMode: (String) -> Unit,
     onSetExtreme: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    tapGuard: ThermostatTapGuard = AppThermostatTapGuard,
 ) {
     val metadata = ui.metadata
     val enabled = !ui.offline
+
+    // The action a confirmation is currently standing in front of, or null when nothing is pending.
+    // Holding the action itself rather than a description of it keeps the guard out of the business
+    // of knowing what the card's controls do.
+    var awaitingConfirmation by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+    // Every control on the card goes through this. Inside the window a tap behaves exactly as it did
+    // before; outside it, the tap is parked until the dialog comes back.
+    //
+    // Gating here — at the tap — rather than at the outgoing service call is deliberate: the controls
+    // are optimistic, so gating the call would let the readout jump to a value the user then declines,
+    // and snap back seconds later.
+    val guarded: (() -> Unit) -> Unit = { action ->
+        if (tapGuard.isConfirmed(ui.entityId)) action() else awaitingConfirmation = action
+    }
+
+    awaitingConfirmation?.let { action ->
+        ThermostatConfirmationDialog(
+            displayName = ui.displayName,
+            onConfirm = {
+                awaitingConfirmation = null
+                tapGuard.confirm(ui.entityId)
+                action()
+            },
+            onDismiss = { awaitingConfirmation = null },
+        )
+    }
 
     // Optimistic mode selections. No debounce, unlike the setpoint: each is a single deliberate tap,
     // not a burst, so there is nothing to coalesce.
@@ -207,6 +237,7 @@ internal fun ThermostatControlCard(
                     tint = tint,
                     enabled = enabled,
                     onSet = onSetTarget,
+                    guarded = guarded,
                 )
             }
 
@@ -223,9 +254,11 @@ internal fun ThermostatControlCard(
                     },
                     enabled = enabled,
                 ) { index ->
-                    val mode = metadata.hvacModes[index]
-                    pendingHvacMode = mode
-                    onSetHvacMode(mode)
+                    guarded {
+                        val mode = metadata.hvacModes[index]
+                        pendingHvacMode = mode
+                        onSetHvacMode(mode)
+                    }
                 }
             }
 
@@ -237,9 +270,11 @@ internal fun ThermostatControlCard(
                     },
                     enabled = enabled,
                 ) { index ->
-                    val mode = metadata.fanModes[index]
-                    pendingFanMode = mode
-                    onSetFanMode(mode)
+                    guarded {
+                        val mode = metadata.fanModes[index]
+                        pendingFanMode = mode
+                        onSetFanMode(mode)
+                    }
                 }
             }
 
@@ -251,24 +286,26 @@ internal fun ThermostatControlCard(
                     // row that half-disables reads as broken, so the whole row goes together.
                     enabled = enabled && shownHvacMode.resolvesPresets(),
                 ) { index ->
-                    if (index in presets.indices) {
-                        val preset = presets[index]
-                        preset.setpointFor(shownHvacMode, ui.extremeActive)?.let { setpoint ->
-                            pendingPreset = preset.kind
-                            onSetTarget(setpoint)
-                        }
-                    } else {
-                        val nowExtreme = !ui.extremeActive
-                        onSetExtreme(nowExtreme)
-                        // Toggling doesn't just change what the pills *would* write — the setpoint
-                        // in force moves with them, so a thermostat sitting on Comfort follows
-                        // Comfort to its new value instead of silently falling off the preset.
-                        // Only on a tap here: reacting to the helper changing would have every open
-                        // dashboard write the same setpoint at once.
-                        activePreset?.let { preset ->
-                            preset.setpointFor(shownHvacMode, nowExtreme)?.let { setpoint ->
+                    guarded {
+                        if (index in presets.indices) {
+                            val preset = presets[index]
+                            preset.setpointFor(shownHvacMode, ui.extremeActive)?.let { setpoint ->
                                 pendingPreset = preset.kind
                                 onSetTarget(setpoint)
+                            }
+                        } else {
+                            val nowExtreme = !ui.extremeActive
+                            onSetExtreme(nowExtreme)
+                            // Toggling doesn't just change what the pills *would* write — the setpoint
+                            // in force moves with them, so a thermostat sitting on Comfort follows
+                            // Comfort to its new value instead of silently falling off the preset.
+                            // Only on a tap here: reacting to the helper changing would have every open
+                            // dashboard write the same setpoint at once.
+                            activePreset?.let { preset ->
+                                preset.setpointFor(shownHvacMode, nowExtreme)?.let { setpoint ->
+                                    pendingPreset = preset.kind
+                                    onSetTarget(setpoint)
+                                }
                             }
                         }
                     }
@@ -276,6 +313,47 @@ internal fun ThermostatControlCard(
             }
         }
     }
+}
+
+/**
+ * The confirmation standing in front of every thermostat control.
+ *
+ * A dialog rather than an undo affordance after the fact: the whole point is that a heating system
+ * shouldn't be told to do anything at all by a sleeve brushing a wall tablet, and "undo" only helps
+ * someone who noticed.
+ *
+ * It names the thermostat and the window, so the second half of the bargain — that this is the only
+ * question the user will be asked for a while — is visible before they agree to it.
+ */
+@Composable
+private fun ThermostatConfirmationDialog(
+    displayName: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = {
+            Icon(
+                imageVector = ControlIcons.Thermostat,
+                contentDescription = null,
+                modifier = Modifier.size(Dimens.RowIconSize),
+            )
+        },
+        // The name goes in the question rather than the body: the roster labels this one just
+        // "Thermostat", which reads as a sentence in "Adjust Thermostat?" and as a typo in "This
+        // will change Thermostat."
+        title = { Text("Adjust $displayName?") },
+        text = {
+            Text(
+                "The change goes through right away, and you won't be asked again for " +
+                    "${ThermostatConfirmationWindow.inWholeMinutes} minutes.",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        },
+        confirmButton = { TextButton(onClick = onConfirm) { Text("Adjust") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+    )
 }
 
 /**
@@ -298,6 +376,7 @@ private fun TargetTemperatureStepper(
     tint: Color,
     enabled: Boolean,
     onSet: (Double) -> Unit,
+    guarded: (() -> Unit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var pending by remember { mutableStateOf<Double?>(null) }
@@ -341,7 +420,7 @@ private fun TargetTemperatureStepper(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         StepperButton(Icons.Filled.Remove, "Lower target temperature", tint, canStep) {
-            pending = stepTo(shown, -range.step, range)
+            guarded { pending = stepTo(shown, -range.step, range) }
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
@@ -357,7 +436,7 @@ private fun TargetTemperatureStepper(
             )
         }
         StepperButton(Icons.Filled.Add, "Raise target temperature", tint, canStep) {
-            pending = stepTo(shown, +range.step, range)
+            guarded { pending = stepTo(shown, +range.step, range) }
         }
     }
 }
