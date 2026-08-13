@@ -54,6 +54,8 @@ sealed interface EntityUi {
         val targetTemperature: Double?,
         /** `current_temperature` — the ambient reading shown under the setpoint. */
         val currentTemperature: Double?,
+        /** `current_humidity`, as a percentage. null on the many thermostats that don't report it. */
+        val currentHumidity: Double?,
         /** Raw Home Assistant strings, matched against the lists the metadata declares. */
         val fanMode: String?,
         val presetMode: String?,

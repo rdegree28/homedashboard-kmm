@@ -31,6 +31,12 @@ data class ThermostatMetadata(
     val extremeToggle: ExtremeToggle? = null,
     /** Suffix on both readouts. Not an attribute — `climate.*` entities publish no unit. */
     val unitLabel: String = "°",
+    /**
+     * Which scale the readings are in. Declared for the same reason [unitLabel] is — `climate.*`
+     * entities publish no unit — and needed by the card's dew point, which is computed in Celsius
+     * and converted back, so a bare "°" isn't enough to go on.
+     */
+    val fahrenheit: Boolean = true,
 ) : EntityMetadata {
 
     /**

@@ -19,6 +19,9 @@ object Dimens {
 
     /** Glyph inside a pill button — smaller than [RowIconSize], which crowds a pill's label. */
     val PillIconSize: Dp = 18.dp
+
+    /** Glyph sitting inline with body text, sized to the text rather than to its row. */
+    val InlineIconSize: Dp = 14.dp
     val RowLabelGap: Dp = 16.dp
     val ChartHeight: Dp = 150.dp
     val SectionSpacing: Dp = 16.dp

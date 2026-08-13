@@ -67,6 +67,7 @@ fun EntityMetadata.toEntityUi(
             // "—" and disables rather than pretending to drive a setpoint that isn't there.
             targetTemperature = if (offline) null else state?.attrDouble("temperature"),
             currentTemperature = if (offline) null else state?.attrDouble("current_temperature"),
+            currentHumidity = if (offline) null else state?.attrDouble("current_humidity"),
             fanMode = if (offline) null else state?.attrString("fan_mode"),
             presetMode = if (offline) null else state?.attrString("preset_mode"),
             // Its own input_boolean, so it survives the thermostat being unavailable — the preset

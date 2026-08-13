@@ -17,7 +17,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Opacity
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Thermostat
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -43,6 +45,7 @@ import com.degree.homedash.shared.model.entity.TemperaturePreset
 import com.degree.homedash.shared.model.entity.ThermostatMetadata
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
+import com.degree.homedash.ui.dewPoint
 import com.degree.homedash.ui.formatNumber
 import com.degree.homedash.ui.icons.ControlIcons
 import kotlinx.coroutines.delay
@@ -199,6 +202,8 @@ internal fun ThermostatControlCard(
                     range = range,
                     unitLabel = metadata.unitLabel,
                     currentTemperature = ui.currentTemperature,
+                    currentHumidity = ui.currentHumidity,
+                    fahrenheit = metadata.fahrenheit,
                     tint = tint,
                     enabled = enabled,
                     onSet = onSetTarget,
@@ -288,6 +293,8 @@ private fun TargetTemperatureStepper(
     range: ThermostatMetadata.TargetTemperature,
     unitLabel: String,
     currentTemperature: Double?,
+    currentHumidity: Double?,
+    fahrenheit: Boolean,
     tint: Color,
     enabled: Boolean,
     onSet: (Double) -> Unit,
@@ -342,17 +349,98 @@ private fun TargetTemperatureStepper(
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.SemiBold,
             )
-            Text(
-                // Non-breaking space, not "", so the row keeps its height when there's no reading.
-                text = currentTemperature?.let { "now ${formatNumber(it, 1)}$unitLabel" } ?: " ",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            NowReadout(
+                currentTemperature = currentTemperature,
+                currentHumidity = currentHumidity,
+                unitLabel = unitLabel,
+                fahrenheit = fahrenheit,
             )
         }
         StepperButton(Icons.Filled.Add, "Raise target temperature", tint, canStep) {
             pending = stepTo(shown, +range.step, range)
         }
     }
+}
+
+/**
+ * The ambient line under the setpoint: what the room is actually like right now, as against the
+ * target above it. Reads `now 🌡 71° / 💧 55° (59%)`.
+ *
+ * Dew point rather than bare humidity as the headline number, because it's the one that says how the
+ * air will *feel* without having to be read against the temperature — 59% means something different
+ * at 71° than at 80°. The relative humidity trails it in parentheses since that's the figure the
+ * thermostat itself reports and the rest of the dashboard shows.
+ *
+ * Both readings are dropped silently when the thermostat doesn't report humidity (most don't) rather
+ * than showing dashes for something that will never arrive.
+ */
+@Composable
+private fun NowReadout(
+    currentTemperature: Double?,
+    currentHumidity: Double?,
+    unitLabel: String,
+    fahrenheit: Boolean,
+) {
+    val dew = if (currentTemperature != null && currentHumidity != null) {
+        dewPoint(currentTemperature, currentHumidity, fahrenheit)
+    } else {
+        null
+    }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(3.dp),
+        // Fixed, so the card doesn't change height when a reading drops out.
+        modifier = Modifier.height(Dimens.InlineIconSize + 4.dp),
+    ) {
+        Text(
+            text = if (currentTemperature != null) "now" else "",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        currentTemperature?.let { temperature ->
+            NowReading(
+                icon = Icons.Filled.Thermostat,
+                tint = AppColors.TempWarm,
+                contentDescription = "Current temperature",
+                text = "${formatNumber(temperature, 1)}$unitLabel",
+            )
+            if (dew != null && currentHumidity != null) {
+                Text(
+                    text = "/",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                )
+                NowReading(
+                    icon = Icons.Filled.Opacity,
+                    tint = AppColors.Wet,
+                    contentDescription = "Dew point",
+                    text = "${formatNumber(dew, 0)}$unitLabel (${formatNumber(currentHumidity, 0)}%)",
+                )
+            }
+        }
+    }
+}
+
+/** One glyph-and-number pair on the [NowReadout] line. */
+@Composable
+private fun NowReading(
+    icon: ImageVector,
+    tint: Color,
+    contentDescription: String,
+    text: String,
+) {
+    Icon(
+        imageVector = icon,
+        contentDescription = contentDescription,
+        tint = tint,
+        modifier = Modifier.size(Dimens.InlineIconSize),
+    )
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }
 
 /**
