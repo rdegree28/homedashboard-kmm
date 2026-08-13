@@ -108,10 +108,10 @@ fun HomeContent(
             }
         }
 
-        // Above the launcher tiles: it's the control most likely to be the reason someone walked up
-        // to the tablet, and it belongs to no room, so it reads as the house's own rather than as
-        // another thing to go find. Full width, like the warnings — the card is built to span both
-        // grid columns anyway (see `cardSpan`).
+        // The house thermostat, below the room tiles. It belongs to no room, so it gets its own
+        // titled section here instead of a place in someone's dashboard; the launcher grid above
+        // keeps its bare look by staying outside any group. The card spans the full width on its
+        // own (see `cardSpan`), so the group holds exactly one row.
         Spacer(modifier = Modifier.height(16.dp))
         ControlGroup(
             title = "Climate",

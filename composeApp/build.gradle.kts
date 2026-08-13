@@ -11,7 +11,7 @@ plugins {
 
 // The app version, in one place. Keep in step with AppInfo.VERSION, which the Home header displays;
 // tools/deploy-web.sh refuses to publish an APK if the two have drifted apart.
-val appVersionName = "1.3.1"
+val appVersionName = "1.4"
 
 /**
  * versionCode derived from [appVersionName] as major*10000 + minor*100 + patch, so 1.3.1 -> 10301
