@@ -61,7 +61,12 @@ fun HistoryGraph(
                 return@Box
             }
 
-            val top = (maxValue ?: points.maxOf { it.value }).coerceAtLeast(1.0)
+            // Statistics buckets carry the spread of the period they cover; raw samples don't (their
+            // min/max are the value), so this is false for every short-range chart.
+            val banded = points.any { it.max > it.min }
+            // Scale to the band's ceiling when one is drawn, so bucket peaks aren't clipped flat.
+            val dataTop = if (banded) points.maxOf { it.max } else points.maxOf { it.value }
+            val top = (maxValue ?: dataTop).coerceAtLeast(1.0)
             val minT = points.first().timeSeconds
             val maxT = points.last().timeSeconds
             val span = (maxT - minT).coerceAtLeast(1.0)
@@ -69,15 +74,47 @@ fun HistoryGraph(
             Canvas(Modifier.fillMaxSize()) {
                 val w = size.width
                 val h = size.height
-                fun pointAt(p: HistoryPoint) = Offset(
-                    x = (((p.timeSeconds - minT) / span) * w).toFloat(),
-                    y = (h - (p.value / top).coerceIn(0.0, 1.0) * h).toFloat(),
+                fun offsetAt(timeSeconds: Double, value: Double) = Offset(
+                    x = (((timeSeconds - minT) / span) * w).toFloat(),
+                    y = (h - (value / top).coerceIn(0.0, 1.0) * h).toFloat(),
                 )
+                fun pointAt(p: HistoryPoint) = offsetAt(p.timeSeconds, p.value)
 
                 // Axis gridlines: top (max), middle, baseline (0).
                 drawLine(gridColor, Offset(0f, 1f), Offset(w, 1f), 1f)
                 drawLine(gridColor, Offset(0f, h / 2f), Offset(w, h / 2f), 1f)
                 drawLine(gridColor, Offset(0f, h - 1f), Offset(w, h - 1f), 1f)
+
+                // Min/max envelope of each statistics bucket, drawn first so the mean line reads on top.
+                // Value-colored charts shade it segment-by-segment to match their series; the rest take
+                // one path out along the maxima and back along the minima.
+                if (banded && colorForValue != null) {
+                    for (i in 1 until points.size) {
+                        val a = points[i - 1]
+                        val b = points[i]
+                        val quad = Path().apply {
+                            offsetAt(a.timeSeconds, a.max).let { moveTo(it.x, it.y) }
+                            offsetAt(b.timeSeconds, b.max).let { lineTo(it.x, it.y) }
+                            offsetAt(b.timeSeconds, b.min).let { lineTo(it.x, it.y) }
+                            offsetAt(a.timeSeconds, a.min).let { lineTo(it.x, it.y) }
+                            close()
+                        }
+                        drawPath(quad, colorForValue((a.value + b.value) / 2.0).copy(alpha = 0.18f))
+                    }
+                } else if (banded) {
+                    val band = Path().apply {
+                        points.forEachIndexed { i, p ->
+                            val o = offsetAt(p.timeSeconds, p.max)
+                            if (i == 0) moveTo(o.x, o.y) else lineTo(o.x, o.y)
+                        }
+                        for (i in points.indices.reversed()) {
+                            val o = offsetAt(points[i].timeSeconds, points[i].min)
+                            lineTo(o.x, o.y)
+                        }
+                        close()
+                    }
+                    drawPath(band, lineColor.copy(alpha = 0.15f))
+                }
 
                 val strokeWidth = 2.dp.toPx()
                 if (colorForValue == null) {

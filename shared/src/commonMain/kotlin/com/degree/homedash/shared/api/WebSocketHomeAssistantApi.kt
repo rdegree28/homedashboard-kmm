@@ -2,6 +2,7 @@ package com.degree.homedash.shared.api
 
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
+import com.degree.homedash.shared.model.StatisticsPeriod
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
 
@@ -36,5 +37,17 @@ internal class WebSocketHomeAssistantApi(
     ): List<HistoryPoint> {
         val text = client.request { id -> HaProtocolHelper.encodeHistory(id, entityId, startIso, endIso) }
         return HaProtocolHelper.parseHistory(text, entityId)
+    }
+
+    override suspend fun statistics(
+        entityId: String,
+        startIso: String,
+        endIso: String,
+        period: StatisticsPeriod,
+    ): List<HistoryPoint> {
+        val text = client.request { id ->
+            HaProtocolHelper.encodeStatistics(id, entityId, startIso, endIso, period)
+        }
+        return HaProtocolHelper.parseStatistics(text, entityId)
     }
 }

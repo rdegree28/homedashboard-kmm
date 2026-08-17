@@ -43,7 +43,7 @@ class PlantGraphViewModel(
             combine(repo.connection, range) { connection, range -> connection to range }
                 .collect { (connection, range) ->
                     if (connection == HaConnectionStatus.Connected) {
-                        runCatching { history.value = repo.powerHistory(entityId, hoursBack = range.hoursBack) }
+                        runCatching { history.value = repo.history(entityId, hoursBack = range.hoursBack) }
                     }
                 }
         }

@@ -2,6 +2,7 @@ package com.degree.homedash.shared.api
 
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
+import com.degree.homedash.shared.model.StatisticsPeriod
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
 
@@ -46,5 +47,21 @@ internal interface HomeAssistantApi {
         entityId: String,
         startIso: String,
         endIso: String,
+    ): List<HistoryPoint>
+
+    /**
+     * Fetch [entityId]'s long-term statistics between [startIso] and [endIso], aggregated into
+     * [period]-wide buckets carrying mean/min/max. Unlike [history] — which reads raw recorder states
+     * and so only reaches back as far as the recorder's purge window — hourly and daily statistics are
+     * retained indefinitely, so this is the only way to chart windows longer than that.
+     *
+     * Empty when the entity has no statistics (only sensors with a `state_class` get them) or the
+     * request failed.
+     */
+    suspend fun statistics(
+        entityId: String,
+        startIso: String,
+        endIso: String,
+        period: StatisticsPeriod,
     ): List<HistoryPoint>
 }

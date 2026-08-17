@@ -57,7 +57,7 @@ class WaterGraphViewModel(
                 .collect { (connection, range) ->
                     if (connection == HaConnectionStatus.Connected) {
                         runCatching {
-                            history.value = repo.powerHistory(entityId, hoursBack = range.hoursBack).dropTransientDips()
+                            history.value = repo.history(entityId, hoursBack = range.hoursBack).dropTransientDips()
                         }
                     }
                 }

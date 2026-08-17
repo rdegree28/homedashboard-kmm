@@ -1,6 +1,7 @@
 package com.degree.homedash.shared.api
 
 import com.degree.homedash.shared.model.EntityState
+import com.degree.homedash.shared.model.StatisticsPeriod
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonObject
@@ -103,6 +104,87 @@ class WebSocketHomeAssistantApiTest {
         val points = WebSocketHomeAssistantApi(client).history("sensor.power", "s", "e")
 
         assertTrue(points.isEmpty())
+    }
+
+    @Test
+    fun statisticsEncodesRequestAndParsesBuckets() = runTest {
+        val client = FakeHaClient()
+        // Response shape captured from a live HA instance: `start`/`end` are epoch *milliseconds*,
+        // unlike history's seconds.
+        client.requestResponse = """
+            {"id":1,"type":"result","success":true,"result":{"sensor.moisture":[
+              {"start":1782363600000,"end":1782450000000,"mean":29.5,"min":0.0,"max":91.46},
+              {"start":1782450000000,"end":1782536400000,"mean":41.0,"min":39.94,"max":42.07}
+            ]}}
+        """.trimIndent()
+
+        val points = WebSocketHomeAssistantApi(client)
+            .statistics("sensor.moisture", "2026-06-25T00:00:00Z", "2026-08-17T00:00:00Z", StatisticsPeriod.DAY)
+
+        assertEquals(2, points.size)
+        assertEquals(1782363600.0, points[0].timeSeconds)
+        assertEquals(29.5, points[0].value)
+        assertEquals(0.0, points[0].min)
+        assertEquals(91.46, points[0].max)
+        assertEquals(1782450000.0, points[1].timeSeconds)
+        assertEquals(41.0, points[1].value)
+
+        val command = client.lastRequestCommand!!
+        assertTrue(command.contains("recorder/statistics_during_period"), command)
+        assertTrue(command.contains("sensor.moisture"), command)
+        assertTrue(command.contains("2026-06-25T00:00:00Z"), command)
+        assertTrue(command.contains("2026-08-17T00:00:00Z"), command)
+        // The wire value, not the enum name.
+        assertTrue(command.contains("\"period\":\"day\""), command)
+        assertTrue(command.contains("mean"), command)
+    }
+
+    @Test
+    fun statisticsFallsBackToOtherAggregatesWhenABucketHasNoMean() = runTest {
+        val client = FakeHaClient()
+        // Meter-style sensors record a total rather than a mean.
+        client.requestResponse = """
+            {"id":1,"type":"result","success":true,"result":{"sensor.energy":[
+              {"start":1782363600000,"end":1782450000000,"sum":12.5},
+              {"start":1782450000000,"end":1782536400000},
+              {"start":1782536400000,"end":1782622800000,"max":7.0}
+            ]}}
+        """.trimIndent()
+
+        val points = WebSocketHomeAssistantApi(client)
+            .statistics("sensor.energy", "s", "e", StatisticsPeriod.HOUR)
+
+        // The bucket with no usable number at all is skipped.
+        assertEquals(2, points.size)
+        assertEquals(12.5, points[0].value)
+        // Absent min/max collapse onto the value, so nothing draws a spurious band.
+        assertEquals(12.5, points[0].min)
+        assertEquals(12.5, points[0].max)
+        assertEquals(7.0, points[1].value)
+    }
+
+    @Test
+    fun statisticsReturnsEmptyWhenEntityHasNoStatistics() = runTest {
+        val client = FakeHaClient()
+        client.requestResponse = """{"id":1,"type":"result","success":true,"result":{}}"""
+
+        val points = WebSocketHomeAssistantApi(client)
+            .statistics("sensor.power", "s", "e", StatisticsPeriod.HOUR)
+
+        assertTrue(points.isEmpty())
+    }
+
+    @Test
+    fun rawHistorySamplesCarryNoSpread() = runTest {
+        val client = FakeHaClient()
+        client.requestResponse =
+            """{"id":1,"type":"result","success":true,"result":{"sensor.power":[{"s":"40.0","lu":100.0}]}}"""
+
+        val point = WebSocketHomeAssistantApi(client).history("sensor.power", "s", "e").single()
+
+        // An instantaneous reading is its own min and max — charts use this to decide not to band it.
+        assertEquals(40.0, point.min)
+        assertEquals(40.0, point.max)
     }
 }
 

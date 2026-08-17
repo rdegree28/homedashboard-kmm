@@ -7,6 +7,7 @@ import com.degree.homedash.shared.api.HomeAssistantApi
 import com.degree.homedash.shared.api.WebSocketHomeAssistantApi
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
+import com.degree.homedash.shared.model.StatisticsPeriod
 import com.degree.homedash.shared.model.entity.HvacMode
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
@@ -122,18 +123,46 @@ class HomeAssistantRepo internal constructor(
         serviceData: JsonObject? = null,
     ) = api.callService(domain, service, entityId, serviceData)
 
-    /** Fetch [hoursBack] hours of numeric history for [entityId], ending now. */
+    /**
+     * Fetch [hoursBack] hours of numeric history for [entityId], ending now, picking the best source
+     * for the window: raw recorder states for short ranges, long-term statistics beyond them.
+     *
+     * The recorder purges raw states after `purge_keep_days` (10 by default), so a raw query for a
+     * month or a year silently returns only the last week or so — every chart looked capped at the
+     * purge horizon. Statistics are rolled up hourly/daily and kept indefinitely, so longer windows
+     * read from those instead and come back with a mean plus the min/max spread of each bucket.
+     *
+     * Falls back to raw states when an entity has no statistics at all (sensors without a
+     * `state_class` never get them) — a short chart beats an empty one.
+     */
     @OptIn(ExperimentalTime::class)
-    suspend fun powerHistory(
+    suspend fun history(
         entityId: String,
         hoursBack: Int,
     ): List<HistoryPoint> {
         val end = Clock.System.now()
         val start = end.minus(hoursBack.hours)
-        return api.history(entityId, start.toString(), end.toString())
+        val startIso = start.toString()
+        val endIso = end.toString()
+
+        if (hoursBack <= RAW_HISTORY_MAX_HOURS) return api.history(entityId, startIso, endIso)
+
+        val period = if (hoursBack <= HOURLY_STATS_MAX_HOURS) StatisticsPeriod.HOUR else StatisticsPeriod.DAY
+        return api.statistics(entityId, startIso, endIso, period)
+            .ifEmpty { api.history(entityId, startIso, endIso) }
     }
 
     companion object {
+        /**
+         * Longest window still served from raw recorder states. Sits inside the recorder's default
+         * 10-day retention so the short-range charts keep full per-sample detail, while anything
+         * longer — where raw data would be partly purged anyway — comes from statistics.
+         */
+        private const val RAW_HISTORY_MAX_HOURS = 24 * 7
+
+        /** Above this, hourly buckets would be too many points to plot usefully; switch to daily. */
+        private const val HOURLY_STATS_MAX_HOURS = 24 * 90
+
         /** The production repository backed by a live Home Assistant WebSocket connection. */
         fun create(): HomeAssistantRepo = HomeAssistantRepo(WebSocketHomeAssistantApi(HaWebSocketClient()))
     }

@@ -88,7 +88,7 @@ class OfficeViewModel(
             repo.connection.collect { status ->
                 if (status == HaConnectionStatus.Connected) {
                     runCatching {
-                        powerHistory.value = repo.powerHistory(OfficeEntities.POWER, hoursBack = 168)
+                        powerHistory.value = repo.history(OfficeEntities.POWER, hoursBack = 168)
                     }
                 }
             }

@@ -7,6 +7,8 @@ import com.degree.homedash.shared.model.HistoryCommand
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.model.SimpleCommand
 import com.degree.homedash.shared.model.StateChanged
+import com.degree.homedash.shared.model.StatisticsCommand
+import com.degree.homedash.shared.model.StatisticsPeriod
 import com.degree.homedash.shared.model.SubscribeEventsCommand
 import com.degree.homedash.shared.model.Target
 import kotlinx.serialization.json.Json
@@ -125,6 +127,24 @@ internal object HaProtocolHelper {
             ),
         )
 
+    fun encodeStatistics(
+        id: Long,
+        entityId: String,
+        startTimeIso: String,
+        endTimeIso: String,
+        period: StatisticsPeriod,
+    ): String =
+        json.encodeToString(
+            StatisticsCommand.serializer(),
+            StatisticsCommand(
+                id = id,
+                startTime = startTimeIso,
+                endTime = endTimeIso,
+                statisticIds = listOf(entityId),
+                period = period.wire,
+            ),
+        )
+
     /**
      * Parse a `history/history_during_period` result into numeric samples for [entityId].
      * Entries use the compressed form: `s` = state value, `lu`/`lc` = last updated/changed (epoch s).
@@ -141,6 +161,38 @@ internal object HaProtocolHelper {
             val value = o["s"]?.jsonPrimitive?.contentOrNull?.toDoubleOrNull() ?: return@mapNotNull null
             val time = (o["lu"] ?: o["lc"])?.jsonPrimitive?.doubleOrNull ?: return@mapNotNull null
             HistoryPoint(timeSeconds = time, value = value)
+        }
+    }.getOrDefault(emptyList())
+
+    /**
+     * Parse a `recorder/statistics_during_period` result into samples for [entityId]. Each entry is one
+     * bucket: `start`/`end` are epoch *milliseconds* (unlike history's seconds) and the requested
+     * `mean`/`min`/`max` come back as numbers. The bucket's start time is used as the sample time.
+     *
+     * The value is the mean where there is one, falling back to `state`/`sum` so meter-style sensors
+     * (which record a total rather than a mean) still plot. Buckets with no usable number are skipped.
+     */
+    fun parseStatistics(
+        resultText: String,
+        entityId: String,
+    ): List<HistoryPoint> = runCatching {
+        val arr = json.parseToJsonElement(resultText).jsonObject["result"]
+            ?.jsonObject?.get(entityId)?.jsonArray ?: return emptyList()
+        arr.mapNotNull { el ->
+            val o = el.jsonObject
+            fun num(key: String) = o[key]?.jsonPrimitive?.doubleOrNull
+            val startMs = num("start") ?: return@mapNotNull null
+            val min = num("min")
+            val max = num("max")
+            val value = num("mean") ?: num("state") ?: num("sum") ?: max ?: min ?: return@mapNotNull null
+            HistoryPoint(
+                timeSeconds = startMs / 1000.0,
+                value = value,
+                // Keep min ≤ value ≤ max even if a bucket reports an odd combination, so charts that
+                // draw the spread as a band never invert it.
+                min = (min ?: value).coerceAtMost(value),
+                max = (max ?: value).coerceAtLeast(value),
+            )
         }
     }.getOrDefault(emptyList())
 }
