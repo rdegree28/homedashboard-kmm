@@ -137,9 +137,17 @@ class EntityMetadataRepo(
         FanMetadata.dellaTowerFan("fan.bedroom_fan_tower_fan", "Tower Fan"),
     )
 
-    /** The Pets sensors — currently just the cat water fountain. */
+    /** The Pets sensors — currently just the cat water fountain: its water level and its filter. */
     fun loadPetsEntityMetadataList(): List<EntityMetadata> = listOf(
-        WaterLevelMetadata("sensor.cat_water_fountain_remaining_water_pct", "Remaining Water"),
+        WaterLevelMetadata(
+            "sensor.cat_water_fountain_remaining_water_pct",
+            "Remaining Water",
+            // 31 days is what the fountain's own `number.cat_water_fountain_filter_cycle` holds.
+            filterHealth = WaterLevelMetadata.FilterHealth(
+                "sensor.cat_water_fountain_remaining_filter_day",
+                maxDays = 31,
+            ),
+        ),
     )
 
     /**

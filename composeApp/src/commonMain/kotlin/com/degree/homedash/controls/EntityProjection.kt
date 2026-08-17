@@ -105,6 +105,9 @@ fun EntityMetadata.toEntityUi(
             metadata = this,
             pct = pct,
             valueText = pct?.let { "${formatNumber(it, decimals = 0)} %" } ?: "—",
+            // Read off the filter's own sensor, not the water level's — the same second-entity
+            // arrangement as a fan's mister.
+            filterDaysRemaining = filterHealth?.let { allStates[it.entityId].daysOrNull() },
         )
     }
 
@@ -125,3 +128,7 @@ private fun EntityState?.isOffline(): Boolean = this == null || this.isUnavailab
 /** The numeric state, or null when it isn't a usable reading. */
 private fun EntityState?.percentOrNull(): Double? =
     this?.state?.toDoubleOrNull()?.takeUnless { isUnavailable }
+
+/** A whole-day countdown, or null when the sensor is missing, unavailable, or non-numeric. */
+private fun EntityState?.daysOrNull(): Int? =
+    this?.state?.toDoubleOrNull()?.takeUnless { isUnavailable }?.roundToInt()

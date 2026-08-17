@@ -8,7 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.degree.homedash.controls.EntityAction
+import com.degree.homedash.controls.PetFilterHealthControl
+import com.degree.homedash.controls.WaterLevelControl
+import com.degree.homedash.controls.entityId
 import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
@@ -34,20 +36,22 @@ fun PetsContent(
     onOpenGraph: (String) -> Unit,
 ) {
     DashboardScaffold(title = "Pets", onBack = onBack, onOpenSettings = onOpenSettings, icon = RoomIcons.Paw) {
-        ControlGroup(
-            title = "Cat Water Fountain",
-            entities = ui.items,
-            onAction = { action ->
-                if (action is EntityAction.OpenGraph) onOpenGraph(action.entityId)
-            },
-            empty = {
+        // The content overload rather than the entities one, because a fountain contributes two rows
+        // — its water level and its filter — and only the first of them opens a graph.
+        ControlGroup(title = "Cat Water Fountain") {
+            if (ui.items.isEmpty()) {
                 Text(
                     "No water level sensor found.",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-            },
-        )
+            }
+            ui.items.forEach { item ->
+                WaterLevelControl(item, onClick = { onOpenGraph(item.entityId) })
+                // Absent on a fountain that declares no filter, or whose sensor has gone quiet.
+                if (item.filterDaysRemaining != null) PetFilterHealthControl(item)
+            }
+        }
     }
 }
 
@@ -58,6 +62,22 @@ private fun PetsScreenPreview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             PetsContent(
                 ui = PetsUiState(previewLevels),
+                onBack = {},
+                onOpenSettings = {},
+                onOpenGraph = {},
+            )
+        }
+    }
+}
+
+/** Both readings near their limits — the amber filter band is only a few days wide in real life. */
+@Preview(widthDp = 380, heightDp = 400)
+@Composable
+private fun PetsScreenLowPreview() {
+    MaterialTheme(colorScheme = darkColorScheme()) {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            PetsContent(
+                ui = PetsUiState(previewLevelsLow),
                 onBack = {},
                 onOpenSettings = {},
                 onOpenGraph = {},

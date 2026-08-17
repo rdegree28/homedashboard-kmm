@@ -6,11 +6,28 @@ import com.degree.homedash.shared.model.HistoryPoint
 
 // Sample data for the Pets @Previews (which live next to their composables in this package).
 
+private val previewFountainMetadata = WaterLevelMetadata(
+    PetsEntities.CAT_WATER_LEVEL,
+    "Remaining Water",
+    filterHealth = WaterLevelMetadata.FilterHealth(PetsEntities.CAT_FILTER_DAYS, maxDays = 31),
+)
+
 internal val previewLevels: List<EntityUi.WaterLevel> = listOf(
     EntityUi.WaterLevel(
-        metadata = WaterLevelMetadata(PetsEntities.CAT_WATER_LEVEL, "Remaining Water"),
+        metadata = previewFountainMetadata,
         pct = 68.0,
         valueText = "68 %",
+        filterDaysRemaining = 26,
+    ),
+)
+
+/** A fountain near both limits, so the preview shows the amber end of both bars beside the green. */
+internal val previewLevelsLow: List<EntityUi.WaterLevel> = listOf(
+    EntityUi.WaterLevel(
+        metadata = previewFountainMetadata,
+        pct = 38.0,
+        valueText = "38 %",
+        filterDaysRemaining = 2,
     ),
 )
 

@@ -36,9 +36,30 @@ fun WaterLevelControl(
     ui: EntityUi.WaterLevel,
     onClick: (() -> Unit)? = null,
 ) {
-    val fraction = ui.pct?.let { (it / 100.0).coerceIn(0.0, 1.0) } ?: 0.0
-    val barColor = waterLevelColor(ui.pct)
+    LevelBarRow(
+        label = ui.displayName,
+        valueText = ui.valueText,
+        fraction = (ui.pct?.let { (it / 100.0).coerceIn(0.0, 1.0) } ?: 0.0).toFloat(),
+        barColor = waterLevelColor(ui.pct),
+        onClick = onClick,
+    )
+}
 
+/**
+ * The shared shape of a level readout: name, value, and a filled bar underneath, optionally tappable
+ * with a chevron.
+ *
+ * Factored out because the fountain shows two of these — its water level and its filter life — which
+ * differ only in what they count and how they colour it. One layout, so they can't drift apart.
+ */
+@Composable
+internal fun LevelBarRow(
+    label: String,
+    valueText: String,
+    fraction: Float,
+    barColor: Color,
+    onClick: (() -> Unit)? = null,
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -48,12 +69,12 @@ fun WaterLevelControl(
     ) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = ui.displayName,
+                text = label,
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
-                text = ui.valueText,
+                text = valueText,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = barColor,
@@ -77,7 +98,7 @@ fun WaterLevelControl(
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(fraction.toFloat())
+                    .fillMaxWidth(fraction)
                     .height(10.dp)
                     .clip(RoundedCornerShape(5.dp))
                     .background(barColor),
