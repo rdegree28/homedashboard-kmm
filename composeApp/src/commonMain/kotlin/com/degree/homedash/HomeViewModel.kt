@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.toEntityUis
+import com.degree.homedash.pets.PetsEntities
+import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.entity.HvacMode
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
@@ -14,15 +16,20 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-/** Severity of a [HomeWarning] — drives the warning card's color. */
-enum class WarningSeverity { Warning, Critical }
+/**
+ * Severity of a [HomeWarning] — drives the warning card's color, listed lowest urgency first.
+ *
+ * [Notification] is blue: something wants doing, but nothing is wrong. [Warning] (amber) is a
+ * heading-the-wrong-way nudge, and [Critical] (red) means act now.
+ */
+enum class WarningSeverity { Notification, Warning, Critical }
 
 /** An at-a-glance warning shown at the top of the Home launcher. */
 data class HomeWarning(val message: String, val severity: WarningSeverity)
 
 /**
  * Backs the Home launcher: the dashboard cards it offers, plus any warnings drawn from live state
- * (currently the cat water fountain level).
+ * (the cat water fountain level and her medication reminders).
  */
 class HomeViewModel(
     private val repo: HomeAssistantRepo,
@@ -61,7 +68,8 @@ class HomeViewModel(
             .map { states ->
                 petEntities.toEntityUis(states)
                     .filterIsInstance<EntityUi.WaterLevel>()
-                    .mapNotNull(::catWaterWarning)
+                    .mapNotNull(::catWaterWarning) +
+                    listOfNotNull(catMedicationWarning(states))
             }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
@@ -86,6 +94,30 @@ class HomeViewModel(
     fun setExtremeTemperatures(entityId: String, extreme: Boolean) {
         viewModelScope.launch { repo.setExtremeTemperatures(entityId, extreme) }
     }
+}
+
+/**
+ * Warn while either of the cat's medication reminders is active, as one card naming whichever doses
+ * are still owed.
+ *
+ * These are read straight from [states] rather than projected through [EntityUi] like the fountain
+ * above: they're plain `input_boolean` helpers with nothing to render — no card, no control, no
+ * metadata type — and the launcher only ever asks whether they're on.
+ *
+ * Blue, not amber: a due dose is a standing to-do rather than something going wrong, so it sits
+ * below the fountain's warnings on the urgency scale. Home Assistant clears the helper once the dose
+ * is marked given, so the card goes away on its own.
+ */
+internal fun catMedicationWarning(states: Map<String, EntityState>): HomeWarning? {
+    val am = states[PetsEntities.CAT_MEDICATION_AM_REMINDER]?.isOn == true
+    val pm = states[PetsEntities.CAT_MEDICATION_PM_REMINDER]?.isOn == true
+    val due = when {
+        am && pm -> "morning and evening"
+        am -> "morning"
+        pm -> "evening"
+        else -> return null
+    }
+    return HomeWarning("Callie needs her $due pill", WarningSeverity.Notification)
 }
 
 /** Warn once the fountain drops into the amber/red band (mirrors `waterLevelColor`: <10 red, <35 amber). */

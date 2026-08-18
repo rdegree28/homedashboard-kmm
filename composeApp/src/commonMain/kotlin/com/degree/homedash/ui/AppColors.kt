@@ -11,6 +11,7 @@ object AppColors {
     val StatusGreen = Color(0xFF2EA043) // connected, signal "available"
     val StatusAmber = Color(0xFFD9A406) // connecting, signal "focused", soil getting dry
     val StatusRed = Color(0xFFD83A3A) // error, signal "meeting", soil too dry
+    val StatusBlue = Color(0xFF3D9BE9) // informational notice — lower key than amber, still legible in black
     val StatusGray = Color(0xFF888888) // disconnected, no reading
     val SignalOff = Color(0xFFB6B6B6) // signal "off"
     val Healthy = Color(0xFF66BB6A) // plants card, healthy soil

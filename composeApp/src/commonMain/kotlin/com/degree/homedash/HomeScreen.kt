@@ -125,6 +125,7 @@ fun HomeContent(
 @Composable
 private fun WarningCard(warning: HomeWarning) {
     val color = when (warning.severity) {
+        WarningSeverity.Notification -> AppColors.StatusBlue
         WarningSeverity.Warning -> AppColors.StatusAmber
         WarningSeverity.Critical -> AppColors.StatusRed
     }
@@ -162,7 +163,10 @@ private fun HomeScreenPreview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
             HomeContent(
-                warnings = listOf(HomeWarning("Cat water running low — 24 %", WarningSeverity.Warning)),
+                warnings = listOf(
+                    HomeWarning("Cat water running low — 24 %", WarningSeverity.Warning),
+                    HomeWarning("Cat needs her morning pill", WarningSeverity.Notification),
+                ),
                 thermostats = listOf(previewThermostat("Thermostat")),
                 navigation = previewNavigationCards,
                 onAction = {},
