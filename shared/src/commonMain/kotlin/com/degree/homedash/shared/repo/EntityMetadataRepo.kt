@@ -109,7 +109,6 @@ class EntityMetadataRepo(
         TriggerEntityMetadata.movieLights(),
         LightMetadata("light.living_room_light_west", "West"),
         LightMetadata("light.living_room_light_east", "East"),
-        LightMetadata("light.homework_light", "Homework"),
         LightMetadata("light.dining_ceiling_light", "Dining Ceiling"),
         LightMetadata("light.kitchen_stove_light", "Kitchen Stove"),
         FanMetadata.dellaTowerFan("fan.living_room_fan", "Fan"),
