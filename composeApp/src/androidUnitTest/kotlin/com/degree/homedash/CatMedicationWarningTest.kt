@@ -27,19 +27,19 @@ class CatMedicationWarningTest {
 
     @Test
     fun `names the morning dose`() {
-        assertEquals("Cat needs her morning pill", catMedicationWarning(states(am = true, pm = false))?.message)
+        assertEquals("Callie needs her morning pill", catMedicationWarning(states(am = true, pm = false))?.message)
     }
 
     @Test
     fun `names the evening dose`() {
-        assertEquals("Cat needs her evening pill", catMedicationWarning(states(am = false, pm = true))?.message)
+        assertEquals("Callie needs her evening pill", catMedicationWarning(states(am = false, pm = true))?.message)
     }
 
     @Test
     fun `both overdue doses share one card`() {
         val warning = catMedicationWarning(states(am = true, pm = true))
 
-        assertEquals("Cat needs her morning and evening pill", warning?.message)
+        assertEquals("Callie needs her morning and evening pill", warning?.message)
     }
 
     @Test

@@ -91,7 +91,8 @@ internal fun previewNavigation(
     label: String = target.name,
     icon: NavigationMetadata.RoomIcon = defaultIconFor(target),
     tint: Long = defaultTintFor(target),
-) = EntityUi.Navigation(NavigationMetadata(target, label, icon, tint))
+    photo: NavigationMetadata.CardPhoto? = defaultPhotoFor(target),
+) = EntityUi.Navigation(NavigationMetadata(target, label, icon, tint, photo))
 
 /** Mirrors the pairing the repo declares, so previews match the real launcher. */
 private fun defaultIconFor(target: NavigationMetadata.NavigationTarget) = when (target) {
@@ -102,13 +103,25 @@ private fun defaultIconFor(target: NavigationMetadata.NavigationTarget) = when (
     NavigationMetadata.NavigationTarget.Pets -> NavigationMetadata.RoomIcon.Paw
 }
 
+/** Likewise for photos — only the Pets card ships one today. */
+private fun defaultPhotoFor(target: NavigationMetadata.NavigationTarget) = when (target) {
+    NavigationMetadata.NavigationTarget.Office,
+    NavigationMetadata.NavigationTarget.Plants,
+    NavigationMetadata.NavigationTarget.LivingRoom,
+    NavigationMetadata.NavigationTarget.Bedroom,
+    -> null
+    NavigationMetadata.NavigationTarget.Pets -> NavigationMetadata.CardPhoto.Callie
+}
+
 /** Likewise for tints — keeps preview cards coloured the way the launcher colours them. */
 private fun defaultTintFor(target: NavigationMetadata.NavigationTarget) = when (target) {
     NavigationMetadata.NavigationTarget.Office -> 0xFFCCCCCC
     NavigationMetadata.NavigationTarget.Plants -> 0xFFCCCCCC
     NavigationMetadata.NavigationTarget.LivingRoom -> 0xFFCCCCCC
     NavigationMetadata.NavigationTarget.Bedroom -> 0xFFCCCCCC
-    NavigationMetadata.NavigationTarget.Pets -> 0xFFCCCCCC
+    // The real gold, unlike its neutral neighbours: this card's photo is ringed in its tint, so a
+    // placeholder grey would show a ring the launcher never draws.
+    NavigationMetadata.NavigationTarget.Pets -> 0xFFC29844
 }
 
 internal fun previewTrigger(label: String) = EntityUi.Trigger(

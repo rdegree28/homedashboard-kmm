@@ -90,6 +90,7 @@ kotlin {
             implementation(compose.materialIconsExtended)
             implementation(compose.ui)
             implementation(compose.preview)
+            implementation(libs.compose.components.resources)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(libs.androidx.lifecycle.runtime.compose)
@@ -121,6 +122,14 @@ kotlin {
 composeCompiler {
     // Treat the listed :shared types as stable so composables receiving them remain skippable.
     stabilityConfigurationFiles.add(rootProject.layout.projectDirectory.file("compose_stability.conf"))
+}
+
+compose.resources {
+    // Names the generated accessor class's package — and, with it, the directory the assets land in
+    // inside the APK and the web distribution. Left unset this derives from the Gradle group and
+    // module name, giving the browser a URL like `composeResources/homedashboard_kmm.composeapp.
+    // generated.resources/drawable/callie.png`.
+    packageOfResClass = "com.degree.homedash.resources"
 }
 
 android {

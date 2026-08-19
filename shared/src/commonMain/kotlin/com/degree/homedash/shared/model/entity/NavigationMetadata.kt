@@ -12,6 +12,12 @@ data class NavigationMetadata(
     override val displayName: String,
     val icon: RoomIcon,
     val tint: Long,
+    /**
+     * Non-null when the card draws a photograph in place of its [icon] — the launcher's Pets tile
+     * shows the cat rather than a paw print. [icon] stays required either way: a card's dashboard
+     * header still draws the glyph (see `PetsScreen`), and it is the fallback if a photo can't load.
+     */
+    val photo: CardPhoto? = null,
 ) : EntityMetadata {
 
     override val entityId: String get() = "nav.${destination.name.lowercase()}"
@@ -36,5 +42,14 @@ data class NavigationMetadata(
         Sofa,
         Bed,
         Paw
+    }
+
+    /**
+     * Which photograph a card draws, named for its subject the way [RoomIcon] is named for its
+     * drawing. A token, not a picture: `:shared` has no Compose dependency, so the UI resolves these
+     * to bundled image resources (see `CardPhotos`).
+     */
+    enum class CardPhoto {
+        Callie
     }
 }

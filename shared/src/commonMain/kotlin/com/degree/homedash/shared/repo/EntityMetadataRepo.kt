@@ -9,6 +9,7 @@ import com.degree.homedash.shared.model.entity.EntityMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.LightMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata
+import com.degree.homedash.shared.model.entity.NavigationMetadata.CardPhoto
 import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
 import com.degree.homedash.shared.model.entity.NavigationMetadata.RoomIcon
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
@@ -172,7 +173,7 @@ class EntityMetadataRepo(
             NavigationMetadata(NavigationTarget.LivingRoom, "Living Room", RoomIcon.Sofa, 0xFFF0C930),
             NavigationMetadata(NavigationTarget.Office, "Office", RoomIcon.Desk, 0xFF3298CE),
             NavigationMetadata(NavigationTarget.Plants, "Plants", RoomIcon.Plant, 0xFF00FF00),
-            NavigationMetadata(NavigationTarget.Pets, "Pets", RoomIcon.Paw, 0xFFC29844),
+            NavigationMetadata(NavigationTarget.Pets, "Pets", RoomIcon.Paw, 0xFFC29844, photo = CardPhoto.Callie),
         )
 
         /** The flag a dashboard sits behind, or null when it's available to everyone. */

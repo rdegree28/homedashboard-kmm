@@ -18,7 +18,9 @@
     header @wasm Cache-Control "public, max-age=31536000, immutable"
 
     # Stable-named entry files: must always revalidate so a redeploy is picked up immediately.
-    @entry path /index.html /composeApp.js /composeApp.js.map /styles.css
+    # Bundled images (composeResources/**) are in here for the same reason: their names never change,
+    # so replacing one would otherwise sit behind a browser's heuristic cache until a hard refresh.
+    @entry path /index.html /composeApp.js /composeApp.js.map /styles.css /composeResources/*
     header @entry Cache-Control "no-cache"
 
     try_files {path} /index.html

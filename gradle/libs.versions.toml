@@ -48,6 +48,10 @@ multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-sett
 multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "settings" }
 # Logging
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+# Bundled image resources. The `compose.components.resources` shorthand is deprecated in 1.11, and
+# the plugin only generates the `Res` accessor class when commonMain declares this exact coordinate —
+# version.ref = "compose" is what keeps it matching the plugin version.
+compose-components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose" }
 # Android
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 # Lifecycle ViewModel + runtime (Compose Multiplatform)

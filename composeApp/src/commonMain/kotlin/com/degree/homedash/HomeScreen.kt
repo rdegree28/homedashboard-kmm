@@ -165,7 +165,7 @@ private fun HomeScreenPreview() {
             HomeContent(
                 warnings = listOf(
                     HomeWarning("Cat water running low — 24 %", WarningSeverity.Warning),
-                    HomeWarning("Cat needs her morning pill", WarningSeverity.Notification),
+                    HomeWarning("Callie needs her morning pill", WarningSeverity.Notification),
                 ),
                 thermostats = listOf(previewThermostat("Thermostat")),
                 navigation = previewNavigationCards,

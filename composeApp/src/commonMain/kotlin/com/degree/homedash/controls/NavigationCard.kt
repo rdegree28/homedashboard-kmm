@@ -1,5 +1,8 @@
 package com.degree.homedash.controls
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Card
@@ -20,14 +24,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.degree.homedash.shared.model.entity.NavigationMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
 import com.degree.homedash.ui.Dimens
+import com.degree.homedash.ui.icons.cardPhoto
 import com.degree.homedash.ui.icons.roomIcon
 import com.degree.homedash.ui.roomTint
+import org.jetbrains.compose.resources.painterResource
 
 /**
  * A full-width launcher card: destination icon, label, and a trailing chevron. Tapping it opens the
@@ -45,12 +55,7 @@ fun NavigationCard(
             modifier = Modifier.fillMaxWidth().height(88.dp).padding(horizontal = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(
-                imageVector = roomIcon(ui.metadata.icon),
-                contentDescription = null,
-                tint = roomTint(ui.metadata.tint),
-                modifier = Modifier.size(40.dp),
-            )
+            CardArt(metadata = ui.metadata, glyphSize = 40.dp)
             Spacer(Modifier.width(20.dp))
             Text(
                 text = ui.displayName,
@@ -65,6 +70,48 @@ fun NavigationCard(
                 modifier = Modifier.size(28.dp),
             )
         }
+    }
+}
+
+/**
+ * A launcher card's leading art: the photograph it declares, or its glyph when it declares none.
+ *
+ * A photo is cropped to a circle and ringed in the card's tint, so it reads as a portrait rather
+ * than a picture wedged into an icon slot — and so the tile keeps the colour that a glyph got from
+ * being tinted. It draws larger than a glyph because a face needs the area a silhouette doesn't.
+ */
+@Composable
+private fun CardArt(
+    metadata: NavigationMetadata,
+    glyphSize: Dp,
+    modifier: Modifier = Modifier,
+    photoSize: Dp = 48.dp,
+) {
+    val tint = roomTint(metadata.tint)
+    val photo = metadata.photo
+    if (photo == null) {
+        Icon(
+            imageVector = roomIcon(metadata.icon),
+            contentDescription = null,
+            tint = tint,
+            modifier = modifier.size(glyphSize),
+        )
+    } else {
+        Image(
+            painter = painterResource(cardPhoto(photo)),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            // Order matters: the clip has to precede both the fill and the ring so they follow the
+            // circle, and the ring is drawn after the image (Border strokes post-content) so an
+            // opaque photo can't hide it. The tinted disc shows through only until the bitmap
+            // arrives — on web the painter is empty for the first frames, and a ring around nothing
+            // reads as a rendering bug.
+            modifier = modifier
+                .size(photoSize)
+                .clip(CircleShape)
+                .background(tint.copy(alpha = 0.2f), CircleShape)
+                .border(2.dp, tint, CircleShape),
+        )
     }
 }
 
@@ -88,11 +135,10 @@ fun NavigationTile(
             modifier = Modifier.fillMaxSize().align(Alignment.TopCenter),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Icon(
-                imageVector = roomIcon(ui.metadata.icon),
-                contentDescription = null,
-                tint = roomTint(ui.metadata.tint),
-                modifier = Modifier.size(38.dp).align(Alignment.CenterHorizontally),
+            CardArt(
+                metadata = ui.metadata,
+                glyphSize = 38.dp,
+                modifier = Modifier.align(Alignment.CenterHorizontally),
             )
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
