@@ -5,25 +5,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
-import com.degree.homedash.controls.LightEntityUi
 import com.degree.homedash.controls.toEntityUis
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import com.degree.homedash.ui.dewPointText
 import com.degree.homedash.ui.formatNumber
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @Immutable
 data class LivingRoomUiState(
     val triggers: List<EntityUi.Trigger>,
-    val lights: List<LightEntityUi>,
+    val lights: List<EntityUi.Light>,
     val fans: List<EntityUi.Fan>,
     val climate: List<EntityUi.Climate>,
 )
@@ -31,7 +29,6 @@ data class LivingRoomUiState(
 /** Projects the configured Living Room lights into [LivingRoomUiState]. */
 class LivingRoomViewModel(
     private val repo: HomeAssistantRepo,
-    private val expRepo: ExpHomeAssistantRepo,
     metadataRepo: EntityMetadataRepo,
 ) : ViewModel() {
 
@@ -39,26 +36,22 @@ class LivingRoomViewModel(
     private val entities = metadataRepo.loadLivingRoomEntityMetadataList()
 
     val uiState: StateFlow<LivingRoomUiState> =
-        combine(
-            expRepo.loadEntityStatesForMetadata(entities),
-            repo.states
-        ) { expStateMap, states ->
-            val uis = entities.toEntityUis(states)
-            val expUis = expStateMap.toEntityUis()
-            LivingRoomUiState(
-                triggers = uis.filterIsInstance<EntityUi.Trigger>(),
-                lights = expUis.filterIsInstance<LightEntityUi>(),
-                fans = uis.filterIsInstance<EntityUi.Fan>(),
-                climate = uis.filterIsInstance<EntityUi.Climate>().withDewPoint(states),
+        repo.states
+            .map { states ->
+                val uis = entities.toEntityUis(states)
+                LivingRoomUiState(
+                    triggers = uis.filterIsInstance<EntityUi.Trigger>(),
+                    lights = uis.filterIsInstance<EntityUi.Light>(),
+                    fans = uis.filterIsInstance<EntityUi.Fan>(),
+                    climate = uis.filterIsInstance<EntityUi.Climate>().withDewPoint(states),
+                )
+            }
+            .distinctUntilChanged()
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5_000),
+                LivingRoomUiState(emptyList(), emptyList(), emptyList(), emptyList()),
             )
-        }
-        .distinctUntilChanged()
-        .stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5_000),
-            LivingRoomUiState(emptyList(), emptyList(), emptyList(), emptyList()),
-        )
-
 
     fun toggle(entityId: String) {
         viewModelScope.launch { repo.toggle(entityId) }
