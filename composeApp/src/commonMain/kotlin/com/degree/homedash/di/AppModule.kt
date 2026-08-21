@@ -27,7 +27,13 @@ import org.koin.dsl.module
 fun appModule(defaultConfig: HaConfig?) = module {
     viewModel { AppViewModel(defaultConfig, get(), get(), get(), get()) }
     viewModel { HomeViewModel(get(), get()) }
-    viewModel { OfficeViewModel(get(), get(), get()) }
+    viewModel {
+        OfficeViewModel(
+            repo = get(),
+            metadataRepo = get(),
+            expRepo = get()
+        )
+    }
     viewModel { LivingRoomViewModel(get(), get()) }
     viewModel { BedroomViewModel(get(), get()) }
     viewModel { PetsViewModel(get(), get()) }

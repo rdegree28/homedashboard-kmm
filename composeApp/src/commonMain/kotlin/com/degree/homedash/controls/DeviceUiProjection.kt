@@ -17,12 +17,12 @@ import com.degree.homedash.shared.model.states.LightState
  * a fan's mister is its own `humidifier.*` entity, so its on/off can't come from [state]. Defaults to
  * empty for the single-entity callers.
  */
-fun EntityMetadata.toExpEntityUi(
+fun EntityMetadata.toUi(
     state: ExpEntityState,
-): ExpEntityUi = when (this) {
+): DeviceUi = when (this) {
     is LightMetadata -> {
         state as LightState
-        LightEntityUi(
+        LightDeviceUi(
             metadata = this,
             state = state,
         )
@@ -111,10 +111,10 @@ fun EntityMetadata.toExpEntityUi(
 }
 
 /** Projects a whole screen's roster against the current [states] map. */
-fun Map<EntityMetadata, ExpEntityState>.toEntityUis(): List<ExpEntityUi> =
+fun Map<EntityMetadata, ExpEntityState>.toDeviceUis(): List<DeviceUi> =
     mapNotNull {
         try {
-            it.key.toExpEntityUi(it.value)
+            it.key.toUi(it.value)
         } catch (e: Exception) {
             null
         }

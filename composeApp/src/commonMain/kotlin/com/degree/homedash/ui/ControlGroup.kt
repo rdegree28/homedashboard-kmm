@@ -27,7 +27,7 @@ import com.degree.homedash.controls.ControlPreview
 import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.EntityControl
 import com.degree.homedash.controls.EntityUi
-import com.degree.homedash.controls.ExpEntityUi
+import com.degree.homedash.controls.DeviceUi
 import com.degree.homedash.controls.cardSpan
 import com.degree.homedash.controls.entityId
 import com.degree.homedash.controls.hasCard
@@ -103,7 +103,7 @@ fun ControlGroup(
 @Composable
 fun ControlGroup(
     title: String,
-    expEntities: List<ExpEntityUi>,
+    devices: List<DeviceUi>,
     empty: @Composable () -> Unit = {},
 ) {
     Column(
@@ -111,7 +111,7 @@ fun ControlGroup(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         GroupTitle(title)
-        ExpCardGrid(expEntities)
+        ExpCardGrid(devices)
     }
 }
 
@@ -179,17 +179,17 @@ private fun CardGrid(
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun ExpCardGrid(
-    expEntities: List<ExpEntityUi>,
+    devices: List<DeviceUi>,
 ) {
     LookaheadScope {
         val lookaheadScope = this
         // One stable movable slot per entity id, reused across state pushes and row moves. The latest
         // EntityUi is passed in at call time, so slots don't need recreating when values change.
-        val slots = remember { mutableMapOf<String, @Composable (ExpEntityUi) -> Unit>() }
-        slots.keys.retainAll(expEntities.mapTo(HashSet()) { it.id })
-        expEntities.forEach { entity ->
+        val slots = remember { mutableMapOf<String, @Composable (DeviceUi) -> Unit>() }
+        slots.keys.retainAll(devices.mapTo(HashSet()) { it.id })
+        devices.forEach { entity ->
             slots.getOrPut(entity.id) {
-                movableContentOf { latest: ExpEntityUi ->
+                movableContentOf { latest: DeviceUi ->
                     EntityControl(
                         expEntity = latest,
                         layout = ControlLayout.Card,
@@ -200,7 +200,7 @@ private fun ExpCardGrid(
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            expPackCardRows(expEntities, columns = 2).forEach { rowEntities ->
+            expPackCardRows(devices, columns = 2).forEach { rowEntities ->
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     var used = 0
                     rowEntities.forEach { entity ->
@@ -244,18 +244,18 @@ private fun packCardRows(entities: List<EntityUi>, columns: Int): List<List<Enti
  * Greedily packs [entities] into grid rows whose card spans sum to at most [columns]. A span-2 card
  * (see [cardSpan]) starts a fresh row and fills it; span-1 cards pair up. Preserves list order.
  */
-private fun expPackCardRows(entities: List<ExpEntityUi>, columns: Int): List<List<ExpEntityUi>> {
-    val rows = mutableListOf<List<ExpEntityUi>>()
-    var current = mutableListOf<ExpEntityUi>()
+private fun expPackCardRows(devices: List<DeviceUi>, columns: Int): List<List<DeviceUi>> {
+    val rows = mutableListOf<List<DeviceUi>>()
+    var current = mutableListOf<DeviceUi>()
     var width = 0
-    for (entity in entities) {
-        val span = entity.cardSpan.coerceIn(1, columns)
+    for (device in devices) {
+        val span = device.cardSpan.coerceIn(1, columns)
         if (width + span > columns && current.isNotEmpty()) {
             rows.add(current)
             current = mutableListOf()
             width = 0
         }
-        current.add(entity)
+        current.add(device)
         width += span
     }
     if (current.isNotEmpty()) rows.add(current)

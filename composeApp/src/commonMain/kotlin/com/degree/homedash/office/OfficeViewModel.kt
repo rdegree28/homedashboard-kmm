@@ -5,7 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
-import com.degree.homedash.controls.LightEntityUi
+import com.degree.homedash.controls.LightDeviceUi
+import com.degree.homedash.controls.toDeviceUis
 import com.degree.homedash.controls.toEntityUis
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
@@ -21,7 +22,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -54,7 +54,7 @@ data class DoorUi(val label: String, val statusText: String, val open: Boolean, 
 @Immutable
 data class OfficeUiState(
     val connection: HaConnectionStatus,
-    val lights: List<LightEntityUi>,
+    val lights: List<LightDeviceUi>,
     val fans: List<EntityUi.Fan>,
     val climate: List<EntityUi.Climate>,
     val doors: List<EntityUi.Door>,
@@ -148,10 +148,10 @@ private fun buildOfficeUiState(
     expStateMap: Map<EntityMetadata, ExpEntityState>
 ): OfficeUiState {
     val uis = entities.toEntityUis(states)
-    val expUis = expStateMap.toEntityUis()
+    val expUis = expStateMap.toDeviceUis()
     return OfficeUiState(
         connection = connection,
-        lights = expUis.filterIsInstance<LightEntityUi>(),
+        lights = expUis.filterIsInstance<LightDeviceUi>(),
         fans = uis.filterIsInstance<EntityUi.Fan>(),
         climate = uis.filterIsInstance<EntityUi.Climate>().withDewPointSubvalue(states),
         doors = uis.filterIsInstance<EntityUi.Door>(),

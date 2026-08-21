@@ -13,10 +13,10 @@ import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
  * nothing about the card's identity depends on a DI object.
  */
 @Immutable
-data class LightEntityUi(
+data class LightDeviceUi(
     private val metadata: ToggleableEntityMetadata,
     private val state: LightState,
-) : ExpEntityUi {
+) : DeviceUi {
 
     override val id: String get() = metadata.entityId
     val name: String get() = metadata.displayName

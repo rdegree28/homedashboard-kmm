@@ -228,12 +228,12 @@ fun EntityControl(
  */
 @Composable
 fun EntityControl(
-    expEntity: ExpEntityUi,
+    expEntity: DeviceUi,
     layout: ControlLayout,
     modifier: Modifier = Modifier,
 ) {
     when (expEntity) {
-        is LightEntityUi -> {
+        is LightDeviceUi -> {
             val repo: ExpHomeAssistantRepo = koinInject()
             val icon: @Composable (Color) -> Unit = { tint ->
                 LightIcon(on = expEntity.isOn, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))

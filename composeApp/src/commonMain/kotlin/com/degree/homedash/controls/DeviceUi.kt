@@ -1,6 +1,6 @@
 package com.degree.homedash.controls
 
-sealed interface ExpEntityUi {
+sealed interface DeviceUi {
 
     val id: String
 
