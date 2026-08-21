@@ -2,6 +2,7 @@ package com.degree.homedash.shared.repo
 
 import com.degree.homedash.shared.api.ExpHomeAssistantApi
 import com.degree.homedash.shared.model.entity.EntityMetadata
+import com.degree.homedash.shared.model.entity.ToggleableEntityMetadata
 import com.degree.homedash.shared.model.states.ExpEntityState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -11,7 +12,7 @@ import kotlinx.coroutines.flow.map
  * actions callers need rather than handing out an api.
  */
 class ExpHomeAssistantRepo internal constructor(
-    internal val api: ExpHomeAssistantApi,
+    private val api: ExpHomeAssistantApi,
 ) {
 
     fun loadEntityStatesForMetadatum(metadataList: List<EntityMetadata>): Flow<Map<EntityMetadata, ExpEntityState>> {
@@ -22,7 +23,7 @@ class ExpHomeAssistantRepo internal constructor(
         }
     }
 
-    fun toggleEntity(entity: EntityMetadata) {
+    fun toggleEntity(entity: ToggleableEntityMetadata) {
         api.toggleEntity(entityId = entity.entityId)
     }
 }

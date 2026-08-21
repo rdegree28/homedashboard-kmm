@@ -23,8 +23,7 @@ fun EntityMetadata.toExpEntityUi(
     is LightMetadata -> {
         state as LightState
         LightEntityUi(
-            id = this.entityId,
-            name = this.displayName,
+            metadata = this,
             state = state,
         )
     }
