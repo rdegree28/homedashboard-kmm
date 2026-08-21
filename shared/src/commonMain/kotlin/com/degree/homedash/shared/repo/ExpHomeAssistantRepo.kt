@@ -15,7 +15,7 @@ class ExpHomeAssistantRepo internal constructor(
     private val api: ExpHomeAssistantApi,
 ) {
 
-    fun loadEntityStatesForMetadatum(metadataList: List<EntityMetadata>): Flow<Map<EntityMetadata, ExpEntityState>> {
+    fun loadEntityStatesForMetadata(metadataList: List<EntityMetadata>): Flow<Map<EntityMetadata, ExpEntityState>> {
         return api.loadAllStates().map { stateMap ->
             metadataList.mapNotNull { meta ->
                 stateMap[meta.entityId]?.let { state -> meta to state }

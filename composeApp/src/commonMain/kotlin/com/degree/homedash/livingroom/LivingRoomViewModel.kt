@@ -17,8 +17,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -42,7 +40,7 @@ class LivingRoomViewModel(
 
     val uiState: StateFlow<LivingRoomUiState> =
         combine(
-            expRepo.loadEntityStatesForMetadatum(entities),
+            expRepo.loadEntityStatesForMetadata(entities),
             repo.states
         ) { expStateMap, states ->
             val uis = entities.toEntityUis(states)
