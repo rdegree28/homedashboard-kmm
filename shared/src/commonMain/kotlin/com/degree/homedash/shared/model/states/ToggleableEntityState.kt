@@ -1,21 +1,21 @@
 package com.degree.homedash.shared.model.states
 
-import com.degree.homedash.shared.api.HomeAssistantActionApi
+import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 
 /**
  * Entity state interface that holds for toggleable cards.
  */
 interface ToggleableEntityState : ExpEntityState {
 
-    /**
-     * Whether the entity is currently "on" or not. It is expected that onToggle() will revert this
-     * state.
-     */
+    /** Whether the entity is currently "on". */
     val isOn: Boolean
 
     /**
-     * Action that is called when the device is toggled. Returns an optimistic state of the result
-     * of the toggle.
+     * Flips the entity through [repo]. The repo is passed in rather than held so states stay plain
+     * values; what each domain does to toggle still lives here.
+     *
+     * Fire-and-forget: HA reports the result by pushing a new state, which replaces this instance,
+     * so there is nothing to await and nothing to hand back.
      */
-    suspend fun onToggle(): Boolean
+    fun onToggle(repo: ExpHomeAssistantRepo)
 }

@@ -28,7 +28,7 @@ fun appModule(defaultConfig: HaConfig?) = module {
     viewModel { AppViewModel(defaultConfig, get(), get(), get(), get()) }
     viewModel { HomeViewModel(get(), get()) }
     viewModel { OfficeViewModel(get(), get()) }
-    viewModel { LivingRoomViewModel(get(), get(),get()) }
+    viewModel { LivingRoomViewModel(get(), get(), get()) }
     viewModel { BedroomViewModel(get(), get()) }
     viewModel { PetsViewModel(get(), get()) }
     viewModel { PlantsViewModel(get()) }

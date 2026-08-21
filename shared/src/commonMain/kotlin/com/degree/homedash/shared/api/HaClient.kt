@@ -1,7 +1,6 @@
 package com.degree.homedash.shared.api
 
 import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.shared.model.states.ExpEntityState
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
 
@@ -15,7 +14,6 @@ internal interface HaClient {
 
     /** Live map of entity id → latest [EntityState], updated as Home Assistant pushes state changes. */
     val states: StateFlow<Map<String, EntityState>>
-    val expStates: StateFlow<Map<String, ExpEntityState>>
 
     /** Live connection status to the Home Assistant WebSocket API. */
     val connection: StateFlow<HaConnectionStatus>

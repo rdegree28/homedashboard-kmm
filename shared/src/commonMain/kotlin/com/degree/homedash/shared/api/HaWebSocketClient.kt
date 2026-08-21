@@ -2,8 +2,6 @@ package com.degree.homedash.shared.api
 
 import co.touchlab.kermit.Logger
 import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.shared.model.states.ExpEntityState
-import com.degree.homedash.shared.model.states.LightState
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
@@ -47,9 +45,6 @@ internal class HaWebSocketClient(
     private val _states = MutableStateFlow<Map<String, EntityState>>(emptyMap())
     override val states: StateFlow<Map<String, EntityState>> = _states.asStateFlow()
 
-    private val _expStates = MutableStateFlow<Map<String, ExpEntityState>>(emptyMap())
-    override val expStates: StateFlow<Map<String, ExpEntityState>> = _expStates.asStateFlow()
-
     private val _connection = MutableStateFlow<HaConnectionStatus>(HaConnectionStatus.Disconnected)
     override val connection: StateFlow<HaConnectionStatus> = _connection.asStateFlow()
 
@@ -60,10 +55,6 @@ internal class HaWebSocketClient(
 
     /** A `result` frame with its id already read off, plus the raw text for the caller to parse. */
     private data class ResultMessage(val id: Long?, val text: String)
-
-    // Toggle-capable ExpEntityStates carry the action api that drives them; the api only needs a
-    // HaClient, so this client supplies itself rather than the graph handing one back in.
-    private val actionApi by lazy { WebSocketHomeAssistantActionApi(this) }
 
     private val idMutex = Mutex()
     private var lastId = 0L
@@ -200,9 +191,6 @@ internal class HaWebSocketClient(
                     val list = HaProtocolHelper.parseStates(root)
                     if (list.isNotEmpty()) {
                         _states.value = list.associateBy { it.entityId }
-                        _expStates.value = list.mapNotNull { state ->
-                            state.toExpEntityState()?.let { state.entityId to it }
-                        }.toMap()
                     } else {
                         log.w { "get_states returned no entities: ${text.summarize()}" }
                     }
@@ -218,30 +206,8 @@ internal class HaWebSocketClient(
                     if (change.newState == null) current - change.entityId
                     else current + (change.entityId to change.newState)
                 }
-                _expStates.update { current ->
-                    // A domain with no experimental mapping yet reads the same as a removal, so a
-                    // stale entry can't outlive the change that dropped it.
-                    val exp = change.newState?.toExpEntityState()
-                    if (exp == null) current - change.entityId
-                    else current + (change.entityId to exp)
-                }
             }
         }
-    }
-
-    /**
-     * Map a raw [EntityState] onto its experimental counterpart, or null while the domain has no
-     * [ExpEntityState] type yet — the exp flow simply omits those entities.
-     */
-    private fun EntityState.toExpEntityState(): ExpEntityState? = when (domain) {
-        "light" -> LightState(
-            entityId = entityId,
-            isOn = isOn,
-            isOffline = isUnavailable,
-            api = actionApi,
-        )
-
-        else -> null
     }
 }
 

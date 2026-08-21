@@ -1,5 +1,7 @@
 package com.degree.homedash.controls
 
+import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import org.koin.compose.koinInject
 import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.shared.model.entity.NavigationMetadata
 import androidx.compose.foundation.layout.Arrangement
@@ -232,6 +234,7 @@ fun EntityControl(
 ) {
     when (expEntity) {
         is LightEntityUi -> {
+            val repo: ExpHomeAssistantRepo = koinInject()
             val icon: @Composable (Color) -> Unit = { tint ->
                 LightIcon(on = expEntity.isOn, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
             }
@@ -239,7 +242,7 @@ fun EntityControl(
             EntityToggleCard(
                 ui,
                 AppColors.LightOn,
-                expEntity.onToggle,
+                { expEntity.onToggle(repo) },
                 icon,
                 modifier)
         }

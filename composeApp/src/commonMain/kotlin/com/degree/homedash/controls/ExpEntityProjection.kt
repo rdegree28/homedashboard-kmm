@@ -24,10 +24,8 @@ fun EntityMetadata.toExpEntityUi(
         state as LightState
         LightEntityUi(
             id = this.entityId,
-            isOn = state.isOn,
-            offline = state.isOffline,
             name = this.displayName,
-            onToggle = state::onToggle,
+            state = state,
         )
     }
 

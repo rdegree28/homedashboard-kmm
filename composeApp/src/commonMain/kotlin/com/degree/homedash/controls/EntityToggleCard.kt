@@ -10,7 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -18,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import com.degree.homedash.office.ToggleUi
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
-import kotlinx.coroutines.launch
 
 /**
  * Shared card tile for toggleable entities: a custom [iconContent] top-left + centered name.
@@ -29,22 +27,16 @@ import kotlinx.coroutines.launch
 internal fun EntityToggleCard(
     ui: ToggleUi,
     onTint: Color,
-    onToggle: suspend () -> Unit,
+    onToggle: () -> Unit,
     iconContent: @Composable (tint: Color) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val baseTint = if (ui.isOn) onTint else MaterialTheme.colorScheme.onSurfaceVariant
     val iconTint = if (ui.offline) baseTint.copy(alpha = 0.3f) else baseTint
-    val coroutineScope = rememberCoroutineScope()
-
     EntityCard(
         modifier = modifier,
         label = ui.name,
-        onClick = {
-            coroutineScope.launch {
-                onToggle()
-            }
-        },
+        onClick = onToggle,
         enabled = !ui.offline,
         labelItalic = ui.offline,
         labelMuted = ui.offline,

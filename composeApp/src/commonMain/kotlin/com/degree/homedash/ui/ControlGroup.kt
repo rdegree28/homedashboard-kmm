@@ -104,7 +104,6 @@ fun ControlGroup(
 fun ControlGroup(
     title: String,
     expEntities: List<ExpEntityUi>,
-    onAction: (EntityAction) -> Unit,
     empty: @Composable () -> Unit = {},
 ) {
     Column(
@@ -112,7 +111,7 @@ fun ControlGroup(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         GroupTitle(title)
-        CardGrid(expEntities)
+        ExpCardGrid(expEntities)
     }
 }
 
@@ -179,7 +178,7 @@ private fun CardGrid(
  */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun CardGrid(
+private fun ExpCardGrid(
     expEntities: List<ExpEntityUi>,
 ) {
     LookaheadScope {

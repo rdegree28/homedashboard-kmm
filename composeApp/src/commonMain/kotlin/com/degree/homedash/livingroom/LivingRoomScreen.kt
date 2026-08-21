@@ -93,7 +93,6 @@ fun LivingRoomContent(
             ControlGroup(
                 title = "Lights",
                 expEntities = ui.lights,
-                onAction = onAction,
             )
 
             ControlGroup(
