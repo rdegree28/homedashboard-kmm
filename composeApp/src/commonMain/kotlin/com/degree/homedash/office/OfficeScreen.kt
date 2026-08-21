@@ -92,9 +92,7 @@ fun OfficeContent(
     ) {
         ControlGroup(
             title = "Lights",
-            entities = ui.lights,
-            useCardUis = true,
-            onAction = onAction,
+            expEntities = ui.lights,
         )
 
         ControlGroup(

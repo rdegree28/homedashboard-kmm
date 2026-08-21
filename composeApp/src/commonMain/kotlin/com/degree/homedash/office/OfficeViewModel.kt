@@ -5,12 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
+import com.degree.homedash.controls.LightEntityUi
 import com.degree.homedash.controls.toEntityUis
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.api.HaConnectionStatus
+import com.degree.homedash.shared.model.states.ExpEntityState
+import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import com.degree.homedash.ui.dewPointText
 import com.degree.homedash.ui.readingText
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +21,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -50,7 +54,7 @@ data class DoorUi(val label: String, val statusText: String, val open: Boolean, 
 @Immutable
 data class OfficeUiState(
     val connection: HaConnectionStatus,
-    val lights: List<EntityUi.Light>,
+    val lights: List<LightEntityUi>,
     val fans: List<EntityUi.Fan>,
     val climate: List<EntityUi.Climate>,
     val doors: List<EntityUi.Door>,
@@ -69,6 +73,7 @@ data class OfficeUiState(
 class OfficeViewModel(
     private val repo: HomeAssistantRepo,
     metadataRepo: EntityMetadataRepo,
+    private val expRepo: ExpHomeAssistantRepo,
 ) : ViewModel() {
 
     private val powerHistory = MutableStateFlow<List<HistoryPoint>>(emptyList())
@@ -77,11 +82,16 @@ class OfficeViewModel(
     private val entities = metadataRepo.loadOfficeEntityMetadataList()
 
     val uiState: StateFlow<OfficeUiState> =
-        combine(repo.states, repo.connection, powerHistory) { states, connection, history ->
-            buildOfficeUiState(entities, states, connection, history)
+        combine(
+            repo.states,
+            repo.connection,
+            powerHistory,
+            expRepo.loadEntityStatesForMetadata(entities)
+        ) { states, connection, history, expStateMap ->
+            buildOfficeUiState(entities, states, connection, history, expStateMap)
         }
-            .distinctUntilChanged()
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EMPTY)
+        .distinctUntilChanged()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EMPTY)
 
     init {
         viewModelScope.launch {
@@ -124,7 +134,7 @@ class OfficeViewModel(
     }
 
     private companion object {
-        val EMPTY = buildOfficeUiState(emptyList(), emptyMap(), HaConnectionStatus.Disconnected, emptyList())
+        val EMPTY = buildOfficeUiState(emptyList(), emptyMap(), HaConnectionStatus.Disconnected, emptyList(), emptyMap())
     }
 }
 
@@ -135,11 +145,13 @@ private fun buildOfficeUiState(
     states: Map<String, EntityState>,
     connection: HaConnectionStatus,
     powerHistory: List<HistoryPoint>,
+    expStateMap: Map<EntityMetadata, ExpEntityState>
 ): OfficeUiState {
     val uis = entities.toEntityUis(states)
+    val expUis = expStateMap.toEntityUis()
     return OfficeUiState(
         connection = connection,
-        lights = uis.filterIsInstance<EntityUi.Light>(),
+        lights = expUis.filterIsInstance<LightEntityUi>(),
         fans = uis.filterIsInstance<EntityUi.Fan>(),
         climate = uis.filterIsInstance<EntityUi.Climate>().withDewPointSubvalue(states),
         doors = uis.filterIsInstance<EntityUi.Door>(),

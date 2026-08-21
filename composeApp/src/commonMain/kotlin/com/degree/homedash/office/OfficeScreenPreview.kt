@@ -2,8 +2,10 @@ package com.degree.homedash.office
 
 import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
+import com.degree.homedash.controls.LightEntityUi
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.api.HaConnectionStatus
+import com.degree.homedash.shared.model.states.LightState
 import kotlin.math.sin
 
 // Shared sample data for the Office screen preview.
@@ -14,8 +16,8 @@ internal val previewHistory: List<HistoryPoint> =
 internal val previewOfficeUiState = OfficeUiState(
     connection = HaConnectionStatus.Connected,
     lights = listOf(
-        EntityUi.Light(LightMetadata("light.office", "Office"), isOn = true, offline = false),
-        EntityUi.Light(LightMetadata("light.small", "Small"), isOn = false, offline = false),
+        LightEntityUi(LightMetadata("light.office", "Office"), state = LightState(entityId = "light.office", isOn = true, isOffline = false)),
+        LightEntityUi(LightMetadata("light.small", "Small"), state = LightState(entityId = "light.small", isOn = false, isOffline = false)),
     ),
     fans = listOf(
         EntityUi.Fan(FanMetadata("fan.office", "Office Fan", FanMetadata.SpeedAdjustment(12)), isOn = true, offline = false, percentage = 75),
