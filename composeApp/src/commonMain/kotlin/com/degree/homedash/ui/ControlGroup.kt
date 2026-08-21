@@ -27,6 +27,7 @@ import com.degree.homedash.controls.ControlPreview
 import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.EntityControl
 import com.degree.homedash.controls.EntityUi
+import com.degree.homedash.controls.DeviceControl
 import com.degree.homedash.controls.DeviceUi
 import com.degree.homedash.controls.cardSpan
 import com.degree.homedash.controls.entityId
@@ -190,8 +191,8 @@ private fun ExpCardGrid(
         devices.forEach { entity ->
             slots.getOrPut(entity.id) {
                 movableContentOf { latest: DeviceUi ->
-                    EntityControl(
-                        expEntity = latest,
+                    DeviceControl(
+                        device = latest,
                         layout = ControlLayout.Card,
                         modifier = Modifier.fillMaxWidth().animateBounds(lookaheadScope),
                     )

@@ -1,7 +1,5 @@
 package com.degree.homedash.controls
 
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
-import org.koin.compose.koinInject
 import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.shared.model.entity.NavigationMetadata
 import androidx.compose.foundation.layout.Arrangement
@@ -219,35 +217,6 @@ fun EntityControl(
     }
 }
 
-
-/**
- * Central renderer: maps an [EntityUi] to the right control, in the requested [layout], routing user
- * interaction through [onAction]. Lights and fans have a [ControlLayout.Card] form (tap to toggle),
- * climate has a read-only card; every other type renders its row regardless of [layout]. [modifier]
- * applies to the card cell (grid weighting).
- */
-@Composable
-fun EntityControl(
-    expEntity: DeviceUi,
-    layout: ControlLayout,
-    modifier: Modifier = Modifier,
-) {
-    when (expEntity) {
-        is LightDeviceUi -> {
-            val repo: ExpHomeAssistantRepo = koinInject()
-            val icon: @Composable (Color) -> Unit = { tint ->
-                LightIcon(on = expEntity.isOn, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
-            }
-            val ui = ToggleUi(name = expEntity.name, isOn = expEntity.isOn, offline = expEntity.offline)
-            EntityToggleCard(
-                ui,
-                AppColors.LightOn,
-                { expEntity.onToggle(repo) },
-                icon,
-                modifier)
-        }
-    }
-}
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
 @Composable

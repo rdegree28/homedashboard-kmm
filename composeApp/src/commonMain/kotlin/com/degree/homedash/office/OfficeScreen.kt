@@ -92,7 +92,7 @@ fun OfficeContent(
     ) {
         ControlGroup(
             title = "Lights",
-            expEntities = ui.lights,
+            devices = ui.lights,
         )
 
         ControlGroup(
