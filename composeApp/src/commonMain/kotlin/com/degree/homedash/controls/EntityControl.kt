@@ -217,6 +217,35 @@ fun EntityControl(
     }
 }
 
+
+/**
+ * Central renderer: maps an [EntityUi] to the right control, in the requested [layout], routing user
+ * interaction through [onAction]. Lights and fans have a [ControlLayout.Card] form (tap to toggle),
+ * climate has a read-only card; every other type renders its row regardless of [layout]. [modifier]
+ * applies to the card cell (grid weighting).
+ */
+@Composable
+fun EntityControl(
+    expEntity: ExpEntityUi,
+    layout: ControlLayout,
+    modifier: Modifier = Modifier,
+) {
+    when (expEntity) {
+        is LightEntityUi -> {
+            val icon: @Composable (Color) -> Unit = { tint ->
+                LightIcon(on = expEntity.isOn, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
+            }
+            val ui = ToggleUi(name = expEntity.name, isOn = expEntity.isOn, offline = expEntity.offline)
+            EntityToggleCard(
+                ui,
+                AppColors.LightOn,
+                expEntity.onToggle,
+                icon,
+                modifier)
+        }
+    }
+}
+
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
 @Composable
 private fun EntityLightRowPreview() = ControlPreview {

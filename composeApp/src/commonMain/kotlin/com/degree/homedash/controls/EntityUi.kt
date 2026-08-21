@@ -2,6 +2,7 @@ package com.degree.homedash.controls
 
 import com.degree.homedash.shared.model.entity.*
 import androidx.compose.runtime.Immutable
+import com.degree.homedash.shared.model.states.LightState
 
 /**
  * Live render state for an entity, one variant per control type. Each variant nests its *typed*

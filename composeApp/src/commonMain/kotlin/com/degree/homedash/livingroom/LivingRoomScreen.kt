@@ -92,8 +92,7 @@ fun LivingRoomContent(
 
             ControlGroup(
                 title = "Lights",
-                entities = ui.lights,
-                useCardUis = true,
+                expEntities = ui.lights,
                 onAction = onAction,
             )
 
@@ -122,7 +121,7 @@ private fun LivingRoomScreenPreview() {
             LivingRoomContent(
                 ui = LivingRoomUiState(
                     triggers = listOf(previewTrigger("Main Lights")),
-                    lights = previewLights,
+                    lights = emptyList(),
                     fans = previewFans,
                     climate = previewClimate,
                 ),

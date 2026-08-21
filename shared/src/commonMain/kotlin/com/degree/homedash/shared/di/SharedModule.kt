@@ -8,8 +8,13 @@ import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.api.HaClient
 import com.degree.homedash.shared.api.HaWebSocketClient
+import com.degree.homedash.shared.api.HomeAssistantActionApi
 import com.degree.homedash.shared.api.HomeAssistantApi
+import com.degree.homedash.shared.api.HomeAssistantStateApi
+import com.degree.homedash.shared.api.WebSocketHomeAssistantActionApi
 import com.degree.homedash.shared.api.WebSocketHomeAssistantApi
+import com.degree.homedash.shared.api.WebSocketHomeAssistantStateApi
+import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import org.koin.dsl.module
 
 /**
@@ -19,7 +24,10 @@ import org.koin.dsl.module
 val sharedModule = module {
     single<HaClient> { HaWebSocketClient() }
     single<HomeAssistantApi> { WebSocketHomeAssistantApi(get()) }
+    single<HomeAssistantActionApi> { WebSocketHomeAssistantActionApi(get()) }
+    single<HomeAssistantStateApi> { WebSocketHomeAssistantStateApi(get()) }
     single { HomeAssistantRepo(get()) }
+    single { ExpHomeAssistantRepo(get(), get()) }
     single { EntityMetadataRepo(get(), get()) }
     single { ConfigStore() }
     // AuthRepo's constructor is internal (it wraps the private AuthDao), so build it via its factory.

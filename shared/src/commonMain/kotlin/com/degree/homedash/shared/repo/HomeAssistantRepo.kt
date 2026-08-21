@@ -3,7 +3,9 @@ package com.degree.homedash.shared.repo
 import com.degree.homedash.shared.api.HaConfig
 import com.degree.homedash.shared.api.HaConnectionStatus
 import com.degree.homedash.shared.api.HaWebSocketClient
+import com.degree.homedash.shared.api.HomeAssistantActionApi
 import com.degree.homedash.shared.api.HomeAssistantApi
+import com.degree.homedash.shared.api.WebSocketHomeAssistantActionApi
 import com.degree.homedash.shared.api.WebSocketHomeAssistantApi
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
