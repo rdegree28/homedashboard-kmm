@@ -110,19 +110,6 @@ class OfficeViewModel(
         viewModelScope.launch { repo.toggle(entityId) }
     }
 
-    fun setFanSpeed(entityId: String, percentage: Int) {
-        viewModelScope.launch { repo.setFanPercentage(entityId, percentage) }
-    }
-
-    fun setOscillating(entityId: String, oscillating: Boolean) {
-        viewModelScope.launch { repo.setFanOscillating(entityId, oscillating) }
-    }
-
-    /** [entityId] is the mister's own humidifier entity, not the fan's. */
-    fun setMisting(entityId: String, misting: Boolean) {
-        viewModelScope.launch { repo.setMisting(entityId, misting) }
-    }
-
     fun signal(mode: SignalMode) {
         viewModelScope.launch {
             when (mode) {

@@ -43,9 +43,6 @@ fun OfficeScreen(
         onBack = onBack,
         onOpenSettings = onOpenSettings,
         onToggle = vm::toggle,
-        onSetFanSpeed = vm::setFanSpeed,
-        onSetOscillating = vm::setOscillating,
-        onSetMisting = vm::setMisting,
         onSignal = vm::signal,
     )
 }
@@ -61,17 +58,11 @@ fun OfficeContent(
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
     onToggle: (String) -> Unit,
-    onSetFanSpeed: (String, Int) -> Unit,
-    onSetOscillating: (String, Boolean) -> Unit,
-    onSetMisting: (String, Boolean) -> Unit,
     onSignal: (SignalMode) -> Unit,
 ) {
     val onAction: (EntityAction) -> Unit = { action ->
         when (action) {
             is EntityAction.Toggle -> onToggle(action.entityId)
-            is EntityAction.SetSpeed -> onSetFanSpeed(action.entityId, action.percentage)
-            is EntityAction.SetOscillating -> onSetOscillating(action.entityId, action.oscillating)
-            is EntityAction.SetMisting -> onSetMisting(action.entityId, action.misting)
             // The office heater has no metadata entry yet, so no thermostat reaches this screen.
             is EntityAction.SetTargetTemperature -> Unit
             is EntityAction.SetHvacMode -> Unit
@@ -81,6 +72,7 @@ fun OfficeContent(
             is EntityAction.OpenGraph -> Unit // Office has no graph navigation
             is EntityAction.Activate -> Unit // no scene cards on this screen yet
             is EntityAction.Navigate -> Unit // launcher-only
+            else -> throw IllegalStateException("No longer using onAction")
         }
     }
 
@@ -187,9 +179,6 @@ private fun OfficeScreenPreview() = PreviewKoin {
                 onBack = {},
                 onOpenSettings = {},
                 onToggle = {},
-                onSetFanSpeed = { _, _ -> },
-                onSetOscillating = { _, _ -> },
-                onSetMisting = { _, _ -> },
                 onSignal = {},
             )
         }
