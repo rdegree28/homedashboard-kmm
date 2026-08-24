@@ -1,5 +1,6 @@
 package com.degree.homedash.shared.api
 
+import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.states.ExpEntityState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.JsonObject
@@ -12,8 +13,14 @@ import kotlinx.serialization.json.JsonObject
  */
 internal interface ExpHomeAssistantApi {
 
-    /** Live map of entity id → typed [ExpEntityState], re-derived as Home Assistant pushes changes. */
-    fun loadAllStates(): Flow<Map<String, ExpEntityState>>
+    /**
+     * Live device states, re-derived as Home Assistant pushes changes.
+     *
+     * Carries the raw snapshot alongside the typed one so a single push stays a single emission —
+     * [ExpEntityState.withCompanions] needs raw entities to resolve companions, and a second flow for
+     * them would double every update.
+     */
+    fun loadAllStates(): Flow<ExpStateSnapshot>
 
     /**
      * Calls the entity's toggle service on HA.
@@ -36,3 +43,9 @@ internal interface ExpHomeAssistantApi {
         serviceData: JsonObject? = null,
     )
 }
+
+/** Typed device states plus the raw Home Assistant snapshot they were derived from. */
+internal data class ExpStateSnapshot(
+    val devices: Map<String, ExpEntityState>,
+    val entities: Map<String, EntityState>,
+)

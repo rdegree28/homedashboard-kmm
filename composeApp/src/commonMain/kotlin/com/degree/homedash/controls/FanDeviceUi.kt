@@ -31,7 +31,7 @@ data class FanDeviceUi(
     val isOscillating: Boolean = state.isOscillating
     /** Whether the fan can mist at all — drives whether the toggle is offered. */
     val hasMisting: Boolean = metadata.misting != null
-    val isMisting: Boolean = false
+    val isMisting: Boolean = state.isMisting
 
     fun onToggle(repo: ExpHomeAssistantRepo) = metadata.onToggle(repo)
 

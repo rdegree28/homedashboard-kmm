@@ -26,11 +26,14 @@ internal class WebSocketExpHomeAssistantApi(
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) : ExpHomeAssistantApi {
 
-    override fun loadAllStates(): Flow<Map<String, ExpEntityState>> =
+    override fun loadAllStates(): Flow<ExpStateSnapshot> =
         client.states.map { states ->
-            states.values.mapNotNull { state ->
-                state.toExpEntityState()?.let { state.entityId to it }
-            }.toMap()
+            ExpStateSnapshot(
+                devices = states.values.mapNotNull { state ->
+                    state.toExpEntityState()?.let { state.entityId to it }
+                }.toMap(),
+                entities = states,
+            )
         }
 
     override fun toggleEntity(entityId: String) {
@@ -72,8 +75,9 @@ internal class WebSocketExpHomeAssistantApi(
             isOffline = isUnavailable,
             percentage = attrDouble("percentage")?.roundToInt() ?: 0,
             isOscillating = attrBoolean("oscillating") == true,
-            // Read off the mister's own entity, not the fan's.
-//            isMisting = misting?.let { allStates[it.entityId]?.isOn == true } == true,
+            // Always false here: the mister is a separate entity, and this mapping sees one entity at
+            // a time with no metadata to say which one. FanState.withCompanions fills it in once the
+            // roster is in hand.
             isMisting = false,
         )
 

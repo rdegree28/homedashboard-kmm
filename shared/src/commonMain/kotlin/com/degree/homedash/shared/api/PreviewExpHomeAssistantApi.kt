@@ -7,7 +7,7 @@ import kotlinx.serialization.json.JsonObject
 
 /** Backs [ExpHomeAssistantRepo.preview]; every call is a no-op. */
 internal object PreviewExpHomeAssistantApi : ExpHomeAssistantApi {
-    override fun loadAllStates(): Flow<Map<String, ExpEntityState>> = emptyFlow()
+    override fun loadAllStates(): Flow<ExpStateSnapshot> = emptyFlow()
 
     override fun toggleEntity(entityId: String) = Unit
     override fun callService(

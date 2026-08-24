@@ -35,9 +35,11 @@ class ExpHomeAssistantRepo internal constructor(
      *   `distinctUntilChanged` downstream, as `LivingRoomViewModel` does.
      */
     fun loadEntityStatesForMetadata(metadataList: List<EntityMetadata>): Flow<Map<EntityMetadata, ExpEntityState>> {
-        return api.loadAllStates().map { stateMap ->
+        return api.loadAllStates().map { snapshot ->
             metadataList.mapNotNull { meta ->
-                stateMap[meta.entityId]?.let { state -> meta to state }
+                snapshot.devices[meta.entityId]?.let { state ->
+                    meta to state.withCompanions(meta, snapshot.entities)
+                }
             }.toMap()
         }
     }
@@ -65,13 +67,16 @@ class ExpHomeAssistantRepo internal constructor(
     /**
      * Turn a fan's mister on or off.
      *
-     * [entityId] is the mister's own `humidifier.*` entity, not the fan's — Home Assistant models the
-     * two separately (see `FanMetadata.MistingControl`).
+     * Targets the mister's own `humidifier.*` entity, not the fan's — Home Assistant models the two
+     * separately (see [FanMetadata.MistingControl]). No-ops for a fan that has no mister.
      */
     internal fun setMisting(
         metadata: FanMetadata,
         misting: Boolean,
-    ) = api.callService(metadata.entityId.substringBefore('.'), if (misting) "turn_on" else "turn_off", metadata.entityId)
+    ) {
+        val misterId = metadata.misting?.entityId ?: return
+        api.callService(misterId.substringBefore('.'), if (misting) "turn_on" else "turn_off", misterId)
+    }
 
     /** Turn a fan's oscillation on or off. The value arrives back via the `oscillating` attribute. */
     internal fun setFanOscillating(
