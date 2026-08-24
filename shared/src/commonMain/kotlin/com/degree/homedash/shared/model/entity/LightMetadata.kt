@@ -8,7 +8,4 @@ import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 data class LightMetadata(
     override val entityId: String,
     override val displayName: String,
-) : ToggleableEntityMetadata {
-
-    override fun onToggle(repo: ExpHomeAssistantRepo) = repo.toggleEntity(this)
-}
+) : ToggleableEntityMetadata, EntityMetadata

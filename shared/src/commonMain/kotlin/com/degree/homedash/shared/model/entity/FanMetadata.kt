@@ -1,5 +1,7 @@
 package com.degree.homedash.shared.model.entity
 
+import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+
 /**
  * A fan.
  *
@@ -12,7 +14,7 @@ data class FanMetadata(
     val speedAdjustment: SpeedAdjustment? = null,
     val hasOscillationFeature: Boolean = false,
     val misting: MistingControl? = null,
-) : EntityMetadata {
+) : ToggleableEntityMetadata, EntityMetadata {
 
     /**
      * A fan's built-in mister, or null when it has none.
@@ -41,6 +43,18 @@ data class FanMetadata(
             fun forLevelCount(levelCount: Int): SpeedAdjustment? =
                 if (levelCount >= 2) SpeedAdjustment(levelCount) else null
         }
+    }
+
+    fun setFanSpeed(newFanPercentage: Int, repo: ExpHomeAssistantRepo) {
+        repo.setFanPercentage(metadata = this, percentage = newFanPercentage)
+    }
+
+    fun setOscillationState(newOscillationState: Boolean, repo: ExpHomeAssistantRepo) {
+        repo.setFanOscillating(metadata = this, oscillating = newOscillationState)
+    }
+
+    fun setMistingState(newMistingState: Boolean, repo: ExpHomeAssistantRepo) {
+        repo.setMisting(metadata = this, misting = newMistingState)
     }
 
     // Defined for factories

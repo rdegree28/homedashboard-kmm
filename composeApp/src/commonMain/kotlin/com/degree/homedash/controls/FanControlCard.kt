@@ -160,6 +160,125 @@ internal fun FanControlCard(
     }
 }
 
+@Composable
+internal fun FanControlCard(
+    ui: FanDeviceUi,
+    onSetSpeed: (Int) -> Unit,
+    onSetOscillating: (Boolean) -> Unit,
+    onSetMisting: (Boolean) -> Unit,
+    onToggle: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val fanIcon: @Composable (tint: Color) -> Unit = { tint ->
+        FanIcon(
+            spinning = ui.isOn,
+            durationMs = fanSpinDurationMs(
+                percentage = ui.percentage,
+                levelCount = ui.levelCount,
+                hasSpeedControl = ui.levelCount >= 2,
+            ),
+            tint = tint,
+            modifier = Modifier.size(Dimens.RowIconSize),
+        )
+    }
+
+    if (!(ui.isOn && ui.levelCount >= 2)) {
+        EntityToggleCard(
+            ui = ToggleUi(ui.name, ui.isOn, ui.offline),
+            onTint = AppColors.FanBlue,
+            onToggle = onToggle,
+            iconContent = fanIcon,
+            modifier = modifier,
+        )
+    } else {
+        val isTwoHigh = remember(ui.hasOscillation, ui.hasMisting) { ui.hasOscillation || ui.hasMisting }
+        val height = if (isTwoHigh) Dimens.TwoRowEntityCardHeight else Dimens.EntityCardHeight
+
+        HomeDashboardCard(
+            onClick = onToggle,
+            enabled = true,
+            height = height,
+            modifier = modifier,
+        ) {
+            if (isTwoHigh) {
+                Column(
+                    modifier = Modifier.fillMaxSize().clickable(onClick = onToggle),
+                    verticalArrangement = Arrangement.SpaceAround
+                ) {
+                    Row(
+                        modifier = Modifier,
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        fanIcon(if (ui.isMisting) AppColors.FanMisting else AppColors.FanBlue)
+                        Text(
+                            text = ui.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            maxLines = 2,
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            if (ui.hasOscillation) {
+                                FanControlButton(
+                                    text = "Oscillate",
+                                    icon = Icons.Filled.SwapHoriz,
+                                    onToggle = { onSetOscillating(!ui.isOscillating) },
+                                    isOn = ui.isOscillating,
+                                    modifier = Modifier
+                                )
+                            }
+                            if (ui.hasMisting) {
+                                FanControlButton(
+                                    text = "Mist",
+                                    icon = Icons.Filled.WaterDrop,
+                                    color = AppColors.FanMisting,
+                                    onToggle = { onSetMisting(!ui.isMisting) },
+                                    isOn = ui.isMisting,
+                                    modifier = Modifier
+                                )
+                            }
+                        }
+                    }
+
+                    FanSpeedSlider(
+                        percentage = ui.percentage,
+                        levelCount = ui.levelCount,
+                        onSet = onSetSpeed,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .clickable(onClick = onToggle),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        fanIcon(AppColors.FanBlue)
+                        Text(
+                            text = ui.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            maxLines = 2,
+                        )
+                    }
+                    FanSpeedSlider(
+                        percentage = ui.percentage,
+                        levelCount = ui.levelCount,
+                        onSet = onSetSpeed,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F, widthDp = 380)
 @Composable
 private fun FanControlCardPreview() = ControlPreview {

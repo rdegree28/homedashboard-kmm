@@ -98,9 +98,7 @@ fun OfficeContent(
 
         ControlGroup(
             title = "Fans",
-            entities = ui.fans,
-            useCardUis = true,
-            onAction = onAction,
+            devices = ui.fans,
         )
 
         ControlGroup("Status") {

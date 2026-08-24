@@ -2,8 +2,10 @@ package com.degree.homedash.controls
 
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.entity.EntityMetadata
+import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.LightMetadata
 import com.degree.homedash.shared.model.states.ExpEntityState
+import com.degree.homedash.shared.model.states.FanState
 import com.degree.homedash.shared.model.states.LightState
 
 /**
@@ -21,10 +23,16 @@ fun EntityMetadata.toUi(
     state: ExpEntityState,
 ): DeviceUi = when (this) {
     is LightMetadata -> {
-        state as LightState
         LightDeviceUi(
             metadata = this,
-            state = state,
+            state = state as LightState,
+        )
+    }
+
+    is FanMetadata -> {
+        FanDeviceUi(
+            metadata = this,
+            state = state as FanState,
         )
     }
 

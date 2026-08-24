@@ -12,11 +12,13 @@ import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
  * Sealed so [EntityMetadata]'s hierarchy stays closed — an open sub-interface would force every
  * exhaustive `when` over metadata to grow a branch for it.
  */
-sealed interface ToggleableEntityMetadata : EntityMetadata {
+sealed interface ToggleableEntityMetadata {
+
+    val entityId: String
 
     /**
      * Flips the entity through [repo]. Fire-and-forget: HA reports the result by pushing a new state,
      * so there is nothing to await and nothing to hand back.
      */
-    fun onToggle(repo: ExpHomeAssistantRepo)
+    fun onToggle(repo: ExpHomeAssistantRepo) = repo.toggleEntity(this)
 }

@@ -1,7 +1,7 @@
 package com.degree.homedash.controls
 
 import androidx.compose.runtime.Immutable
-import com.degree.homedash.shared.model.entity.ToggleableEntityMetadata
+import com.degree.homedash.shared.model.entity.LightMetadata
 import com.degree.homedash.shared.model.states.LightState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 
@@ -14,7 +14,7 @@ import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
  */
 @Immutable
 data class LightDeviceUi(
-    private val metadata: ToggleableEntityMetadata,
+    private val metadata: LightMetadata,
     private val state: LightState,
 ) : DeviceUi {
 

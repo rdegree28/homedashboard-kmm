@@ -2,9 +2,11 @@ package com.degree.homedash.office
 
 import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
+import com.degree.homedash.controls.FanDeviceUi
 import com.degree.homedash.controls.LightDeviceUi
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.api.HaConnectionStatus
+import com.degree.homedash.shared.model.states.FanState
 import com.degree.homedash.shared.model.states.LightState
 import kotlin.math.sin
 
@@ -20,9 +22,15 @@ internal val previewOfficeUiState = OfficeUiState(
         LightDeviceUi(LightMetadata("light.small", "Small"), state = LightState(entityId = "light.small", isOn = false, isOffline = false)),
     ),
     fans = listOf(
-        EntityUi.Fan(FanMetadata("fan.office", "Office Fan", FanMetadata.SpeedAdjustment(12)), isOn = true, offline = false, percentage = 75),
-        EntityUi.Fan(FanMetadata("fan.box", "Box Fan"), isOn = false, offline = false, percentage = 0),
-        EntityUi.Fan(FanMetadata("fan.misting", "Misting Fan"), isOn = false, offline = false, percentage = 0),
+        FanDeviceUi(FanMetadata("fan.office", "Office Fan", FanMetadata.SpeedAdjustment(12)),
+            FanState("fan.office", true, false, percentage = 8, isOscillating = true, isMisting = false)
+        ),
+        FanDeviceUi(FanMetadata("fan.box", "Box Fan"),
+            FanState("fan.box", true, false, percentage = 1, isOscillating = false, isMisting = false)
+        ),
+        FanDeviceUi(FanMetadata("fan.misting", "Misting Fan"),
+            FanState("fan.misting", true, false, percentage = 1, isOscillating = false, isMisting = true)
+        ),
     ),
     climate = listOf(
         EntityUi.Climate(ClimateMetadata("sensor.temp", "Temperature", ClimateMetadata.ClimateKind.Temperature), "75.6 °F"),

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
+import com.degree.homedash.controls.FanDeviceUi
 import com.degree.homedash.controls.LightDeviceUi
 import com.degree.homedash.controls.toDeviceUis
 import com.degree.homedash.controls.toEntityUis
@@ -55,7 +56,7 @@ data class DoorUi(val label: String, val statusText: String, val open: Boolean, 
 data class OfficeUiState(
     val connection: HaConnectionStatus,
     val lights: List<LightDeviceUi>,
-    val fans: List<EntityUi.Fan>,
+    val fans: List<FanDeviceUi>,
     val climate: List<EntityUi.Climate>,
     val doors: List<EntityUi.Door>,
     val activeSignal: String?,
@@ -152,7 +153,7 @@ private fun buildOfficeUiState(
     return OfficeUiState(
         connection = connection,
         lights = expUis.filterIsInstance<LightDeviceUi>(),
-        fans = uis.filterIsInstance<EntityUi.Fan>(),
+        fans = expUis.filterIsInstance<FanDeviceUi>(),
         climate = uis.filterIsInstance<EntityUi.Climate>().withDewPointSubvalue(states),
         doors = uis.filterIsInstance<EntityUi.Door>(),
         activeSignal = states[OfficeEntities.SIGNAL_MODE]?.state,

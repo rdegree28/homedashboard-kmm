@@ -5,7 +5,7 @@ package com.degree.homedash.shared.model.states
  * off [com.degree.homedash.shared.model.entity.ToggleableEntityMetadata], since flipping an entity
  * needs its identity rather than its current value.
  */
-interface ToggleableEntityState : ExpEntityState {
+interface ToggleableEntityState {
 
     /** Whether the entity is currently "on". */
     val isOn: Boolean

@@ -2,6 +2,7 @@ package com.degree.homedash.shared.api
 
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.states.ExpEntityState
+import com.degree.homedash.shared.model.states.FanState
 import com.degree.homedash.shared.model.states.LightState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -9,6 +10,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonObject
+import kotlin.math.roundToInt
 
 /**
  * [ExpHomeAssistantApi] over the live WebSocket connection.
@@ -40,12 +43,38 @@ internal class WebSocketExpHomeAssistantApi(
         }
     }
 
+    /**
+     * Invoke the Home Assistant service `domain.service`, optionally targeting [entityId] and passing
+     * [serviceData]. Fire-and-forget: any effect surfaces later via the [states] flow. Silently
+     * dropped while disconnected.
+     */
+    override fun callService(
+        domain: String,
+        service: String,
+        entityId: String?,
+        serviceData: JsonObject?,
+    ) {
+        scope.launch {
+            client.callService(domain, service, entityId, serviceData)
+        }
+    }
+
     /** Null while a domain has no [ExpEntityState] type yet — those entities are simply omitted. */
     private fun EntityState.toExpEntityState(): ExpEntityState? = when (domain) {
         "light" -> LightState(
             entityId = entityId,
             isOn = isOn,
             isOffline = isUnavailable,
+        )
+        "fan" -> FanState(
+            entityId = entityId,
+            isOn = isOn,
+            isOffline = isUnavailable,
+            percentage = attrDouble("percentage")?.roundToInt() ?: 0,
+            isOscillating = attrBoolean("oscillating") == true,
+            // Read off the mister's own entity, not the fan's.
+//            isMisting = misting?.let { allStates[it.entityId]?.isOn == true } == true,
+            isMisting = false,
         )
 
         else -> null

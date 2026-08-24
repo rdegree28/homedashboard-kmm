@@ -2,6 +2,7 @@ package com.degree.homedash.shared.api
 
 import com.degree.homedash.shared.model.states.ExpEntityState
 import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.json.JsonObject
 
 /**
  * The experimental stack's Home Assistant surface: live typed states in, entity actions out.
@@ -22,4 +23,16 @@ internal interface ExpHomeAssistantApi {
      * alive when the composable that triggered it leaves the screen.
      */
     fun toggleEntity(entityId: String)
+
+    /**
+     * Invoke the Home Assistant service `domain.service`, optionally targeting [entityId] and passing
+     * [serviceData]. Fire-and-forget: any effect surfaces later via the [states] flow. Silently
+     * dropped while disconnected.
+     */
+    fun callService(
+        domain: String,
+        service: String,
+        entityId: String?,
+        serviceData: JsonObject? = null,
+    )
 }

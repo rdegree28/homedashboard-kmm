@@ -24,9 +24,10 @@ fun DeviceControl(
     layout: ControlLayout,
     modifier: Modifier = Modifier,
 ) {
+    val repo: ExpHomeAssistantRepo = koinInject()
+
     when (device) {
         is LightDeviceUi -> {
-            val repo: ExpHomeAssistantRepo = koinInject()
             val icon: @Composable (Color) -> Unit = { tint ->
                 LightIcon(on = device.isOn, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
             }
@@ -37,6 +38,17 @@ fun DeviceControl(
                 { device.onToggle(repo) },
                 icon,
                 modifier,
+            )
+        }
+
+        is FanDeviceUi -> {
+            FanControlCard(
+                ui = device,
+                onSetSpeed = { device.setFanSpeed(it, repo) },
+                onSetOscillating = { device.toggleOscillation(repo) },
+                onSetMisting = { device.toggleMisting(repo) },
+                onToggle = { device.onToggle(repo) },
+                modifier = modifier,
             )
         }
     }

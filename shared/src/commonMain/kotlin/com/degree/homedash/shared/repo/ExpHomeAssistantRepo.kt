@@ -3,10 +3,13 @@ package com.degree.homedash.shared.repo
 import com.degree.homedash.shared.api.ExpHomeAssistantApi
 import com.degree.homedash.shared.api.PreviewExpHomeAssistantApi
 import com.degree.homedash.shared.model.entity.EntityMetadata
+import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.ToggleableEntityMetadata
 import com.degree.homedash.shared.model.states.ExpEntityState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 
 /**
  * Public face of the experimental stack — the exp counterpart to [HomeAssistantRepo], wired as a Koin
@@ -49,9 +52,32 @@ class ExpHomeAssistantRepo internal constructor(
      *
      * Fire-and-forget: HA answers a service call by pushing a new state, so there is nothing to await.
      */
-    fun toggleEntity(entity: ToggleableEntityMetadata) {
+    internal fun toggleEntity(entity: ToggleableEntityMetadata) {
         api.toggleEntity(entityId = entity.entityId)
     }
+
+    /** Set a fan's speed (0–100%). The value arrives back via the entity's `percentage` attribute. */
+    internal fun setFanPercentage(
+        metadata: FanMetadata,
+        percentage: Int,
+    ) = api.callService("fan", "set_percentage", metadata.entityId, buildJsonObject { put("percentage", percentage) })
+
+    /**
+     * Turn a fan's mister on or off.
+     *
+     * [entityId] is the mister's own `humidifier.*` entity, not the fan's — Home Assistant models the
+     * two separately (see `FanMetadata.MistingControl`).
+     */
+    internal fun setMisting(
+        metadata: FanMetadata,
+        misting: Boolean,
+    ) = api.callService(metadata.entityId.substringBefore('.'), if (misting) "turn_on" else "turn_off", metadata.entityId)
+
+    /** Turn a fan's oscillation on or off. The value arrives back via the `oscillating` attribute. */
+    internal fun setFanOscillating(
+        metadata: FanMetadata,
+        oscillating: Boolean,
+    ) = api.callService("fan", "oscillate", metadata.entityId, buildJsonObject { put("oscillating", oscillating) })
 
     companion object {
 
