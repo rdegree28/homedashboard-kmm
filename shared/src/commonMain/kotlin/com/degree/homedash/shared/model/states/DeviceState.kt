@@ -1,14 +1,18 @@
 package com.degree.homedash.shared.model.states
 
 import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.shared.model.entity.EntityMetadata
+import com.degree.homedash.shared.model.entity.DeviceMetadata
 
 /**
- * Experimental new entity state.
+ * The live state of a device — what it is doing right now, as opposed to [DeviceMetadata]'s static
+ * description of it.
+ *
+ * One implementation per device type ([LightState], [FanState], …), each built from the raw
+ * [EntityState]s Home Assistant reports.
  */
-interface ExpEntityState {
+interface DeviceState {
 
-    // Entity ID
+    /** Id of the Home Assistant entity this device's state is read from. */
     val entityId: String
 
     val isOffline: Boolean
@@ -26,7 +30,7 @@ interface ExpEntityState {
      * Most states have no companions, so the default returns this unchanged.
      */
     fun withCompanions(
-        metadata: EntityMetadata,
+        metadata: DeviceMetadata,
         allStates: Map<String, EntityState>,
-    ): ExpEntityState = this
+    ): DeviceState = this
 }

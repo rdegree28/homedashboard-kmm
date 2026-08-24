@@ -11,10 +11,10 @@ package com.degree.homedash.shared.model.entity
  * ViewModel executes it through `HomeAssistantRepo`, keeping this package free of any dependency on
  * the transport layer. Build the common ones with the factories in TriggerEntityMetadataFactory.kt.
  */
-abstract class TriggerEntityMetadata(
+abstract class TriggerDeviceMetadata(
     override val entityId: String,
     override val displayName: String,
-) : EntityMetadata {
+) : DeviceMetadata {
 
     /** The service call this card fires when pressed. */
     abstract fun action(): ServiceCall

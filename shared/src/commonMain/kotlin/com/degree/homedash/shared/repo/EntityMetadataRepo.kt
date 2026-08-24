@@ -5,7 +5,7 @@ import com.degree.homedash.shared.dao.FeatureFlagDao
 import com.degree.homedash.shared.model.FeatureFlag
 import com.degree.homedash.shared.model.entity.ClimateMetadata
 import com.degree.homedash.shared.model.entity.DoorMetadata
-import com.degree.homedash.shared.model.entity.EntityMetadata
+import com.degree.homedash.shared.model.entity.DeviceMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.LightMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata
@@ -14,7 +14,7 @@ import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarg
 import com.degree.homedash.shared.model.entity.NavigationMetadata.RoomIcon
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
 import com.degree.homedash.shared.model.entity.ThermostatMetadata
-import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
+import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
 import com.degree.homedash.shared.model.entity.WaterLevelMetadata
 import com.degree.homedash.shared.model.entity.bedroomLightsFull
 import com.degree.homedash.shared.model.entity.bedroomLightsLow
@@ -23,10 +23,9 @@ import com.degree.homedash.shared.model.entity.dellaTowerFan
 import com.degree.homedash.shared.model.entity.livingRoomThermostat
 import com.degree.homedash.shared.model.entity.mainLights
 import com.degree.homedash.shared.model.entity.movieLights
-import com.degree.homedash.shared.model.entity.testCard
 
 /**
- * Repository for providing EntityMetadata to the UI components.
+ * Repository for providing DeviceMetadata to the UI components.
  *
  * Each method declares one screen's roster: which entities it shows, in render order, with the label
  * for each. Entity ids are spelled out here rather than pulled from the `*Entities` objects in the
@@ -48,7 +47,7 @@ class EntityMetadataRepo(
      * These carry no Home Assistant entity — see [NavigationMetadata]. The list is resolved per call
      * against whoever is signed in at that moment.
      */
-    fun loadHomeScreenMetadataList(): List<EntityMetadata> {
+    fun loadHomeScreenMetadataList(): List<DeviceMetadata> {
         val flags = currentUserFlags()
         return HOME_SCREEN_CARDS.filter { card ->
             gatingFlag(card.destination)?.let { it in flags } ?: true
@@ -65,7 +64,7 @@ class EntityMetadataRepo(
      * Its own method rather than an entry in [loadHomeScreenMetadataList], which is navigation cards
      * only — those carry no Home Assistant entity and are projected against an empty state map.
      */
-    fun loadHomeThermostatMetadataList(): List<EntityMetadata> = listOf(
+    fun loadHomeThermostatMetadataList(): List<DeviceMetadata> = listOf(
         ThermostatMetadata.livingRoomThermostat("climate.living_room_thermostat", "Thermostat"),
     )
 
@@ -76,11 +75,11 @@ class EntityMetadataRepo(
     /**
      * The Office lights, fans, climate sensors, and door.
      *
-     * Deliberately excludes the rest of the Office dashboard, none of which has an [EntityMetadata]
+     * Deliberately excludes the rest of the Office dashboard, none of which has an [DeviceMetadata]
      * type yet: the workstation switch, the hexagon lights, the traffic signal and its three scripts,
      * the signal-mode sensor, and the power/energy sensors.
      */
-    fun loadOfficeEntityMetadataList(): List<EntityMetadata> = listOf(
+    fun loadOfficeEntityMetadataList(): List<DeviceMetadata> = listOf(
         LightMetadata("light.office_light", "Office"),
         LightMetadata("light.office_small_light", "Small"),
         FanMetadata.dellaTowerFan("fan.office_fan_office_fan", "Office Fan"),
@@ -105,9 +104,9 @@ class EntityMetadataRepo(
      * cards below stay: they are the thermostat's own readings, but what they measure really is this
      * room.
      */
-    fun loadLivingRoomEntityMetadataList(): List<EntityMetadata> = listOf(
-        TriggerEntityMetadata.mainLights(),
-        TriggerEntityMetadata.movieLights(),
+    fun loadLivingRoomEntityMetadataList(): List<DeviceMetadata> = listOf(
+        TriggerDeviceMetadata.mainLights(),
+        TriggerDeviceMetadata.movieLights(),
         LightMetadata("light.living_room_light_west", "West"),
         LightMetadata("light.living_room_light_east", "East"),
         LightMetadata("light.dining_ceiling_light", "Dining Ceiling"),
@@ -127,10 +126,10 @@ class EntityMetadataRepo(
      * Empty for now — the room's card and screen exist, but nothing in Home Assistant is wired up to
      * it yet. Add entries here and `BedroomScreen` can project them the way the other rooms do.
      */
-    fun loadBedroomEntityMetadataList(): List<EntityMetadata> = listOf(
-        TriggerEntityMetadata.bedroomLightsFull(),
-        TriggerEntityMetadata.bedroomLightsLow(),
-        TriggerEntityMetadata.bedroomLightsNight(),
+    fun loadBedroomEntityMetadataList(): List<DeviceMetadata> = listOf(
+        TriggerDeviceMetadata.bedroomLightsFull(),
+        TriggerDeviceMetadata.bedroomLightsLow(),
+        TriggerDeviceMetadata.bedroomLightsNight(),
         LightMetadata("light.bedroom_light_west", "West"),
         LightMetadata("light.bedroom_light_east", "East"),
         FanMetadata("fan.bedroom_box_fan", "Box Fan"),
@@ -138,7 +137,7 @@ class EntityMetadataRepo(
     )
 
     /** The Pets sensors — currently just the cat water fountain: its water level and its filter. */
-    fun loadPetsEntityMetadataList(): List<EntityMetadata> = listOf(
+    fun loadPetsEntityMetadataList(): List<DeviceMetadata> = listOf(
         WaterLevelMetadata(
             "sensor.cat_water_fountain_remaining_water_pct",
             "Remaining Water",
@@ -158,7 +157,7 @@ class EntityMetadataRepo(
      * `PlantsViewModel` still does the live scan, so a plant added in Home Assistant shows up there
      * without being listed here — but it won't appear in this roster until someone adds it.
      */
-    fun loadPlantsEntityMetadataList(): List<EntityMetadata> = listOf(
+    fun loadPlantsEntityMetadataList(): List<DeviceMetadata> = listOf(
         SoilMoistureMetadata("sensor.dotty_moisture_sensor_soil_moisture", "Dotty"),
         SoilMoistureMetadata("sensor.gray_pot_moisture_sensor_soil_moisture", "Gray Pot"),
         SoilMoistureMetadata("sensor.louie_moisture_sensor_soil_moisture", "Louie"),

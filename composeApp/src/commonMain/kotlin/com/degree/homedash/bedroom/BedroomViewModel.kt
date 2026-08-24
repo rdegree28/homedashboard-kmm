@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.toEntityUis
-import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
+import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.SharingStarted
@@ -64,7 +64,7 @@ class BedroomViewModel(
     }
 
     /** Fires a trigger card's service call — running a script, activating a scene. */
-    fun activate(call: TriggerEntityMetadata.ServiceCall) {
+    fun activate(call: TriggerDeviceMetadata.ServiceCall) {
         viewModelScope.launch { repo.callService(call.domain, call.service, call.entityId) }
     }
 

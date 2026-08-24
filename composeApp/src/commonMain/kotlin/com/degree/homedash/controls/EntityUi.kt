@@ -2,17 +2,16 @@ package com.degree.homedash.controls
 
 import com.degree.homedash.shared.model.entity.*
 import androidx.compose.runtime.Immutable
-import com.degree.homedash.shared.model.states.LightState
 
 /**
  * Live render state for an entity, one variant per control type. Each variant nests its *typed*
- * [EntityMetadata] (so a light's state can't be paired with fan metadata) plus the values that change
+ * [DeviceMetadata] (so a light's state can't be paired with fan metadata) plus the values that change
  * with each state push — the label lives on the metadata, not here. Built by [toEntityUi] and
  * rendered by [EntityControl]; screens hand lists of these to `ControlGroup`.
  */
 @Immutable
 sealed interface EntityUi {
-    val metadata: EntityMetadata
+    val metadata: DeviceMetadata
 
     @Immutable
     data class Light(
@@ -104,7 +103,7 @@ sealed interface EntityUi {
     /** A scene/script trigger card. Like [Navigation], nothing about it changes at runtime. */
     @Immutable
     data class Trigger(
-        override val metadata: TriggerEntityMetadata,
+        override val metadata: TriggerDeviceMetadata,
     ) : EntityUi
 }
 

@@ -10,9 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.degree.homedash.controls.EntityAction
-import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.previewLight
-import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
+import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 import com.degree.homedash.ui.icons.RoomIcons
@@ -54,7 +53,7 @@ fun BedroomContent(
     onSetFanSpeed: (String, Int) -> Unit,
     onSetOscillating: (String, Boolean) -> Unit,
     onSetMisting: (String, Boolean) -> Unit,
-    onActivate: (TriggerEntityMetadata.ServiceCall) -> Unit,
+    onActivate: (TriggerDeviceMetadata.ServiceCall) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val onAction: (EntityAction) -> Unit = { action ->

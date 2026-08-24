@@ -14,7 +14,7 @@ data class FanMetadata(
     val speedAdjustment: SpeedAdjustment? = null,
     val hasOscillationFeature: Boolean = false,
     val misting: MistingControl? = null,
-) : ToggleableEntityMetadata, EntityMetadata {
+) : ToggleableDeviceMetadata, DeviceMetadata {
 
     /**
      * A fan's built-in mister, or null when it has none.

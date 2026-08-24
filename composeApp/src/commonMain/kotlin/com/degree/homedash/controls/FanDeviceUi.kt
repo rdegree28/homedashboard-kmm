@@ -6,11 +6,11 @@ import com.degree.homedash.shared.model.states.FanState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 
 /**
- * Render state for a light card: the static descriptor plus the live state, both plain values.
+ * Render state for a fan card: the static descriptor plus the live state, both plain values.
  *
- * The toggle is the metadata's, since flipping a light needs its identity rather than its current
- * value; the repo to run it through is handed to [onToggle] at the call site rather than held, so
- * nothing about the card's identity depends on a DI object.
+ * The actions are the metadata's, since driving a fan needs its identity rather than its current
+ * value; the repo to run them through is handed in at the call site rather than held, so nothing
+ * about the card's identity depends on a DI object.
  */
 @Immutable
 data class FanDeviceUi(

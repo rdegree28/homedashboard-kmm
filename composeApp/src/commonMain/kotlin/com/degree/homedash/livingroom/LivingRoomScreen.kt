@@ -10,7 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.previewTrigger
-import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
+import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
 import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
@@ -50,7 +50,7 @@ fun LivingRoomContent(
     onSetFanSpeed: (String, Int) -> Unit,
     onSetOscillating: (String, Boolean) -> Unit,
     onSetMisting: (String, Boolean) -> Unit,
-    onActivate: (TriggerEntityMetadata.ServiceCall) -> Unit,
+    onActivate: (TriggerDeviceMetadata.ServiceCall) -> Unit,
     showLights: Boolean = false,
 ) {
     val onAction: (EntityAction) -> Unit = { action ->

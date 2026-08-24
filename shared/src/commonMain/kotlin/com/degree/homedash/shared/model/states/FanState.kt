@@ -1,7 +1,7 @@
 package com.degree.homedash.shared.model.states
 
 import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.shared.model.entity.EntityMetadata
+import com.degree.homedash.shared.model.entity.DeviceMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
 
 data class FanState(
@@ -11,13 +11,13 @@ data class FanState(
     val percentage: Int,
     val isOscillating: Boolean,
     val isMisting: Boolean,
-) : ToggleableEntityState, ExpEntityState {
+) : ToggleableDeviceState, DeviceState {
 
     /** Reads the mister's own `humidifier.*` entity, which the fan's state knows nothing about. */
     override fun withCompanions(
-        metadata: EntityMetadata,
+        metadata: DeviceMetadata,
         allStates: Map<String, EntityState>,
-    ): ExpEntityState =
+    ): DeviceState =
         if (metadata !is FanMetadata) this
         else copy(isMisting = metadata.misting?.let { allStates[it.entityId]?.isOn } == true)
 }

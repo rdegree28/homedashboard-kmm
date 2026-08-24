@@ -146,7 +146,7 @@ private fun defaultTintFor(target: NavigationMetadata.NavigationTarget) = when (
 }
 
 internal fun previewTrigger(label: String) = EntityUi.Trigger(
-    object : TriggerEntityMetadata("trigger.${label.lowercase().replace(' ', '_')}", label) {
+    object : TriggerDeviceMetadata("trigger.${label.lowercase().replace(' ', '_')}", label) {
         override fun action() = ServiceCall.turnOn("scene.${label.lowercase().replace(' ', '_')}")
     },
 )

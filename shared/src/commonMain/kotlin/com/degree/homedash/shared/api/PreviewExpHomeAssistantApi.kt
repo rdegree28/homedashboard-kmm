@@ -1,6 +1,5 @@
 package com.degree.homedash.shared.api
 
-import com.degree.homedash.shared.model.states.ExpEntityState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.serialization.json.JsonObject

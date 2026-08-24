@@ -3,7 +3,7 @@ package com.degree.homedash.shared.model.entity
 /**
  * A launcher card that opens another dashboard.
  *
- * Unlike every other [EntityMetadata] there is no Home Assistant entity behind this one: it carries no
+ * Unlike every other [DeviceMetadata] there is no Home Assistant entity behind this one: it carries no
  * live state, and [entityId] is synthetic — derived from [destination] purely to give the card a stable
  * list key.
  */
@@ -18,7 +18,7 @@ data class NavigationMetadata(
      * header still draws the glyph (see `PetsScreen`), and it is the fallback if a photo can't load.
      */
     val photo: CardPhoto? = null,
-) : EntityMetadata {
+) : DeviceMetadata {
 
     override val entityId: String get() = "nav.${destination.name.lowercase()}"
 

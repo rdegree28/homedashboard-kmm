@@ -14,7 +14,7 @@ import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.api.HaConnectionStatus
-import com.degree.homedash.shared.model.states.ExpEntityState
+import com.degree.homedash.shared.model.states.DeviceState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import com.degree.homedash.ui.dewPointText
 import com.degree.homedash.ui.readingText
@@ -142,11 +142,11 @@ class OfficeViewModel(
 // --- Projection helpers ---
 
 private fun buildOfficeUiState(
-    entities: List<EntityMetadata>,
+    entities: List<DeviceMetadata>,
     states: Map<String, EntityState>,
     connection: HaConnectionStatus,
     powerHistory: List<HistoryPoint>,
-    expStateMap: Map<EntityMetadata, ExpEntityState>
+    expStateMap: Map<DeviceMetadata, DeviceState>
 ): OfficeUiState {
     val uis = entities.toEntityUis(states)
     val expUis = expStateMap.toDeviceUis()
@@ -157,7 +157,7 @@ private fun buildOfficeUiState(
         climate = uis.filterIsInstance<EntityUi.Climate>().withDewPointSubvalue(states),
         doors = uis.filterIsInstance<EntityUi.Door>(),
         activeSignal = states[OfficeEntities.SIGNAL_MODE]?.state,
-        // The remaining Office controls have no EntityMetadata type, so they stay hand-wired.
+        // The remaining Office controls have no DeviceMetadata type, so they stay hand-wired.
         workstation = states[OfficeEntities.WORKSTATION].toToggleUi("Workstation"),
         hexagon = states[OfficeEntities.HEXAGON].toToggleUi("Hexagon Lights"),
         power = states[OfficeEntities.POWER].toSensorUi("Power", decimals = 2, dashWhenUnavailable = false),

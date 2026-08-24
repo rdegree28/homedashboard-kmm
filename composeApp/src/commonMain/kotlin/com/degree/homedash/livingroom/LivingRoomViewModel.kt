@@ -71,7 +71,7 @@ class LivingRoomViewModel(
     }
 
     /** Fires a trigger card's service call — activating a scene, running a script. */
-    fun activate(call: TriggerEntityMetadata.ServiceCall) {
+    fun activate(call: TriggerDeviceMetadata.ServiceCall) {
         viewModelScope.launch { repo.callService(call.domain, call.service, call.entityId) }
     }
 }

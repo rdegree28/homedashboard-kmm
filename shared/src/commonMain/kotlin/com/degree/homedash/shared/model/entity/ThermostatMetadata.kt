@@ -37,7 +37,7 @@ data class ThermostatMetadata(
      * and converted back, so a bare "°" isn't enough to go on.
      */
     val fahrenheit: Boolean = true,
-) : EntityMetadata {
+) : DeviceMetadata {
 
     /**
      * The Home Assistant helper holding whether extreme setpoints are in force.

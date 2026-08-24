@@ -47,7 +47,7 @@ sealed interface EntityAction {
     data class Navigate(val target: NavigationMetadata.NavigationTarget) : EntityAction
 
     /** Fire a scene/script/automation. Carries the whole call, since a trigger's id is synthetic. */
-    data class Activate(val call: TriggerEntityMetadata.ServiceCall) : EntityAction
+    data class Activate(val call: TriggerDeviceMetadata.ServiceCall) : EntityAction
 }
 
 /** How a control should render. `ControlGroup` picks this per group; individual controls don't. */

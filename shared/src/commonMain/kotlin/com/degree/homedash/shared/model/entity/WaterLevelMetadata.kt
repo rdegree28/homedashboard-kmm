@@ -9,7 +9,7 @@ data class WaterLevelMetadata(
     override val displayName: String,
     /** Non-null when a second entity reports filter life; the screen shows its bar exactly then. */
     val filterHealth: FilterHealth? = null,
-) : EntityMetadata {
+) : DeviceMetadata {
 
     /**
      * The filter's own sensor, plus the cycle length its days count down from.

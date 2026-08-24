@@ -5,4 +5,4 @@ data class LightState(
     override val entityId: String,
     override val isOn: Boolean,
     override val isOffline: Boolean,
-) : ToggleableEntityState, ExpEntityState
+) : ToggleableDeviceState, DeviceState

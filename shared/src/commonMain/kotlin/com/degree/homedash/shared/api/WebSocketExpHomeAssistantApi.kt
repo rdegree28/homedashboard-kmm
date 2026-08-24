@@ -1,7 +1,7 @@
 package com.degree.homedash.shared.api
 
 import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.shared.model.states.ExpEntityState
+import com.degree.homedash.shared.model.states.DeviceState
 import com.degree.homedash.shared.model.states.FanState
 import com.degree.homedash.shared.model.states.LightState
 import kotlinx.coroutines.CoroutineScope
@@ -62,8 +62,8 @@ internal class WebSocketExpHomeAssistantApi(
         }
     }
 
-    /** Null while a domain has no [ExpEntityState] type yet — those entities are simply omitted. */
-    private fun EntityState.toExpEntityState(): ExpEntityState? = when (domain) {
+    /** Null while a domain has no [DeviceState] type yet — those entities are simply omitted. */
+    private fun EntityState.toExpEntityState(): DeviceState? = when (domain) {
         "light" -> LightState(
             entityId = entityId,
             isOn = isOn,

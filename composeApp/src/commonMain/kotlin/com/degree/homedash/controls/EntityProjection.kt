@@ -3,7 +3,7 @@ package com.degree.homedash.controls
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.entity.ClimateMetadata
 import com.degree.homedash.shared.model.entity.DoorMetadata
-import com.degree.homedash.shared.model.entity.EntityMetadata
+import com.degree.homedash.shared.model.entity.DeviceMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.HvacAction
 import com.degree.homedash.shared.model.entity.HvacMode
@@ -11,7 +11,7 @@ import com.degree.homedash.shared.model.entity.LightMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
 import com.degree.homedash.shared.model.entity.ThermostatMetadata
-import com.degree.homedash.shared.model.entity.TriggerEntityMetadata
+import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
 import com.degree.homedash.shared.model.entity.WaterLevelMetadata
 import com.degree.homedash.ui.formatNumber
 import com.degree.homedash.ui.readingText
@@ -28,7 +28,7 @@ import kotlin.math.roundToInt
  * a fan's mister is its own `humidifier.*` entity, so its on/off can't come from [state]. Defaults to
  * empty for the single-entity callers.
  */
-fun EntityMetadata.toEntityUi(
+fun DeviceMetadata.toEntityUi(
     state: EntityState?,
     allStates: Map<String, EntityState> = emptyMap(),
 ): EntityUi = when (this) {
@@ -115,11 +115,11 @@ fun EntityMetadata.toEntityUi(
     is NavigationMetadata -> EntityUi.Navigation(this)
 
     // Likewise stateless — a trigger fires a service, it doesn't report anything.
-    is TriggerEntityMetadata -> EntityUi.Trigger(this)
+    is TriggerDeviceMetadata -> EntityUi.Trigger(this)
 }
 
 /** Projects a whole screen's roster against the current [states] map. */
-fun List<EntityMetadata>.toEntityUis(states: Map<String, EntityState>): List<EntityUi> =
+fun List<DeviceMetadata>.toEntityUis(states: Map<String, EntityState>): List<EntityUi> =
     map { it.toEntityUi(states[it.entityId], states) }
 
 /** Missing and unavailable are the same thing to a control: nothing to show. */

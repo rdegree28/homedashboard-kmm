@@ -7,8 +7,8 @@ package com.degree.homedash.shared.model.entity
  */
 
 /** Living Room "Main Lights" scene. */
-fun TriggerEntityMetadata.Companion.testCard(): TriggerEntityMetadata {
-    return object : TriggerEntityMetadata(
+fun TriggerDeviceMetadata.Companion.testCard(): TriggerDeviceMetadata {
+    return object : TriggerDeviceMetadata(
         entityId = "trigger.testcard",
         displayName = "TestCard",
     ) {
@@ -17,8 +17,8 @@ fun TriggerEntityMetadata.Companion.testCard(): TriggerEntityMetadata {
 }
 
 /** Living Room "Main Lights" scene. */
-fun TriggerEntityMetadata.Companion.mainLights(): TriggerEntityMetadata {
-    return object : TriggerEntityMetadata(
+fun TriggerDeviceMetadata.Companion.mainLights(): TriggerDeviceMetadata {
+    return object : TriggerDeviceMetadata(
         entityId = "trigger.main_lights",
         displayName = "Main Lights",
     ) {
@@ -27,8 +27,8 @@ fun TriggerEntityMetadata.Companion.mainLights(): TriggerEntityMetadata {
 }
 
 /** Living Room "Main Lights" scene. */
-fun TriggerEntityMetadata.Companion.movieLights(): TriggerEntityMetadata {
-    return object : TriggerEntityMetadata(
+fun TriggerDeviceMetadata.Companion.movieLights(): TriggerDeviceMetadata {
+    return object : TriggerDeviceMetadata(
         entityId = "trigger.movie_lights",
         displayName = "Movie Lights",
     ) {
@@ -37,8 +37,8 @@ fun TriggerEntityMetadata.Companion.movieLights(): TriggerEntityMetadata {
 }
 
 /** Living Room "Main Lights" scene. */
-fun TriggerEntityMetadata.Companion.bedroomLightsFull(): TriggerEntityMetadata {
-    return object : TriggerEntityMetadata(
+fun TriggerDeviceMetadata.Companion.bedroomLightsFull(): TriggerDeviceMetadata {
+    return object : TriggerDeviceMetadata(
         entityId = "trigger.bedroom_lights_full",
         displayName = "Full Lights",
     ) {
@@ -47,8 +47,8 @@ fun TriggerEntityMetadata.Companion.bedroomLightsFull(): TriggerEntityMetadata {
 }
 
 /** Living Room "Main Lights" scene. */
-fun TriggerEntityMetadata.Companion.bedroomLightsLow(): TriggerEntityMetadata {
-    return object : TriggerEntityMetadata(
+fun TriggerDeviceMetadata.Companion.bedroomLightsLow(): TriggerDeviceMetadata {
+    return object : TriggerDeviceMetadata(
         entityId = "trigger.bedroom_lights_low",
         displayName = "Low Lights",
     ) {
@@ -57,8 +57,8 @@ fun TriggerEntityMetadata.Companion.bedroomLightsLow(): TriggerEntityMetadata {
 }
 
 /** Living Room "Main Lights" scene. */
-fun TriggerEntityMetadata.Companion.bedroomLightsNight(): TriggerEntityMetadata {
-    return object : TriggerEntityMetadata(
+fun TriggerDeviceMetadata.Companion.bedroomLightsNight(): TriggerDeviceMetadata {
+    return object : TriggerDeviceMetadata(
         entityId = "trigger.bedroom_lights_night",
         displayName = "Night Lights",
     ) {

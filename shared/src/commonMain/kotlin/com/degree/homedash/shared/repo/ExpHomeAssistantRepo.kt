@@ -2,10 +2,10 @@ package com.degree.homedash.shared.repo
 
 import com.degree.homedash.shared.api.ExpHomeAssistantApi
 import com.degree.homedash.shared.api.PreviewExpHomeAssistantApi
-import com.degree.homedash.shared.model.entity.EntityMetadata
+import com.degree.homedash.shared.model.entity.DeviceMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
-import com.degree.homedash.shared.model.entity.ToggleableEntityMetadata
-import com.degree.homedash.shared.model.states.ExpEntityState
+import com.degree.homedash.shared.model.entity.ToggleableDeviceMetadata
+import com.degree.homedash.shared.model.states.DeviceState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.buildJsonObject
@@ -34,7 +34,7 @@ class ExpHomeAssistantRepo internal constructor(
      *   upstream is the whole-map flow. Callers that project into UI state should
      *   `distinctUntilChanged` downstream, as `LivingRoomViewModel` does.
      */
-    fun loadEntityStatesForMetadata(metadataList: List<EntityMetadata>): Flow<Map<EntityMetadata, ExpEntityState>> {
+    fun loadEntityStatesForMetadata(metadataList: List<DeviceMetadata>): Flow<Map<DeviceMetadata, DeviceState>> {
         return api.loadAllStates().map { snapshot ->
             metadataList.mapNotNull { meta ->
                 snapshot.devices[meta.entityId]?.let { state ->
@@ -48,13 +48,13 @@ class ExpHomeAssistantRepo internal constructor(
      * Flips [entity] on or off.
      *
      * Takes metadata rather than an id because toggling needs the entity's identity, not its live
-     * value — and the [ToggleableEntityMetadata] parameter is what keeps non-toggleable entities out.
-     * Reached through [ToggleableEntityMetadata.onToggle] rather than called directly, so the only
+     * value — and the [ToggleableDeviceMetadata] parameter is what keeps non-toggleable entities out.
+     * Reached through [ToggleableDeviceMetadata.onToggle] rather than called directly, so the only
      * caller today is `LightMetadata`.
      *
      * Fire-and-forget: HA answers a service call by pushing a new state, so there is nothing to await.
      */
-    internal fun toggleEntity(entity: ToggleableEntityMetadata) {
+    internal fun toggleEntity(entity: ToggleableDeviceMetadata) {
         api.toggleEntity(entityId = entity.entityId)
     }
 
@@ -90,7 +90,7 @@ class ExpHomeAssistantRepo internal constructor(
          * An inert repo for `@Preview` use: no states ever arrive and actions do nothing.
          *
          * Previews render outside the app's Koin graph, so anything reaching for a repo — a
-         * [ToggleableEntityMetadata] card wanting somewhere to send its toggle — has nothing to
+         * [ToggleableDeviceMetadata] card wanting somewhere to send its toggle — has nothing to
          * resolve. This exists because the real constructor is internal to `:shared`, so `:composeApp`
          * can't build a stand-in itself.
          */

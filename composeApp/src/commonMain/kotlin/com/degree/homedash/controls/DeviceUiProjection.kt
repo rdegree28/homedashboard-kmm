@@ -1,10 +1,10 @@
 package com.degree.homedash.controls
 
 import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.shared.model.entity.EntityMetadata
+import com.degree.homedash.shared.model.entity.DeviceMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.LightMetadata
-import com.degree.homedash.shared.model.states.ExpEntityState
+import com.degree.homedash.shared.model.states.DeviceState
 import com.degree.homedash.shared.model.states.FanState
 import com.degree.homedash.shared.model.states.LightState
 
@@ -19,8 +19,8 @@ import com.degree.homedash.shared.model.states.LightState
  * a fan's mister is its own `humidifier.*` entity, so its on/off can't come from [state]. Defaults to
  * empty for the single-entity callers.
  */
-fun EntityMetadata.toUi(
-    state: ExpEntityState,
+fun DeviceMetadata.toUi(
+    state: DeviceState,
 ): DeviceUi = when (this) {
     is LightMetadata -> {
         LightDeviceUi(
@@ -115,11 +115,11 @@ fun EntityMetadata.toUi(
 //    is NavigationMetadata -> EntityUi.Navigation(this)
 //
 //    // Likewise stateless — a trigger fires a service, it doesn't report anything.
-//    is TriggerEntityMetadata -> EntityUi.Trigger(this)
+//    is TriggerDeviceMetadata -> EntityUi.Trigger(this)
 }
 
 /** Projects a whole screen's roster against the current [states] map. */
-fun Map<EntityMetadata, ExpEntityState>.toDeviceUis(): List<DeviceUi> =
+fun Map<DeviceMetadata, DeviceState>.toDeviceUis(): List<DeviceUi> =
     mapNotNull {
         try {
             it.key.toUi(it.value)

@@ -8,7 +8,7 @@ data class ClimateMetadata(
     override val entityId: String,
     override val displayName: String,
     val kind: ClimateKind,
-) : EntityMetadata {
+) : DeviceMetadata {
 
     /** Which climate sensor a [ClimateMetadata] describes — selects the row's icon + tint. */
     enum class ClimateKind {
