@@ -1,6 +1,7 @@
 package com.degree.homedash.ui
 
 import com.degree.homedash.shared.model.EntityState
+import com.degree.homedash.shared.model.states.ClimateState
 import kotlin.math.pow
 import kotlin.math.round
 
@@ -27,4 +28,10 @@ fun EntityState?.readingText(decimals: Int, dashWhenUnavailable: Boolean = true)
     if (dashWhenUnavailable && isUnavailable) return "—"
     val unit = attrString("unit_of_measurement").orEmpty()
     return "${formatNumberOrSelf(state, decimals)} $unit".trim()
+}
+
+fun ClimateState?.readingText(decimals: Int): String {
+    if (this == null || isOffline || value == null) return "—"
+    val number = value ?: return "-"
+    return "${formatNumber(number, decimals)} $unit".trim()
 }

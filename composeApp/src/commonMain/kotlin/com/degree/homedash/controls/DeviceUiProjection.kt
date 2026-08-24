@@ -1,9 +1,11 @@
 package com.degree.homedash.controls
 
 import com.degree.homedash.shared.model.EntityState
+import com.degree.homedash.shared.model.entity.ClimateMetadata
 import com.degree.homedash.shared.model.entity.DeviceMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.LightMetadata
+import com.degree.homedash.shared.model.states.ClimateState
 import com.degree.homedash.shared.model.states.DeviceState
 import com.degree.homedash.shared.model.states.FanState
 import com.degree.homedash.shared.model.states.LightState
@@ -33,6 +35,13 @@ fun DeviceMetadata.toUi(
         FanDeviceUi(
             metadata = this,
             state = state as FanState,
+        )
+    }
+
+    is ClimateMetadata -> {
+        ClimateDeviceUi(
+            metadata = this,
+            state = state as ClimateState,
         )
     }
 

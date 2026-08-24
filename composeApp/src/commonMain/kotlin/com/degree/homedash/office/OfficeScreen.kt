@@ -99,9 +99,7 @@ fun OfficeContent(
 
         ControlGroup(
             title = "Climate",
-            entities = ui.climate,
-            useCardUis = true,
-            onAction = onAction,
+            devices = ui.climate,
         )
 
         ControlGroup(

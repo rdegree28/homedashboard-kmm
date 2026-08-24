@@ -1,10 +1,16 @@
 package com.degree.homedash.controls
 
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Opacity
+import androidx.compose.material.icons.filled.Thermostat
+import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.degree.homedash.office.ToggleUi
+import com.degree.homedash.shared.model.entity.ClimateMetadata
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
@@ -48,6 +54,23 @@ fun DeviceControl(
                 onSetOscillating = { device.toggleOscillation(repo) },
                 onSetMisting = { device.toggleMisting(repo) },
                 onToggle = { device.onToggle(repo) },
+                modifier = modifier,
+            )
+        }
+
+        is ClimateDeviceUi -> {
+            val (icon: ImageVector, tint: Color) = when (device.climateKind) {
+                ClimateMetadata.ClimateKind.Temperature -> Icons.Filled.Thermostat to AppColors.TempWarm
+                ClimateMetadata.ClimateKind.Humidity -> Icons.Filled.WaterDrop to AppColors.Wet
+                ClimateMetadata.ClimateKind.DewPoint -> Icons.Filled.Opacity to AppColors.Wet
+            }
+
+            ClimateCard(
+                label = device.name,
+                valueText = device.valueText,
+                subvalueText = device.subvalueText,
+                icon = icon,
+                tint = tint,
                 modifier = modifier,
             )
         }

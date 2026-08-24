@@ -3,6 +3,7 @@ package com.degree.homedash.office
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.degree.homedash.controls.ClimateDeviceUi
 import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.FanDeviceUi
@@ -57,7 +58,7 @@ data class OfficeUiState(
     val connection: HaConnectionStatus,
     val lights: List<LightDeviceUi>,
     val fans: List<FanDeviceUi>,
-    val climate: List<EntityUi.Climate>,
+    val climate: List<ClimateDeviceUi>,
     val doors: List<EntityUi.Door>,
     val activeSignal: String?,
     val workstation: ToggleUi,
@@ -141,7 +142,7 @@ private fun buildOfficeUiState(
         connection = connection,
         lights = expUis.filterIsInstance<LightDeviceUi>(),
         fans = expUis.filterIsInstance<FanDeviceUi>(),
-        climate = uis.filterIsInstance<EntityUi.Climate>().withDewPointSubvalue(states),
+        climate = expUis.filterIsInstance<ClimateDeviceUi>(),
         doors = uis.filterIsInstance<EntityUi.Door>(),
         activeSignal = states[OfficeEntities.SIGNAL_MODE]?.state,
         // The remaining Office controls have no DeviceMetadata type, so they stay hand-wired.

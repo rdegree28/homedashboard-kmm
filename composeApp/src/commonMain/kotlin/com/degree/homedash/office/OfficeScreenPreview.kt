@@ -1,11 +1,13 @@
 package com.degree.homedash.office
 
+import com.degree.homedash.controls.ClimateDeviceUi
 import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.FanDeviceUi
 import com.degree.homedash.controls.LightDeviceUi
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.api.HaConnectionStatus
+import com.degree.homedash.shared.model.states.ClimateState
 import com.degree.homedash.shared.model.states.FanState
 import com.degree.homedash.shared.model.states.LightState
 import kotlin.math.sin
@@ -33,8 +35,10 @@ internal val previewOfficeUiState = OfficeUiState(
         ),
     ),
     climate = listOf(
-        EntityUi.Climate(ClimateMetadata("sensor.temp", "Temperature", ClimateMetadata.ClimateKind.Temperature), "75.6 °F"),
-        EntityUi.Climate(ClimateMetadata("sensor.humidity", "Humidity", ClimateMetadata.ClimateKind.Humidity), "48.5 %", subvalueText = "Dew pt 50.9 °F"),
+        ClimateDeviceUi(ClimateMetadata("sensor.temp", "Temperature", ClimateMetadata.ClimateKind.Temperature),
+            ClimateState("sensor.temp", false, 75.6, "°F")),
+        ClimateDeviceUi(ClimateMetadata("sensor.humidity", "Humidity", ClimateMetadata.ClimateKind.Humidity),
+            ClimateState("sensor.humidity", false, 48.5, "°F")),
     ),
     doors = listOf(
         EntityUi.Door(DoorMetadata("binary_sensor.office_door", "Office Door"), "Open", open = true, unavailable = false),

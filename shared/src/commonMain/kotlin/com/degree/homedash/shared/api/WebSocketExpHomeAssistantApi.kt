@@ -1,6 +1,7 @@
 package com.degree.homedash.shared.api
 
 import com.degree.homedash.shared.model.EntityState
+import com.degree.homedash.shared.model.states.ClimateState
 import com.degree.homedash.shared.model.states.DeviceState
 import com.degree.homedash.shared.model.states.FanState
 import com.degree.homedash.shared.model.states.LightState
@@ -79,6 +80,12 @@ internal class WebSocketExpHomeAssistantApi(
             // a time with no metadata to say which one. FanState.withCompanions fills it in once the
             // roster is in hand.
             isMisting = false,
+        )
+        "sensor" -> ClimateState(
+            entityId = entityId,
+            isOffline = isUnavailable,
+            value = state.toDoubleOrNull(),
+            unit = attrString("unit_of_measurement").orEmpty(),
         )
 
         else -> null
