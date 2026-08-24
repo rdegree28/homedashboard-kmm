@@ -1,6 +1,7 @@
 package com.degree.homedash.shared.repo
 
 import com.degree.homedash.shared.api.ExpHomeAssistantApi
+import com.degree.homedash.shared.api.PreviewExpHomeAssistantApi
 import com.degree.homedash.shared.model.entity.EntityMetadata
 import com.degree.homedash.shared.model.entity.ToggleableEntityMetadata
 import com.degree.homedash.shared.model.states.ExpEntityState
@@ -50,5 +51,18 @@ class ExpHomeAssistantRepo internal constructor(
      */
     fun toggleEntity(entity: ToggleableEntityMetadata) {
         api.toggleEntity(entityId = entity.entityId)
+    }
+
+    companion object {
+
+        /**
+         * An inert repo for `@Preview` use: no states ever arrive and actions do nothing.
+         *
+         * Previews render outside the app's Koin graph, so anything reaching for a repo — a
+         * [ToggleableEntityMetadata] card wanting somewhere to send its toggle — has nothing to
+         * resolve. This exists because the real constructor is internal to `:shared`, so `:composeApp`
+         * can't build a stand-in itself.
+         */
+        fun preview(): ExpHomeAssistantRepo = ExpHomeAssistantRepo(PreviewExpHomeAssistantApi)
     }
 }

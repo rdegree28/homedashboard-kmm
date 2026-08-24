@@ -14,19 +14,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.office.FanUi
 import com.degree.homedash.office.ToggleUi
+import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import org.koin.compose.KoinApplicationPreview
+import org.koin.dsl.module
 
 // Shared sample data + scaffolding for the control previews (which live next to each composable).
+
+/**
+ * Supplies the Koin graph a preview needs.
+ *
+ * A [com.degree.homedash.controls.DeviceUi] carries its own behavior and reaches for an
+ * [ExpHomeAssistantRepo] to run it through — `DeviceControl` resolves one with `koinInject()`. The app
+ * provides that from its graph, but previews render outside it, so they register an inert repo
+ * instead. Without this, any preview containing a device card throws instead of rendering.
+ */
+@Composable
+internal fun PreviewKoin(content: @Composable () -> Unit) {
+    KoinApplicationPreview(
+        application = { modules(module { single { ExpHomeAssistantRepo.preview() } }) },
+        content = content,
+    )
+}
 
 /** Wraps control previews in the app's dark theme + a padded column. */
 @Composable
 internal fun ControlPreview(content: @Composable ColumnScope.() -> Unit) {
-    MaterialTheme(colorScheme = darkColorScheme()) {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                content = content,
-            )
+    PreviewKoin {
+        MaterialTheme(colorScheme = darkColorScheme()) {
+            Surface(color = MaterialTheme.colorScheme.background) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    content = content,
+                )
+            }
         }
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.degree.homedash.controls.PreviewKoin
 import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.HexagonControl
 import com.degree.homedash.controls.WorkstationControl
@@ -180,7 +181,7 @@ private fun signalColor(mode: SignalMode): Color = when (mode) {
 
 @Preview(widthDp = 380, heightDp = 1700)
 @Composable
-private fun OfficeScreenPreview() {
+private fun OfficeScreenPreview() = PreviewKoin {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
             OfficeContent(
