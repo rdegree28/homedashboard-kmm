@@ -1,7 +1,6 @@
 package com.degree.homedash.shared.api
 
 import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.shared.model.states.DeviceState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.JsonObject
 
@@ -14,13 +13,13 @@ import kotlinx.serialization.json.JsonObject
 internal interface ExpHomeAssistantApi {
 
     /**
-     * Live device states, re-derived as Home Assistant pushes changes.
+     * Live map of Home Assistant entity id → its latest [EntityState], updated as HA pushes changes.
      *
-     * Carries the raw snapshot alongside the typed one so a single push stays a single emission —
-     * [DeviceState.withCompanions] needs raw entities to resolve companions, and a second flow for
-     * them would double every update.
+     * Deliberately raw: which typed device state an entity becomes depends on the roster, not on the
+     * entity's domain — `sensor.*` alone backs climate, soil moisture and water level — so typing
+     * happens in `StatefulDeviceMetadata.toState`, not here.
      */
-    fun loadAllStates(): Flow<ExpStateSnapshot>
+    fun loadAllStates(): Flow<Map<String, EntityState>>
 
     /**
      * Calls the entity's toggle service on HA.
@@ -43,9 +42,3 @@ internal interface ExpHomeAssistantApi {
         serviceData: JsonObject? = null,
     )
 }
-
-/** Typed device states plus the raw Home Assistant snapshot they were derived from. */
-internal data class ExpStateSnapshot(
-    val devices: Map<String, DeviceState>,
-    val entities: Map<String, EntityState>,
-)

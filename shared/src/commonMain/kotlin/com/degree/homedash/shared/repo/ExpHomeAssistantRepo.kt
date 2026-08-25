@@ -2,11 +2,12 @@ package com.degree.homedash.shared.repo
 
 import com.degree.homedash.shared.api.ExpHomeAssistantApi
 import com.degree.homedash.shared.api.PreviewExpHomeAssistantApi
+import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.entity.DeviceMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.ToggleableDeviceMetadata
-import com.degree.homedash.shared.model.states.DeviceState
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -21,28 +22,27 @@ class ExpHomeAssistantRepo internal constructor(
 ) {
 
     /**
-     * Pairs each entry of [metadataList] with its live state.
+     * Live map of Home Assistant entity id → its latest state, for a roster to project against with
+     * `DeviceMetadata.toUi`.
      *
-     * Keyed by *metadata* rather than entity id so callers get their own roster back and never have to
-     * look ids up again, and ordered to match [metadataList] so card layout stays stable.
-     *
-     * Two things to know:
-     * - Metadata with no matching state is **dropped**. An entity Home Assistant has never reported
-     *   (a typo'd or disabled id) is absent from the map rather than present-and-offline, so it
-     *   disappears from the screen instead of rendering as unavailable.
-     * - This re-emits on every state push for *any* entity, not just the ones in [metadataList] — the
-     *   upstream is the whole-map flow. Callers that project into UI state should
-     *   `distinctUntilChanged` downstream, as `LivingRoomViewModel` does.
+     * Raw rather than typed on purpose: an entity's domain doesn't determine which device it is
+     * (`sensor.*` backs climate, soil moisture and water level alike), so only the roster can decide.
+     * Re-emits on every push for *any* entity, so callers projecting into UI state should
+     * `distinctUntilChanged` downstream, as the ViewModels do.
      */
-    fun loadEntityStatesForMetadata(metadataList: List<DeviceMetadata>): Flow<Map<DeviceMetadata, DeviceState>> {
-        return api.loadAllStates().map { snapshot ->
-            metadataList.mapNotNull { meta ->
-                snapshot.devices[meta.entityId]?.let { state ->
-                    meta to state.withCompanions(meta, snapshot.entities)
-                }
-            }.toMap()
-        }
-    }
+    fun loadEntityStates(): Flow<Map<String, EntityState>> = api.loadAllStates()
+
+
+    /**
+     * One entity's live state, re-emitting only when *that* entity changes rather than on every push.
+     * Null while Home Assistant has never reported [entityId] — a disabled or mistyped id.
+     */
+    internal fun entityFor(entityId: String): Flow<EntityState?> =
+        loadEntityStates().map { it[entityId] }.distinctUntilChanged()
+
+    /** [entityFor] the entity backing [metadata]. */
+    internal fun entityForDevice(metadata: DeviceMetadata): Flow<EntityState?> =
+        entityFor(metadata.entityId)
 
     /**
      * Flips [entity] on or off.

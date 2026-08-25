@@ -31,7 +31,7 @@ fun appModule(defaultConfig: HaConfig?) = module {
         OfficeViewModel(
             repo = get(),
             metadataRepo = get(),
-            expRepo = get()
+            deviceRepo = get(),
         )
     }
     viewModel { LivingRoomViewModel(get(), get()) }

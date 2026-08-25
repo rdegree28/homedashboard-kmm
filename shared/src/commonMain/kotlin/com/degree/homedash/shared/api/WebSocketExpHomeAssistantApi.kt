@@ -1,25 +1,18 @@
 package com.degree.homedash.shared.api
 
 import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.shared.model.states.ClimateState
-import com.degree.homedash.shared.model.states.DeviceState
-import com.degree.homedash.shared.model.states.FanState
-import com.degree.homedash.shared.model.states.LightState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
-import kotlin.math.roundToInt
 
 /**
  * [ExpHomeAssistantApi] over the live WebSocket connection.
  *
- * States are derived from [HaClient.states] rather than maintained as a second flow inside
- * [HaWebSocketClient], so there is a single source of truth: one push from HA produces one emission,
- * not two.
+ * Passes [HaClient.states] straight through rather than keeping a second flow of its own, so there is
+ * a single source of truth: one push from HA produces one emission, not two.
  */
 internal class WebSocketExpHomeAssistantApi(
     private val client: HaClient,
@@ -27,15 +20,7 @@ internal class WebSocketExpHomeAssistantApi(
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) : ExpHomeAssistantApi {
 
-    override fun loadAllStates(): Flow<ExpStateSnapshot> =
-        client.states.map { states ->
-            ExpStateSnapshot(
-                devices = states.values.mapNotNull { state ->
-                    state.toExpEntityState()?.let { state.entityId to it }
-                }.toMap(),
-                entities = states,
-            )
-        }
+    override fun loadAllStates(): Flow<Map<String, EntityState>> = client.states
 
     override fun toggleEntity(entityId: String) {
         scope.launch {
@@ -61,33 +46,5 @@ internal class WebSocketExpHomeAssistantApi(
         scope.launch {
             client.callService(domain, service, entityId, serviceData)
         }
-    }
-
-    /** Null while a domain has no [DeviceState] type yet — those entities are simply omitted. */
-    private fun EntityState.toExpEntityState(): DeviceState? = when (domain) {
-        "light" -> LightState(
-            entityId = entityId,
-            isOn = isOn,
-            isOffline = isUnavailable,
-        )
-        "fan" -> FanState(
-            entityId = entityId,
-            isOn = isOn,
-            isOffline = isUnavailable,
-            percentage = attrDouble("percentage")?.roundToInt() ?: 0,
-            isOscillating = attrBoolean("oscillating") == true,
-            // Always false here: the mister is a separate entity, and this mapping sees one entity at
-            // a time with no metadata to say which one. FanState.withCompanions fills it in once the
-            // roster is in hand.
-            isMisting = false,
-        )
-        "sensor" -> ClimateState(
-            entityId = entityId,
-            isOffline = isUnavailable,
-            value = state.toDoubleOrNull(),
-            unit = attrString("unit_of_measurement").orEmpty(),
-        )
-
-        else -> null
     }
 }

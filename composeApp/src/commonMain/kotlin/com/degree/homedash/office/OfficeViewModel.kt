@@ -8,15 +8,16 @@ import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.FanDeviceUi
 import com.degree.homedash.controls.LightDeviceUi
-import com.degree.homedash.controls.toDeviceUis
+import com.degree.homedash.controls.DeviceUi
+import com.degree.homedash.controls.loadDeviceUis
 import com.degree.homedash.controls.toEntityUis
+import com.degree.homedash.shared.model.entity.DeviceMetadata
 import com.degree.homedash.shared.repo.EntityMetadataRepo
+import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.api.HaConnectionStatus
-import com.degree.homedash.shared.model.states.DeviceState
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import com.degree.homedash.ui.dewPointText
 import com.degree.homedash.ui.readingText
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,7 +76,7 @@ data class OfficeUiState(
 class OfficeViewModel(
     private val repo: HomeAssistantRepo,
     metadataRepo: EntityMetadataRepo,
-    private val expRepo: ExpHomeAssistantRepo,
+    private val deviceRepo: ExpHomeAssistantRepo,
 ) : ViewModel() {
 
     private val powerHistory = MutableStateFlow<List<HistoryPoint>>(emptyList())
@@ -88,9 +89,9 @@ class OfficeViewModel(
             repo.states,
             repo.connection,
             powerHistory,
-            expRepo.loadEntityStatesForMetadata(entities)
-        ) { states, connection, history, expStateMap ->
-            buildOfficeUiState(entities, states, connection, history, expStateMap)
+            entities.loadDeviceUis(deviceRepo),
+        ) { states, connection, history, deviceUis ->
+            buildOfficeUiState(entities, states, connection, history, deviceUis)
         }
         .distinctUntilChanged()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EMPTY)
@@ -123,7 +124,7 @@ class OfficeViewModel(
     }
 
     private companion object {
-        val EMPTY = buildOfficeUiState(emptyList(), emptyMap(), HaConnectionStatus.Disconnected, emptyList(), emptyMap())
+        val EMPTY = buildOfficeUiState(emptyList(), emptyMap(), HaConnectionStatus.Disconnected, emptyList(), emptyList())
     }
 }
 
@@ -134,15 +135,14 @@ private fun buildOfficeUiState(
     states: Map<String, EntityState>,
     connection: HaConnectionStatus,
     powerHistory: List<HistoryPoint>,
-    expStateMap: Map<DeviceMetadata, DeviceState>
+    deviceUis: List<DeviceUi>,
 ): OfficeUiState {
     val uis = entities.toEntityUis(states)
-    val expUis = expStateMap.toDeviceUis()
     return OfficeUiState(
         connection = connection,
-        lights = expUis.filterIsInstance<LightDeviceUi>(),
-        fans = expUis.filterIsInstance<FanDeviceUi>(),
-        climate = expUis.filterIsInstance<ClimateDeviceUi>(),
+        lights = deviceUis.filterIsInstance<LightDeviceUi>(),
+        fans = deviceUis.filterIsInstance<FanDeviceUi>(),
+        climate = deviceUis.filterIsInstance<ClimateDeviceUi>(),
         doors = uis.filterIsInstance<EntityUi.Door>(),
         activeSignal = states[OfficeEntities.SIGNAL_MODE]?.state,
         // The remaining Office controls have no DeviceMetadata type, so they stay hand-wired.

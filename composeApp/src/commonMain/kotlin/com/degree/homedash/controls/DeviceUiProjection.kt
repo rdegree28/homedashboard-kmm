@@ -1,51 +1,42 @@
 package com.degree.homedash.controls
 
-import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.entity.ClimateMetadata
 import com.degree.homedash.shared.model.entity.DeviceMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.LightMetadata
-import com.degree.homedash.shared.model.states.ClimateState
-import com.degree.homedash.shared.model.states.DeviceState
-import com.degree.homedash.shared.model.states.FanState
-import com.degree.homedash.shared.model.states.LightState
+import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 
 /**
- * Projects an entity's static descriptor plus its live state into the render state for its control.
- * [state] is null when Home Assistant hasn't reported the entity, which reads the same as unavailable.
+ * This device's control, re-derived whenever the entities behind it change.
  *
- * This is the one place raw [EntityState] becomes an [EntityUi]; screens supply metadata (usually from
- * `EntityMetadataRepo`) and never touch attributes themselves.
+ * Projecting inside the branch is what keeps this cast-free: `this` is already the concrete metadata,
+ * so `loadState` resolves through the type parameter to the matching state type, and the metadata is
+ * captured rather than paired back up afterwards. The UI never sees an `EntityState` either — Home
+ * Assistant's raw representation stays inside `:shared`.
  *
- * [allStates] is only needed by entities that are composites of more than one Home Assistant entity —
- * a fan's mister is its own `humidifier.*` entity, so its on/off can't come from [state]. Defaults to
- * empty for the single-entity callers.
+ * Null for metadata that has no device control yet — those types are still on the [EntityUi] path.
  */
-fun DeviceMetadata.toUi(
-    state: DeviceState,
-): DeviceUi = when (this) {
+fun DeviceMetadata.loadUi(repo: ExpHomeAssistantRepo): Flow<DeviceUi>? = when (this) {
     is LightMetadata -> {
-        LightDeviceUi(
-            metadata = this,
-            state = state as LightState,
-        )
+        val metadata = this
+        loadState(repo).map { state -> LightDeviceUi(metadata = metadata, state = state) }
     }
 
     is FanMetadata -> {
-        FanDeviceUi(
-            metadata = this,
-            state = state as FanState,
-        )
+        val metadata = this
+        loadState(repo).map { state -> FanDeviceUi(metadata = metadata, state = state) }
     }
 
     is ClimateMetadata -> {
-        ClimateDeviceUi(
-            metadata = this,
-            state = state as ClimateState,
-        )
+        val metadata = this
+        loadState(repo).map { state -> ClimateDeviceUi(metadata = metadata, state = state) }
     }
 
-    else -> throw IllegalStateException("No Experimental UI mapper for metadata type")
+    else -> null
 //
 //    is FanMetadata -> EntityUi.Fan(
 //        metadata = this,
@@ -127,12 +118,14 @@ fun DeviceMetadata.toUi(
 //    is TriggerDeviceMetadata -> EntityUi.Trigger(this)
 }
 
-/** Projects a whole screen's roster against the current [states] map. */
-fun Map<DeviceMetadata, DeviceState>.toDeviceUis(): List<DeviceUi> =
-    mapNotNull {
-        try {
-            it.key.toUi(it.value)
-        } catch (e: Exception) {
-            null
-        }
-    }
+/**
+ * A whole screen's controls, each re-emitting only when its own device changes.
+ *
+ * The empty case is guarded because `combine` over no flows never emits — without it a roster with no
+ * stateful devices would stall the caller's own `combine` and leave the screen blank.
+ */
+fun List<DeviceMetadata>.loadDeviceUis(repo: ExpHomeAssistantRepo): Flow<List<DeviceUi>> {
+    val flows = mapNotNull { metadata -> metadata.loadUi(repo) }
+    if (flows.isEmpty()) return flowOf(emptyList())
+    return combine(flows) { uis -> uis.toList() }
+}

@@ -1,6 +1,11 @@
 package com.degree.homedash.shared.model.entity
 
+import com.degree.homedash.shared.model.states.FanState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
+import kotlin.math.roundToInt
 
 /**
  * A fan.
@@ -14,7 +19,27 @@ data class FanMetadata(
     val speedAdjustment: SpeedAdjustment? = null,
     val hasOscillationFeature: Boolean = false,
     val misting: MistingControl? = null,
-) : ToggleableDeviceMetadata, DeviceMetadata {
+) : ToggleableDeviceMetadata, StatefulDeviceMetadata<FanState> {
+
+    /**
+     * The only state assembled from two entities: the mister is its own `humidifier.*` rather than a
+     * fan attribute (see [MistingControl]), so its flow is combined in rather than read off [entityId].
+     * A fan with no mister contributes a constant null instead.
+     */
+    override fun loadState(repo: ExpHomeAssistantRepo): Flow<FanState> =
+        combine(
+            repo.entityForDevice(this),
+            misting?.let { repo.entityFor(it.entityId) } ?: flowOf(null),
+        ) { entity, mister ->
+            FanState(
+                entityId = entityId,
+                isOn = entity?.isOn == true,
+                isOffline = entity == null || entity.isUnavailable,
+                percentage = entity?.attrDouble("percentage")?.roundToInt() ?: 0,
+                isOscillating = entity?.attrBoolean("oscillating") == true,
+                isMisting = mister?.isOn == true,
+            )
+        }
 
     /**
      * A fan's built-in mister, or null when it has none.
