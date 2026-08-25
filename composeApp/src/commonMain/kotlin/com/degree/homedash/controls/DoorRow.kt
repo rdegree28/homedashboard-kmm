@@ -37,7 +37,7 @@ fun DoorRow(
 
 /** Door icon: hollow outline when [open], solid slab when closed. */
 @Composable
-private fun DoorIcon(
+internal fun DoorIcon(
     open: Boolean,
     tint: Color,
     modifier: Modifier = Modifier,

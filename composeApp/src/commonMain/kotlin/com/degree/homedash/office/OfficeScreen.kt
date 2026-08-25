@@ -104,8 +104,7 @@ fun OfficeContent(
 
         ControlGroup(
             title = "Doors",
-            entities = ui.doors,
-            onAction = onAction,
+            devices = ui.doors,
         )
 
         ControlGroup("Workstation") {

@@ -2,6 +2,7 @@ package com.degree.homedash.controls
 
 import com.degree.homedash.shared.model.entity.ClimateMetadata
 import com.degree.homedash.shared.model.entity.DeviceMetadata
+import com.degree.homedash.shared.model.entity.DoorMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.LightMetadata
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
@@ -34,6 +35,11 @@ fun DeviceMetadata.loadUi(repo: ExpHomeAssistantRepo): Flow<DeviceUi>? = when (t
     is ClimateMetadata -> {
         val metadata = this
         loadState(repo).map { state -> ClimateDeviceUi(metadata = metadata, state = state) }
+    }
+
+    is DoorMetadata -> {
+        val metadata = this
+        loadState(repo).map { state -> DoorDeviceUi(metadata = metadata, state = state) }
     }
 
     else -> null

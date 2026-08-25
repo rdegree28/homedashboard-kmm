@@ -9,6 +9,7 @@ import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.FanDeviceUi
 import com.degree.homedash.controls.LightDeviceUi
 import com.degree.homedash.controls.DeviceUi
+import com.degree.homedash.controls.DoorDeviceUi
 import com.degree.homedash.controls.loadDeviceUis
 import com.degree.homedash.controls.toEntityUis
 import com.degree.homedash.shared.model.entity.DeviceMetadata
@@ -60,7 +61,7 @@ data class OfficeUiState(
     val lights: List<LightDeviceUi>,
     val fans: List<FanDeviceUi>,
     val climate: List<ClimateDeviceUi>,
-    val doors: List<EntityUi.Door>,
+    val doors: List<DoorDeviceUi>,
     val activeSignal: String?,
     val workstation: ToggleUi,
     val hexagon: ToggleUi,
@@ -143,7 +144,7 @@ private fun buildOfficeUiState(
         lights = deviceUis.filterIsInstance<LightDeviceUi>(),
         fans = deviceUis.filterIsInstance<FanDeviceUi>(),
         climate = deviceUis.filterIsInstance<ClimateDeviceUi>(),
-        doors = uis.filterIsInstance<EntityUi.Door>(),
+        doors = deviceUis.filterIsInstance<DoorDeviceUi>(),
         activeSignal = states[OfficeEntities.SIGNAL_MODE]?.state,
         // The remaining Office controls have no DeviceMetadata type, so they stay hand-wired.
         workstation = states[OfficeEntities.WORKSTATION].toToggleUi("Workstation"),

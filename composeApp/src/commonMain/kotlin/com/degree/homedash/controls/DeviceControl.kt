@@ -58,6 +58,14 @@ fun DeviceControl(
             )
         }
 
+        is DoorDeviceUi -> DoorCard(
+            label = device.name,
+            statusText = device.statusText,
+            open = device.open,
+            unavailable = device.unavailable,
+            modifier = modifier,
+        )
+
         is ClimateDeviceUi -> {
             val (icon: ImageVector, tint: Color) = when (device.climateKind) {
                 ClimateMetadata.ClimateKind.Temperature -> Icons.Filled.Thermostat to AppColors.TempWarm

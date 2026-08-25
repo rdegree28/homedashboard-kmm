@@ -4,11 +4,13 @@ import com.degree.homedash.controls.ClimateDeviceUi
 import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.FanDeviceUi
+import com.degree.homedash.controls.DoorDeviceUi
 import com.degree.homedash.controls.LightDeviceUi
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.api.HaConnectionStatus
 import com.degree.homedash.shared.model.states.ClimateState
 import com.degree.homedash.shared.model.states.FanState
+import com.degree.homedash.shared.model.states.DoorState
 import com.degree.homedash.shared.model.states.LightState
 import kotlin.math.sin
 
@@ -41,7 +43,10 @@ internal val previewOfficeUiState = OfficeUiState(
             ClimateState("sensor.humidity", false, 48.5, "°F")),
     ),
     doors = listOf(
-        EntityUi.Door(DoorMetadata("binary_sensor.office_door", "Office Door"), "Open", open = true, unavailable = false),
+        DoorDeviceUi(
+            DoorMetadata("binary_sensor.office_door", "Office Door"),
+            DoorState(entityId = "binary_sensor.office_door", isOffline = false, isOpen = true),
+        ),
     ),
     activeSignal = "green",
     workstation = ToggleUi("Workstation", isOn = true, offline = false),
