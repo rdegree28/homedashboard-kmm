@@ -10,6 +10,7 @@ import com.degree.homedash.shared.model.entity.HvacMode
 import com.degree.homedash.shared.model.entity.LightMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata
 import com.degree.homedash.shared.model.entity.OfficeSignalMetadata
+import com.degree.homedash.shared.model.entity.OfficeWorkstationMetadata
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
 import com.degree.homedash.shared.model.entity.ThermostatMetadata
 import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
@@ -120,6 +121,9 @@ fun DeviceMetadata.toEntityUi(
 
     // Fully migrated to the device stack — rendered by DeviceControl, with no [EntityUi] form at all.
     is OfficeSignalMetadata -> null
+
+    // Fully migrated to the device stack — rendered by DeviceControl, with no [EntityUi] form at all.
+    is OfficeWorkstationMetadata -> null
 }
 
 /** Projects a whole screen's roster against the current [states] map. */

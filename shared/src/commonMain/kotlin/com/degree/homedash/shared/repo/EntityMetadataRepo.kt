@@ -13,6 +13,7 @@ import com.degree.homedash.shared.model.entity.OfficeSignalMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata.CardPhoto
 import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
 import com.degree.homedash.shared.model.entity.NavigationMetadata.RoomIcon
+import com.degree.homedash.shared.model.entity.OfficeWorkstationMetadata
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
 import com.degree.homedash.shared.model.entity.ThermostatMetadata
 import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
@@ -113,6 +114,12 @@ class EntityMetadataRepo(
                 OfficeSignalMetadata.SignalMode.MEETING to "script.office_signal_set_red",
             ),
         ),
+        OfficeWorkstationMetadata(
+            toggleEntityId = "switch.office_workstation",
+            displayName = "Workstation",
+            currentPowerEntityId = "sensor.office_workstation_power",
+            totalPowerEntityId = "office_workstation_summation_delivered"
+        )
     )
 
     /**

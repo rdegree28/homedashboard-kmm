@@ -11,6 +11,7 @@ import com.degree.homedash.controls.LightDeviceUi
 import com.degree.homedash.controls.DeviceUi
 import com.degree.homedash.controls.DoorDeviceUi
 import com.degree.homedash.controls.OfficeSignalDeviceUi
+import com.degree.homedash.controls.OfficeWorkstationUi
 import com.degree.homedash.controls.loadDeviceUis
 import com.degree.homedash.controls.toEntityUis
 import com.degree.homedash.shared.model.entity.DeviceMetadata
@@ -64,7 +65,7 @@ data class OfficeUiState(
     val climate: List<ClimateDeviceUi>,
     val doors: List<DoorDeviceUi>,
     val signal: OfficeSignalDeviceUi?,
-    val workstation: ToggleUi,
+    val workstation: OfficeWorkstationUi?,
     val power: SensorUi,
     val energy: SensorUi,
     val powerHistory: List<HistoryPoint>,
@@ -136,7 +137,7 @@ private fun buildOfficeUiState(
         doors = deviceUis.filterIsInstance<DoorDeviceUi>(),
         signal = deviceUis.filterIsInstance<OfficeSignalDeviceUi>().firstOrNull(),
         // The remaining Office controls have no DeviceMetadata type, so they stay hand-wired.
-        workstation = states[OfficeEntities.WORKSTATION].toToggleUi("Workstation"),
+        workstation = deviceUis.filterIsInstance<OfficeWorkstationUi>().firstOrNull(),
         power = states[OfficeEntities.POWER].toSensorUi("Power", decimals = 2, dashWhenUnavailable = false),
         energy = states[OfficeEntities.ENERGY].toSensorUi("Total Power Used", decimals = 2, dashWhenUnavailable = false),
         powerHistory = powerHistory,

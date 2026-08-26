@@ -105,14 +105,16 @@ fun OfficeContent(
             devices = ui.doors,
         )
 
-        ControlGroup("Workstation", titleOutsideCard = true) {
-            WorkstationControl(ui.workstation) { onToggle(OfficeEntities.WORKSTATION) }
-            Spacer(Modifier.height(8.dp))
-            Text("Power Usage", style = MaterialTheme.typography.titleMedium)
-            PowerGraph(ui.powerHistory)
-            Spacer(Modifier.height(4.dp))
-            StatRow(ui.power)
-            StatRow(ui.energy)
+        ui.workstation?.run {
+            ControlGroup("Workstation", titleOutsideCard = true) {
+                WorkstationControl(ui.workstation) { onToggle(OfficeEntities.WORKSTATION) }
+//            Spacer(Modifier.height(8.dp))
+//            Text("Power Usage", style = MaterialTheme.typography.titleMedium)
+//            PowerGraph(ui.powerHistory)
+//            Spacer(Modifier.height(4.dp))
+//            StatRow(ui.power)
+//            StatRow(ui.energy)
+            }
         }
     }
 }

@@ -7,7 +7,15 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -18,21 +26,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.degree.homedash.office.PowerGraph
+import com.degree.homedash.office.SensorUi
 import com.degree.homedash.office.ToggleUi
+import com.degree.homedash.shared.model.entity.OfficeWorkstationMetadata
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 
 /** A workstation row: a laptop icon with code scrolling on its screen while on (banana yellow). */
 @Composable
 fun WorkstationControl(
-    ui: ToggleUi,
-    workstationControlType: WorkstationControlType = WorkstationControlType.Row,
+    ui: OfficeWorkstationUi,
     onToggle: () -> Unit,
 ) {
-    when (workstationControlType) {
-        is WorkstationControlType.Row -> EntityToggleRow(
-            ui = ui,
+    Column {
+        EntityToggleRow(
+            ui = ToggleUi(name = ui.name, isOn = ui.isOn, offline = ui.isOffline),
             onTint = AppColors.WorkstationOn,
             onToggle = onToggle
         ) { tint ->
@@ -42,6 +54,30 @@ fun WorkstationControl(
                 modifier = Modifier.size(Dimens.RowIconSize)
             )
         }
+
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = "Power Usage",
+            style = MaterialTheme.typography.titleMedium
+        )
+        PowerGraph(ui.powerHistoryPoints)
+        Spacer(Modifier.height(4.dp))
+        StatRow("Current Power", ui.currentPower)
+        StatRow("Total Power", ui.totalPower)
+    }
+}
+
+@Composable
+private fun StatRow(
+    label: String,
+    valueText: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(label, style = MaterialTheme.typography.bodyLarge)
+        Text(valueText, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
     }
 }
 
@@ -125,7 +161,7 @@ sealed interface WorkstationControlType {
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
 @Composable
 private fun WorkstationControlPreview() = ControlPreview {
-    WorkstationControl(previewToggle("On", isOn = true)) {}
-    WorkstationControl(previewToggle("Off", isOn = false)) {}
-    WorkstationControl(previewToggle("Offline", offline = true)) {}
+//    WorkstationControl(OfficeWorkstationUi(metadata = OfficeWorkstationMetadata(displayName = "On")"On", isOn = true)) {}
+//    WorkstationControl(previewToggle("Off", isOn = false)) {}
+//    WorkstationControl(previewToggle("Offline", offline = true)) {}
 }

@@ -7,6 +7,7 @@ import com.degree.homedash.controls.FanDeviceUi
 import com.degree.homedash.controls.DoorDeviceUi
 import com.degree.homedash.controls.LightDeviceUi
 import com.degree.homedash.controls.OfficeSignalDeviceUi
+import com.degree.homedash.controls.OfficeWorkstationUi
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.api.HaConnectionStatus
 import com.degree.homedash.shared.model.states.ClimateState
@@ -14,6 +15,7 @@ import com.degree.homedash.shared.model.states.FanState
 import com.degree.homedash.shared.model.states.DoorState
 import com.degree.homedash.shared.model.states.LightState
 import com.degree.homedash.shared.model.states.OfficeSignalState
+import com.degree.homedash.shared.model.states.OfficeWorkstationState
 import kotlin.math.sin
 
 // Shared sample data for the Office screen preview.
@@ -63,7 +65,8 @@ internal val previewOfficeUiState = OfficeUiState(
             mode = OfficeSignalMetadata.SignalMode.AVAILABLE,
         ),
     ),
-    workstation = ToggleUi("Workstation", isOn = true, offline = false),
+    workstation = OfficeWorkstationUi(metadata = OfficeWorkstationMetadata(displayName = "Workstation", toggleEntityId = "office.workstation", currentPowerEntityId = "current", totalPowerEntityId = "total"),
+        state = OfficeWorkstationState(entityId = "office.workstation", isOn = true, isOffline = false)),
     power = SensorUi("Power", "61.1 W"),
     energy = SensorUi("Total Power Used", "34.8 kWh"),
     powerHistory = previewHistory,
