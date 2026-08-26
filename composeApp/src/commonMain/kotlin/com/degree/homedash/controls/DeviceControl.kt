@@ -35,12 +35,17 @@ fun DeviceControl(
     when (device) {
         is LightDeviceUi -> {
             val icon: @Composable (Color) -> Unit = { tint ->
-                LightIcon(on = device.isOn, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
+                LightIcon(
+                    on = device.isOn,
+                    tint = tint,
+                    modifier = Modifier.size(Dimens.RowIconSize),
+                    icon = device.icon,
+                )
             }
             val ui = ToggleUi(name = device.name, isOn = device.isOn, offline = device.offline)
             EntityToggleCard(
                 ui,
-                AppColors.LightOn,
+                Color(device.tint),
                 { device.onToggle(repo) },
                 icon,
                 modifier,

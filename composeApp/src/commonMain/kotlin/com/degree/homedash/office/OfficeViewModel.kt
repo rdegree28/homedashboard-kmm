@@ -65,7 +65,6 @@ data class OfficeUiState(
     val doors: List<DoorDeviceUi>,
     val signal: OfficeSignalDeviceUi?,
     val workstation: ToggleUi,
-    val hexagon: ToggleUi,
     val power: SensorUi,
     val energy: SensorUi,
     val powerHistory: List<HistoryPoint>,
@@ -138,7 +137,6 @@ private fun buildOfficeUiState(
         signal = deviceUis.filterIsInstance<OfficeSignalDeviceUi>().firstOrNull(),
         // The remaining Office controls have no DeviceMetadata type, so they stay hand-wired.
         workstation = states[OfficeEntities.WORKSTATION].toToggleUi("Workstation"),
-        hexagon = states[OfficeEntities.HEXAGON].toToggleUi("Hexagon Lights"),
         power = states[OfficeEntities.POWER].toSensorUi("Power", decimals = 2, dashWhenUnavailable = false),
         energy = states[OfficeEntities.ENERGY].toSensorUi("Total Power Used", decimals = 2, dashWhenUnavailable = false),
         powerHistory = powerHistory,

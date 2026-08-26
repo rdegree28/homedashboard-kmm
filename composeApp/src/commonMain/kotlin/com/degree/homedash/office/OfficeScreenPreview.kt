@@ -64,7 +64,6 @@ internal val previewOfficeUiState = OfficeUiState(
         ),
     ),
     workstation = ToggleUi("Workstation", isOn = true, offline = false),
-    hexagon = ToggleUi("Hexagon Lights", isOn = false, offline = false),
     power = SensorUi("Power", "61.1 W"),
     energy = SensorUi("Total Power Used", "34.8 kWh"),
     powerHistory = previewHistory,

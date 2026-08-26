@@ -77,12 +77,18 @@ class EntityMetadataRepo(
      * The Office lights, fans, climate sensors, and door.
      *
      * Deliberately excludes the rest of the Office dashboard, none of which has an [DeviceMetadata]
-     * type yet: the workstation switch, the hexagon lights, the traffic signal and its three scripts,
-     * the signal-mode sensor, and the power/energy sensors.
+     * type yet: the workstation switch, and the power/energy sensors.
      */
     fun loadOfficeEntityMetadataList(): List<DeviceMetadata> = listOf(
         LightMetadata("light.office_light", "Office"),
         LightMetadata("light.office_small_light", "Small"),
+        // Panels, not bulbs: its own glyph, and they glow white rather than amber.
+        LightMetadata(
+            "light.hexagon_lights",
+            "Hexagon",
+            icon = LightMetadata.LightIcon.Hexagon,
+            tint = 0xFFFFFFFF,
+        ),
         FanMetadata.dellaTowerFan("fan.office_fan_office_fan", "Office Fan"),
         FanMetadata("fan.office_box_fan", "Box Fan"),
         // The misting fan reports no usable percentage_step; 6 is the count the dashboard has always used.

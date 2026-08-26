@@ -24,6 +24,10 @@ data class LightDeviceUi(
     val isOn: Boolean get() = state.isOn
     val offline: Boolean get() = state.isOffline
 
+    /** The glyph and the on-colour this fixture declares — a bulb in amber unless it says otherwise. */
+    val icon: LightMetadata.LightIcon get() = metadata.icon
+    val tint: Long get() = metadata.tint
+
     fun onToggle(repo: ExpHomeAssistantRepo) = metadata.onToggle(repo)
 
     override val cardSpan: Int

@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.degree.homedash.controls.PreviewKoin
 import com.degree.homedash.controls.EntityAction
-import com.degree.homedash.controls.HexagonControl
 import com.degree.homedash.controls.WorkstationControl
 import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.AppColors
@@ -108,7 +107,6 @@ fun OfficeContent(
 
         ControlGroup("Workstation") {
             WorkstationControl(ui.workstation) { onToggle(OfficeEntities.WORKSTATION) }
-            HexagonControl(ui.hexagon) { onToggle(OfficeEntities.HEXAGON) }
             Spacer(Modifier.height(8.dp))
             Text("Power Usage", style = MaterialTheme.typography.titleMedium)
             PowerGraph(ui.powerHistory)

@@ -92,12 +92,18 @@ fun EntityControl(
         is EntityUi.Light -> {
             val onToggle = { onAction(EntityAction.Toggle(entity.entityId)) }
             val icon: @Composable (Color) -> Unit = { tint ->
-                LightIcon(on = entity.isOn, tint = tint, modifier = Modifier.size(Dimens.RowIconSize))
+                LightIcon(
+                    on = entity.isOn,
+                    tint = tint,
+                    modifier = Modifier.size(Dimens.RowIconSize),
+                    icon = entity.metadata.icon,
+                )
             }
+            val onTint = Color(entity.metadata.tint)
             val ui = ToggleUi(name = entity.displayName, isOn = entity.isOn, offline = entity.offline)
             when (layout) {
-                ControlLayout.Row -> EntityToggleRow(ui, AppColors.LightOn, onToggle, icon)
-                ControlLayout.Card -> EntityToggleCard(ui, AppColors.LightOn, onToggle, icon, modifier)
+                ControlLayout.Row -> EntityToggleRow(ui, onTint, onToggle, icon)
+                ControlLayout.Card -> EntityToggleCard(ui, onTint, onToggle, icon, modifier)
             }
         }
 
