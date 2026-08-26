@@ -105,7 +105,7 @@ fun OfficeContent(
             devices = ui.doors,
         )
 
-        ControlGroup("Workstation") {
+        ControlGroup("Workstation", titleOutsideCard = true) {
             WorkstationControl(ui.workstation) { onToggle(OfficeEntities.WORKSTATION) }
             Spacer(Modifier.height(8.dp))
             Text("Power Usage", style = MaterialTheme.typography.titleMedium)

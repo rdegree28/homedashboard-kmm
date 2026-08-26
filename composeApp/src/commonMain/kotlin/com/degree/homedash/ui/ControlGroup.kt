@@ -40,22 +40,32 @@ import com.degree.homedash.controls.previewLight
  * dashboards. The group is wrapped in a [Card] with the title inside it. Use this for sections that
  * mix control types or embed extras (graphs, selectors); for a homogeneous entity list that can
  * become a card grid, use the [entities] overload below.
+ *
+ * [titleOutsideCard] lifts the title above the card instead, the way the card-grid groups label
+ * themselves — so a slot group can sit next to them without its heading looking a level deeper.
  */
 @Composable
 fun ControlGroup(
     title: String,
+    titleOutsideCard: Boolean = false,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Card(
+    Column(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = AppColors.CardBackground),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+        if (titleOutsideCard) GroupTitle(title)
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = AppColors.CardBackground),
         ) {
-            GroupTitle(title)
-            content()
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                if (!titleOutsideCard) GroupTitle(title)
+                content()
+            }
         }
     }
 }
