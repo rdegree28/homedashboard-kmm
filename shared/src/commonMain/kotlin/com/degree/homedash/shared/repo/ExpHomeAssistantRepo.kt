@@ -58,6 +58,14 @@ class ExpHomeAssistantRepo internal constructor(
         api.toggleEntity(entityId = entity.entityId)
     }
 
+    /** Turn [entityId] off, whatever its domain. */
+    internal fun turnOff(entityId: String) =
+        api.callService(entityId.substringBefore('.'), "turn_off", entityId)
+
+    /** Run a `script.*` entity. */
+    internal fun runScript(scriptEntityId: String) =
+        api.callService("script", "turn_on", scriptEntityId)
+
     /** Set a fan's speed (0–100%). The value arrives back via the entity's `percentage` attribute. */
     internal fun setFanPercentage(
         metadata: FanMetadata,

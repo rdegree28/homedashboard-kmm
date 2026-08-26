@@ -6,12 +6,14 @@ import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.FanDeviceUi
 import com.degree.homedash.controls.DoorDeviceUi
 import com.degree.homedash.controls.LightDeviceUi
+import com.degree.homedash.controls.OfficeSignalDeviceUi
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.api.HaConnectionStatus
 import com.degree.homedash.shared.model.states.ClimateState
 import com.degree.homedash.shared.model.states.FanState
 import com.degree.homedash.shared.model.states.DoorState
 import com.degree.homedash.shared.model.states.LightState
+import com.degree.homedash.shared.model.states.OfficeSignalState
 import kotlin.math.sin
 
 // Shared sample data for the Office screen preview.
@@ -48,7 +50,19 @@ internal val previewOfficeUiState = OfficeUiState(
             DoorState(entityId = "binary_sensor.office_door", isOffline = false, isOpen = true),
         ),
     ),
-    activeSignal = "green",
+    signal = OfficeSignalDeviceUi(
+        OfficeSignalMetadata(
+            entityId = "sensor.office_signal_mode",
+            displayName = "Signal",
+            trafficLight = "light.office_traffic_signal",
+            modeScripts = emptyMap(),
+        ),
+        OfficeSignalState(
+            entityId = "sensor.office_signal_mode",
+            isOffline = false,
+            mode = OfficeSignalMetadata.SignalMode.AVAILABLE,
+        ),
+    ),
     workstation = ToggleUi("Workstation", isOn = true, offline = false),
     hexagon = ToggleUi("Hexagon Lights", isOn = false, offline = false),
     power = SensorUi("Power", "61.1 W"),

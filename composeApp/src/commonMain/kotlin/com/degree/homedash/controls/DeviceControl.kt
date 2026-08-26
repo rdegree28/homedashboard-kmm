@@ -58,6 +58,12 @@ fun DeviceControl(
             )
         }
 
+        is OfficeSignalDeviceUi -> OfficeSignalSelector(
+            activeMode = device.activeMode,
+            onSelect = { mode -> device.select(mode, repo) },
+            modifier = modifier,
+        )
+
         is DoorDeviceUi -> DoorCard(
             label = device.name,
             statusText = device.statusText,

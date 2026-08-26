@@ -10,6 +10,7 @@ import com.degree.homedash.controls.FanDeviceUi
 import com.degree.homedash.controls.LightDeviceUi
 import com.degree.homedash.controls.DeviceUi
 import com.degree.homedash.controls.DoorDeviceUi
+import com.degree.homedash.controls.OfficeSignalDeviceUi
 import com.degree.homedash.controls.loadDeviceUis
 import com.degree.homedash.controls.toEntityUis
 import com.degree.homedash.shared.model.entity.DeviceMetadata
@@ -62,7 +63,7 @@ data class OfficeUiState(
     val fans: List<FanDeviceUi>,
     val climate: List<ClimateDeviceUi>,
     val doors: List<DoorDeviceUi>,
-    val activeSignal: String?,
+    val signal: OfficeSignalDeviceUi?,
     val workstation: ToggleUi,
     val hexagon: ToggleUi,
     val power: SensorUi,
@@ -113,17 +114,6 @@ class OfficeViewModel(
         viewModelScope.launch { repo.toggle(entityId) }
     }
 
-    fun signal(mode: SignalMode) {
-        viewModelScope.launch {
-            when (mode) {
-                SignalMode.OFF -> repo.turnOff(OfficeEntities.TRAFFIC_SIGNAL)
-                SignalMode.AVAILABLE -> repo.runScript(OfficeEntities.SCRIPT_GREEN)
-                SignalMode.FOCUSED -> repo.runScript(OfficeEntities.SCRIPT_AMBER)
-                SignalMode.MEETING -> repo.runScript(OfficeEntities.SCRIPT_RED)
-            }
-        }
-    }
-
     private companion object {
         val EMPTY = buildOfficeUiState(emptyList(), emptyMap(), HaConnectionStatus.Disconnected, emptyList(), emptyList())
     }
@@ -145,7 +135,7 @@ private fun buildOfficeUiState(
         fans = deviceUis.filterIsInstance<FanDeviceUi>(),
         climate = deviceUis.filterIsInstance<ClimateDeviceUi>(),
         doors = deviceUis.filterIsInstance<DoorDeviceUi>(),
-        activeSignal = states[OfficeEntities.SIGNAL_MODE]?.state,
+        signal = deviceUis.filterIsInstance<OfficeSignalDeviceUi>().firstOrNull(),
         // The remaining Office controls have no DeviceMetadata type, so they stay hand-wired.
         workstation = states[OfficeEntities.WORKSTATION].toToggleUi("Workstation"),
         hexagon = states[OfficeEntities.HEXAGON].toToggleUi("Hexagon Lights"),

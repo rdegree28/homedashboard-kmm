@@ -43,7 +43,6 @@ fun OfficeScreen(
         onBack = onBack,
         onOpenSettings = onOpenSettings,
         onToggle = vm::toggle,
-        onSignal = vm::signal,
     )
 }
 
@@ -58,7 +57,6 @@ fun OfficeContent(
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
     onToggle: (String) -> Unit,
-    onSignal: (SignalMode) -> Unit,
 ) {
     val onAction: (EntityAction) -> Unit = { action ->
         when (action) {
@@ -93,9 +91,10 @@ fun OfficeContent(
             devices = ui.fans,
         )
 
-        ControlGroup("Status") {
-            SignalSelector(ui.activeSignal, onSignal)
-        }
+        ControlGroup(
+            title = "Signal",
+            devices = listOfNotNull(ui.signal),
+        )
 
         ControlGroup(
             title = "Climate",
@@ -121,34 +120,6 @@ fun OfficeContent(
 }
 
 @Composable
-private fun SignalSelector(activeSignal: String?, onSelect: (SignalMode) -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        SignalMode.entries.forEach { mode ->
-            val active = activeSignal == mode.stateValue
-            val color = signalColor(mode)
-            Button(
-                onClick = { onSelect(mode) },
-                modifier = Modifier.weight(1f).height(52.dp),
-                contentPadding = PaddingValues(horizontal = 4.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (active) color else MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = if (active) Color.Black else MaterialTheme.colorScheme.onSurfaceVariant,
-                ),
-            ) {
-                Text(
-                    text = mode.label,
-                    maxLines = 1,
-                    style = MaterialTheme.typography.labelLarge,
-                )
-            }
-        }
-    }
-}
-
-@Composable
 private fun StatRow(ui: SensorUi) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -159,12 +130,6 @@ private fun StatRow(ui: SensorUi) {
     }
 }
 
-private fun signalColor(mode: SignalMode): Color = when (mode) {
-    SignalMode.OFF -> AppColors.SignalOff
-    SignalMode.AVAILABLE -> AppColors.StatusGreen
-    SignalMode.FOCUSED -> AppColors.StatusAmber
-    SignalMode.MEETING -> AppColors.StatusRed
-}
 
 @Preview(widthDp = 380, heightDp = 1700)
 @Composable
@@ -176,7 +141,6 @@ private fun OfficeScreenPreview() = PreviewKoin {
                 onBack = {},
                 onOpenSettings = {},
                 onToggle = {},
-                onSignal = {},
             )
         }
     }

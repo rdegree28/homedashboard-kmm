@@ -9,6 +9,7 @@ import com.degree.homedash.shared.model.entity.HvacAction
 import com.degree.homedash.shared.model.entity.HvacMode
 import com.degree.homedash.shared.model.entity.LightMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata
+import com.degree.homedash.shared.model.entity.OfficeSignalMetadata
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
 import com.degree.homedash.shared.model.entity.ThermostatMetadata
 import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
@@ -31,7 +32,7 @@ import kotlin.math.roundToInt
 fun DeviceMetadata.toEntityUi(
     state: EntityState?,
     allStates: Map<String, EntityState> = emptyMap(),
-): EntityUi = when (this) {
+): EntityUi? = when (this) {
     is LightMetadata -> EntityUi.Light(
         metadata = this,
         isOn = state?.isOn == true,
@@ -116,11 +117,14 @@ fun DeviceMetadata.toEntityUi(
 
     // Likewise stateless — a trigger fires a service, it doesn't report anything.
     is TriggerDeviceMetadata -> EntityUi.Trigger(this)
+
+    // Fully migrated to the device stack — rendered by DeviceControl, with no [EntityUi] form at all.
+    is OfficeSignalMetadata -> null
 }
 
 /** Projects a whole screen's roster against the current [states] map. */
 fun List<DeviceMetadata>.toEntityUis(states: Map<String, EntityState>): List<EntityUi> =
-    map { it.toEntityUi(states[it.entityId], states) }
+    mapNotNull { it.toEntityUi(states[it.entityId], states) }
 
 /** Missing and unavailable are the same thing to a control: nothing to show. */
 private fun EntityState?.isOffline(): Boolean = this == null || this.isUnavailable

@@ -9,6 +9,7 @@ import com.degree.homedash.shared.model.entity.DeviceMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.LightMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata
+import com.degree.homedash.shared.model.entity.OfficeSignalMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata.CardPhoto
 import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
 import com.degree.homedash.shared.model.entity.NavigationMetadata.RoomIcon
@@ -95,6 +96,17 @@ class EntityMetadataRepo(
         ClimateMetadata("sensor.sonoff_snzb_02d_temperature", "Temperature", ClimateMetadata.ClimateKind.Temperature),
         ClimateMetadata("sensor.sonoff_snzb_02d_humidity", "Humidity", ClimateMetadata.ClimateKind.Humidity),
         DoorMetadata("binary_sensor.office_door_sensor", "Office Door"),
+        // Reads the mirroring sensor; each mode runs its own script, and Off turns the light off.
+        OfficeSignalMetadata(
+            entityId = "sensor.office_signal_mode",
+            displayName = "Signal",
+            trafficLight = "light.office_traffic_signal",
+            modeScripts = mapOf(
+                OfficeSignalMetadata.SignalMode.AVAILABLE to "script.office_signal_set_green",
+                OfficeSignalMetadata.SignalMode.FOCUSED to "script.office_signal_set_amber",
+                OfficeSignalMetadata.SignalMode.MEETING to "script.office_signal_set_red",
+            ),
+        ),
     )
 
     /**
