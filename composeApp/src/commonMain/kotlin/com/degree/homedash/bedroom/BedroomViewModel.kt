@@ -3,10 +3,15 @@ package com.degree.homedash.bedroom
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.degree.homedash.controls.ClimateDeviceUi
+import com.degree.homedash.controls.DeviceUi
 import com.degree.homedash.controls.EntityUi
-import com.degree.homedash.controls.toEntityUis
+import com.degree.homedash.controls.FanDeviceUi
+import com.degree.homedash.controls.LightDeviceUi
+import com.degree.homedash.controls.loadDeviceUis
 import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
 import com.degree.homedash.shared.repo.EntityMetadataRepo
+import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -18,57 +23,46 @@ import kotlinx.coroutines.launch
 @Immutable
 data class BedroomUiState(
     val triggers: List<EntityUi.Trigger>,
-    val lights: List<EntityUi.Light>,
-    val fans: List<EntityUi.Fan>,
-    val climate: List<EntityUi.Climate>,
+    val lights: List<LightDeviceUi>,
+    val fans: List<FanDeviceUi>,
+    val climate: List<ClimateDeviceUi>,
 )
 
-/** Projects the configured Bedroom entities into [BedroomUiState]. */
+/** Projects the configured Bedroom devices into [BedroomUiState]. */
 class BedroomViewModel(
     private val repo: HomeAssistantRepo,
     metadataRepo: EntityMetadataRepo,
+    deviceRepo: ExpHomeAssistantRepo,
 ) : ViewModel() {
 
     /** The screen's roster; static, so it's read once rather than on every state push. */
     private val entities = metadataRepo.loadBedroomEntityMetadataList()
 
+    /**
+     * The scene cards. Static: a trigger fires a service and reports nothing, so unlike the devices
+     * below there is no state to project — they are built once and never change.
+     */
+    private val triggers: List<EntityUi.Trigger> =
+        entities.filterIsInstance<TriggerDeviceMetadata>().map(EntityUi::Trigger)
+
     val uiState: StateFlow<BedroomUiState> =
-        repo.states
-            .map { states ->
-                val uis = entities.toEntityUis(states)
-                BedroomUiState(
-                    triggers = uis.filterIsInstance<EntityUi.Trigger>(),
-                    lights = uis.filterIsInstance<EntityUi.Light>(),
-                    fans = uis.filterIsInstance<EntityUi.Fan>(),
-                    climate = uis.filterIsInstance<EntityUi.Climate>(),
-                )
-            }
+        entities.loadDeviceUis(deviceRepo)
+            .map { deviceUis -> buildUiState(triggers, deviceUis) }
             .distinctUntilChanged()
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EMPTY)
-
-    fun toggle(entityId: String) {
-        viewModelScope.launch { repo.toggle(entityId) }
-    }
-
-    fun setFanSpeed(entityId: String, percentage: Int) {
-        viewModelScope.launch { repo.setFanPercentage(entityId, percentage) }
-    }
-
-    fun setOscillating(entityId: String, oscillating: Boolean) {
-        viewModelScope.launch { repo.setFanOscillating(entityId, oscillating) }
-    }
-
-    /** [entityId] is the mister's own humidifier entity, not the fan's. */
-    fun setMisting(entityId: String, misting: Boolean) {
-        viewModelScope.launch { repo.setMisting(entityId, misting) }
-    }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), buildUiState(triggers, emptyList()))
 
     /** Fires a trigger card's service call — running a script, activating a scene. */
     fun activate(call: TriggerDeviceMetadata.ServiceCall) {
         viewModelScope.launch { repo.callService(call.domain, call.service, call.entityId) }
     }
-
-    private companion object {
-        val EMPTY = BedroomUiState(emptyList(), emptyList(), emptyList(), emptyList())
-    }
 }
+
+private fun buildUiState(
+    triggers: List<EntityUi.Trigger>,
+    deviceUis: List<DeviceUi>,
+) = BedroomUiState(
+    triggers = triggers,
+    lights = deviceUis.filterIsInstance<LightDeviceUi>(),
+    fans = deviceUis.filterIsInstance<FanDeviceUi>(),
+    climate = deviceUis.filterIsInstance<ClimateDeviceUi>(),
+)

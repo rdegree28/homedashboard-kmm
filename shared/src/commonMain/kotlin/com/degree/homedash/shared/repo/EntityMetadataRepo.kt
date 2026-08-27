@@ -140,7 +140,12 @@ class EntityMetadataRepo(
         ClimateMetadata("sensor.living_room_thermostat_temperature", "Temperature", ClimateMetadata.ClimateKind.Temperature),
         // Unlike Office (humidity card with dew point as a subvalue), the Living Room shows a dew point
         // card computed from the temperature + humidity pair — keyed off the humidity entity id.
-        ClimateMetadata("sensor.living_room_thermostat_humidity", "Dew Point", ClimateMetadata.ClimateKind.DewPoint),
+        ClimateMetadata(
+            "sensor.living_room_thermostat_humidity",
+            "Dew Point",
+            ClimateMetadata.ClimateKind.DewPoint,
+            dewPointSource = ClimateMetadata.DewPointSource("sensor.living_room_thermostat_temperature"),
+        ),
     )
 
     /**

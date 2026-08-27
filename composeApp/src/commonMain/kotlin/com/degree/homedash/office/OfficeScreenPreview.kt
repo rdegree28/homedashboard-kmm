@@ -42,9 +42,9 @@ internal val previewOfficeUiState = OfficeUiState(
     ),
     climate = listOf(
         ClimateDeviceUi(ClimateMetadata("sensor.temp", "Temperature", ClimateMetadata.ClimateKind.Temperature),
-            ClimateState("sensor.temp", false, 75.6, "°F")),
+            ClimateState("sensor.temp", false, HistoricalEntityReading(75.6, "°F"))),
         ClimateDeviceUi(ClimateMetadata("sensor.humidity", "Humidity", ClimateMetadata.ClimateKind.Humidity),
-            ClimateState("sensor.humidity", false, 48.5, "°F")),
+            ClimateState("sensor.humidity", false, HistoricalEntityReading(48.5, "%"))),
     ),
     doors = listOf(
         DoorDeviceUi(

@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.office.FanUi
 import com.degree.homedash.office.ToggleUi
+import com.degree.homedash.shared.model.states.LightState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import org.koin.compose.KoinApplicationPreview
 import org.koin.dsl.module
@@ -67,6 +68,19 @@ internal fun previewLight(
     isOn = isOn,
     offline = offline,
 )
+
+/** The device-stack counterpart of [previewLight], for previews of screens that render [LightDeviceUi]. */
+internal fun previewLightDevice(
+    name: String,
+    isOn: Boolean = false,
+    offline: Boolean = false,
+): LightDeviceUi {
+    val entityId = "light.${name.lowercase()}"
+    return LightDeviceUi(
+        metadata = LightMetadata(entityId, name),
+        state = LightState(entityId = entityId, isOn = isOn, isOffline = offline),
+    )
+}
 
 internal fun previewFan(
     name: String,

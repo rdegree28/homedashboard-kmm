@@ -32,9 +32,8 @@ fun EntityState?.readingText(decimals: Int, dashWhenUnavailable: Boolean = true)
 }
 
 fun ClimateState?.readingText(decimals: Int): String {
-    if (this == null || isOffline || value == null) return "—"
-    val number = value ?: return "-"
-    return "${formatNumber(number, decimals)} $unit".trim()
+    if (this == null || isOffline) return "—"
+    return reading.readingText(decimals)
 }
 
 /**

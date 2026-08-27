@@ -45,9 +45,9 @@ import com.degree.homedash.shared.model.entity.HvacMode
 import com.degree.homedash.shared.model.entity.PresetKind
 import com.degree.homedash.shared.model.entity.TemperaturePreset
 import com.degree.homedash.shared.model.entity.ThermostatMetadata
+import com.degree.homedash.shared.model.dewPoint
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
-import com.degree.homedash.ui.dewPoint
 import com.degree.homedash.ui.formatNumber
 import com.degree.homedash.ui.icons.ControlIcons
 import kotlinx.coroutines.delay

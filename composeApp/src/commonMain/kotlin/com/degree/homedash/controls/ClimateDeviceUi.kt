@@ -14,7 +14,9 @@ data class ClimateDeviceUi(
     val name: String get() = metadata.displayName
 
     val valueText: String = state.readingText(decimals = 1)
-    val subvalueText: String? = null
+
+    /** The humidity under a dew point; null on the plain sensors, which have nothing to qualify. */
+    val subvalueText: String? = state.subvalue?.readingText(decimals = 0)
     val climateKind: ClimateMetadata.ClimateKind = metadata.kind
 
     override val cardSpan: Int get() = 1

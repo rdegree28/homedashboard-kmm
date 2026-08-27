@@ -17,3 +17,16 @@ data class HistoricalEntityReading(
         val Missing = HistoricalEntityReading(value = null, unit = "")
     }
 }
+
+/**
+ * What [this] entity is publishing right now — its numeric state and unit, or
+ * [HistoricalEntityReading.Missing] when it is absent, unavailable, or reporting something
+ * non-numeric.
+ */
+internal fun EntityState?.toReading(): HistoricalEntityReading {
+    if (this == null || isUnavailable) return HistoricalEntityReading.Missing
+    return HistoricalEntityReading(
+        value = state.toDoubleOrNull(),
+        unit = attrString("unit_of_measurement").orEmpty(),
+    )
+}

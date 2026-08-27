@@ -10,7 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.degree.homedash.controls.EntityAction
-import com.degree.homedash.controls.previewLight
+import com.degree.homedash.controls.PreviewKoin
+import com.degree.homedash.controls.previewLightDevice
 import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
@@ -29,10 +30,6 @@ fun BedroomScreen(
         ui = ui,
         onBack = onBack,
         onOpenSettings = onOpenSettings,
-        onToggle = vm::toggle,
-        onSetFanSpeed = vm::setFanSpeed,
-        onSetOscillating = vm::setOscillating,
-        onSetMisting = vm::setMisting,
         onActivate = vm::activate,
         modifier = modifier,
     )
@@ -49,28 +46,14 @@ fun BedroomContent(
     ui: BedroomUiState,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
-    onToggle: (String) -> Unit,
-    onSetFanSpeed: (String, Int) -> Unit,
-    onSetOscillating: (String, Boolean) -> Unit,
-    onSetMisting: (String, Boolean) -> Unit,
     onActivate: (TriggerDeviceMetadata.ServiceCall) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Scene cards are the only entities left on the action path; the devices carry their own behavior.
     val onAction: (EntityAction) -> Unit = { action ->
         when (action) {
-            is EntityAction.Toggle -> onToggle(action.entityId)
             is EntityAction.Activate -> onActivate(action.call)
-            is EntityAction.SetSpeed -> onSetFanSpeed(action.entityId, action.percentage)
-            is EntityAction.SetOscillating -> onSetOscillating(action.entityId, action.oscillating)
-            is EntityAction.SetMisting -> onSetMisting(action.entityId, action.misting)
-            // No thermostat on this screen.
-            is EntityAction.SetTargetTemperature -> Unit
-            is EntityAction.SetHvacMode -> Unit
-            is EntityAction.SetThermostatFanMode -> Unit
-            is EntityAction.SetPresetMode -> Unit
-            is EntityAction.SetExtremeTemperatures -> Unit
-            is EntityAction.OpenGraph -> Unit
-            is EntityAction.Navigate -> Unit
+            else -> Unit
         }
     }
 
@@ -96,38 +79,34 @@ fun BedroomContent(
         }
 
         if (ui.lights.isNotEmpty()) {
-            ControlGroup(title = "Lights", entities = ui.lights, useCardUis = true, onAction = onAction)
+            ControlGroup(title = "Lights", devices = ui.lights)
         }
         if (ui.fans.isNotEmpty()) {
-            ControlGroup(title = "Fans", entities = ui.fans, useCardUis = true, onAction = onAction)
+            ControlGroup(title = "Fans", devices = ui.fans)
         }
         if (ui.climate.isNotEmpty()) {
-            ControlGroup(title = "Climate", entities = ui.climate, useCardUis = true, onAction = onAction)
+            ControlGroup(title = "Climate", devices = ui.climate)
         }
     }
 }
 
 @Preview(widthDp = 380, heightDp = 400)
 @Composable
-private fun BedroomScreenPreview() {
+private fun BedroomScreenPreview() = PreviewKoin {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
             BedroomContent(
                 ui = BedroomUiState(
                     triggers = emptyList(),
                     lights = listOf(
-                        previewLight("West", isOn = true),
-                        previewLight("East", isOn = false),
+                        previewLightDevice("West", isOn = true),
+                        previewLightDevice("East", isOn = false),
                     ),
                     fans = emptyList(),
                     climate = emptyList(),
                 ),
                 onBack = {},
                 onOpenSettings = {},
-                onToggle = {},
-                onSetFanSpeed = { _, _ -> },
-                onSetOscillating = { _, _ -> },
-                onSetMisting = { _, _ -> },
                 onActivate = {},
             )
         }
@@ -137,17 +116,13 @@ private fun BedroomScreenPreview() {
 /** The room before any entities are wired up. */
 @Preview(widthDp = 380, heightDp = 260)
 @Composable
-private fun BedroomEmptyPreview() {
+private fun BedroomEmptyPreview() = PreviewKoin {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
             BedroomContent(
                 ui = BedroomUiState(emptyList(), emptyList(), emptyList(), emptyList()),
                 onBack = {},
                 onOpenSettings = {},
-                onToggle = {},
-                onSetFanSpeed = { _, _ -> },
-                onSetOscillating = { _, _ -> },
-                onSetMisting = { _, _ -> },
                 onActivate = {},
             )
         }

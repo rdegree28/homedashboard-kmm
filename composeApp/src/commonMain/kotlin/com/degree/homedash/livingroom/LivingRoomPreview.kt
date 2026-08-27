@@ -1,50 +1,84 @@
 package com.degree.homedash.livingroom
 
-import com.degree.homedash.shared.model.entity.*
-import com.degree.homedash.controls.EntityUi
+import com.degree.homedash.controls.ClimateDeviceUi
+import com.degree.homedash.controls.FanDeviceUi
+import com.degree.homedash.controls.LightDeviceUi
+import com.degree.homedash.shared.model.HistoricalEntityReading
+import com.degree.homedash.shared.model.entity.ClimateMetadata
+import com.degree.homedash.shared.model.entity.FanMetadata
+import com.degree.homedash.shared.model.entity.LightMetadata
+import com.degree.homedash.shared.model.states.ClimateState
+import com.degree.homedash.shared.model.states.FanState
+import com.degree.homedash.shared.model.states.LightState
 
 // Sample data for the Living Room @Previews (which live next to their composables in this package).
 
-internal val previewLights: List<EntityUi.Light> = listOf(
-    EntityUi.Light(
+internal val previewLights: List<LightDeviceUi> = listOf(
+    LightDeviceUi(
         metadata = LightMetadata(LivingRoomEntities.LIVING_ROOM_LIGHT_WEST, "Ceiling"),
-        isOn = true,
-        offline = false,
+        state = LightState(LivingRoomEntities.LIVING_ROOM_LIGHT_WEST, isOn = true, isOffline = false),
     ),
-    EntityUi.Light(
+    LightDeviceUi(
         metadata = LightMetadata(LivingRoomEntities.LIVING_ROOM_LIGHT_EAST, "Lamp"),
-        isOn = false,
-        offline = false,
+        state = LightState(LivingRoomEntities.LIVING_ROOM_LIGHT_EAST, isOn = false, isOffline = false),
     ),
-    EntityUi.Light(
+    LightDeviceUi(
         metadata = LightMetadata(LivingRoomEntities.HOMEWORK_LIGHT, "Accent"),
-        isOn = false,
-        offline = true,
+        state = LightState(LivingRoomEntities.HOMEWORK_LIGHT, isOn = false, isOffline = true),
     ),
 )
 
-internal val previewFans: List<EntityUi.Fan> = listOf(
-    EntityUi.Fan(
+internal val previewFans: List<FanDeviceUi> = listOf(
+    FanDeviceUi(
         metadata = FanMetadata(LivingRoomEntities.LIVING_ROOM_FAN, "Fan", FanMetadata.SpeedAdjustment(12)),
-        isOn = true,
-        offline = false,
-        percentage = 75,
+        state = FanState(
+            entityId = LivingRoomEntities.LIVING_ROOM_FAN,
+            isOn = true,
+            isOffline = false,
+            percentage = 75,
+            isOscillating = false,
+            isMisting = false,
+        ),
     ),
-    EntityUi.Fan(
+    FanDeviceUi(
         metadata = FanMetadata(LivingRoomEntities.LIVING_ROOM_BOX_FAN, "Ceiling Fan", FanMetadata.SpeedAdjustment(3)),
-        isOn = false,
-        offline = false,
-        percentage = 0,
+        state = FanState(
+            entityId = LivingRoomEntities.LIVING_ROOM_BOX_FAN,
+            isOn = false,
+            isOffline = false,
+            percentage = 0,
+            isOscillating = false,
+            isMisting = false,
+        ),
     ),
 )
 
-internal val previewClimate: List<EntityUi.Climate> = listOf(
-    EntityUi.Climate(
-        metadata = ClimateMetadata(LivingRoomEntities.TEMPERATURE, "Temperature", ClimateMetadata.ClimateKind.Temperature),
-        valueText = "72.5 °F",
+internal val previewClimate: List<ClimateDeviceUi> = listOf(
+    ClimateDeviceUi(
+        metadata = ClimateMetadata(
+            LivingRoomEntities.TEMPERATURE,
+            "Temperature",
+            ClimateMetadata.ClimateKind.Temperature,
+        ),
+        state = ClimateState(
+            entityId = LivingRoomEntities.TEMPERATURE,
+            isOffline = false,
+            reading = HistoricalEntityReading(72.5, "°F"),
+        ),
     ),
-    EntityUi.Climate(
-        metadata = ClimateMetadata(LivingRoomEntities.HUMIDITY, "Dew Point", ClimateMetadata.ClimateKind.DewPoint),
-        valueText = "50.9 °F (48%)",
+    // The dew point card, as its metadata builds it: the computed value with the humidity underneath.
+    ClimateDeviceUi(
+        metadata = ClimateMetadata(
+            LivingRoomEntities.HUMIDITY,
+            "Dew Point",
+            ClimateMetadata.ClimateKind.DewPoint,
+            dewPointSource = ClimateMetadata.DewPointSource(LivingRoomEntities.TEMPERATURE),
+        ),
+        state = ClimateState(
+            entityId = LivingRoomEntities.HUMIDITY,
+            isOffline = false,
+            reading = HistoricalEntityReading(50.9, "°F"),
+            subvalue = HistoricalEntityReading(48.0, "%"),
+        ),
     ),
 )

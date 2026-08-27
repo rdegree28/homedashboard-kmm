@@ -1,7 +1,6 @@
 package com.degree.homedash.shared.model.entity
 
-import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.shared.model.HistoricalEntityReading
+import com.degree.homedash.shared.model.toReading
 import com.degree.homedash.shared.model.states.OfficeWorkstationState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
@@ -47,13 +46,4 @@ data class OfficeWorkstationMetadata(
             )
         }
     }
-}
-
-/** A meter's numeric value and unit; [HistoricalEntityReading.Missing] when it isn't reporting one. */
-private fun EntityState?.toReading(): HistoricalEntityReading {
-    if (this == null || isUnavailable) return HistoricalEntityReading.Missing
-    return HistoricalEntityReading(
-        value = state.toDoubleOrNull(),
-        unit = attrString("unit_of_measurement").orEmpty(),
-    )
 }

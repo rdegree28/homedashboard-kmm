@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.degree.homedash.controls.EntityAction
+import com.degree.homedash.controls.PreviewKoin
 import com.degree.homedash.controls.previewTrigger
 import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
 import org.koin.compose.viewmodel.koinViewModel
@@ -30,10 +31,6 @@ fun LivingRoomScreen(
         ui = ui,
         onBack = onBack,
         onOpenSettings = onOpenSettings,
-        onToggle = vm::toggle,
-        onSetFanSpeed = vm::setFanSpeed,
-        onSetOscillating = vm::setOscillating,
-        onSetMisting = vm::setMisting,
         onActivate = vm::activate,
         showLights = showLights,
     )
@@ -46,29 +43,14 @@ fun LivingRoomContent(
     ui: LivingRoomUiState,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
-    onToggle: (String) -> Unit,
-    onSetFanSpeed: (String, Int) -> Unit,
-    onSetOscillating: (String, Boolean) -> Unit,
-    onSetMisting: (String, Boolean) -> Unit,
     onActivate: (TriggerDeviceMetadata.ServiceCall) -> Unit,
     showLights: Boolean = false,
 ) {
+    // Scene cards are the only entities left on the action path; the devices carry their own behavior.
     val onAction: (EntityAction) -> Unit = { action ->
         when (action) {
-            is EntityAction.Toggle -> onToggle(action.entityId)
             is EntityAction.Activate -> onActivate(action.call)
-            is EntityAction.OpenGraph -> Unit
-            is EntityAction.SetSpeed -> onSetFanSpeed(action.entityId, action.percentage)
-            is EntityAction.SetOscillating -> onSetOscillating(action.entityId, action.oscillating)
-            is EntityAction.SetMisting -> onSetMisting(action.entityId, action.misting)
-            // The thermostat moved to the Home launcher, so nothing here emits these any more.
-            is EntityAction.SetTargetTemperature,
-            is EntityAction.SetHvacMode,
-            is EntityAction.SetThermostatFanMode,
-            is EntityAction.SetPresetMode,
-            is EntityAction.SetExtremeTemperatures,
-            is EntityAction.Navigate,
-            -> Unit
+            else -> Unit
         }
     }
 
@@ -92,23 +74,17 @@ fun LivingRoomContent(
 
             ControlGroup(
                 title = "Lights",
-                entities = ui.lights,
-                useCardUis = true,
-                onAction = onAction,
+                devices = ui.lights,
             )
 
             ControlGroup(
                 title = "Fans",
-                entities = ui.fans,
-                useCardUis = true,
-                onAction = onAction,
+                devices = ui.fans,
             )
 
             ControlGroup(
                 title = "Climate",
-                entities = ui.climate,
-                useCardUis = true,
-                onAction = onAction,
+                devices = ui.climate,
             )
         }
     }
@@ -116,22 +92,18 @@ fun LivingRoomContent(
 
 @Preview(widthDp = 380)
 @Composable
-private fun LivingRoomScreenPreview() {
+private fun LivingRoomScreenPreview() = PreviewKoin {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
             LivingRoomContent(
                 ui = LivingRoomUiState(
                     triggers = listOf(previewTrigger("Main Lights")),
-                    lights = emptyList(),
+                    lights = previewLights,
                     fans = previewFans,
                     climate = previewClimate,
                 ),
                 onBack = {},
                 onOpenSettings = {},
-                onToggle = {},
-                onSetFanSpeed = { _, _ -> },
-                onSetOscillating = { _, _ -> },
-                onSetMisting = { _, _ -> },
                 onActivate = {},
                 showLights = true,
             )
