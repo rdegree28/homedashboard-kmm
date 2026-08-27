@@ -48,7 +48,8 @@ fun WorkstationControl(
         EntityToggleRow(
             ui = ToggleUi(name = ui.name, isOn = ui.isOn, offline = ui.isOffline),
             onTint = AppColors.WorkstationOn,
-            onToggle = onToggle
+            onToggle = onToggle,
+            tintSwitch = true,
         ) { tint ->
             WorkstationIcon(
                 on = ui.isOn,
@@ -62,8 +63,9 @@ fun WorkstationControl(
             text = "Power Usage",
             style = MaterialTheme.typography.titleMedium
         )
+        Spacer(Modifier.height(8.dp))
         PowerGraph(ui.powerHistoryPoints)
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(8.dp))
         StatRow("Current Power", ui.currentPower)
         StatRow("Total Power", ui.totalPower)
     }

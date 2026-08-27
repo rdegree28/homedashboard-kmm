@@ -102,7 +102,7 @@ fun EntityControl(
             val onTint = Color(entity.metadata.tint)
             val ui = ToggleUi(name = entity.displayName, isOn = entity.isOn, offline = entity.offline)
             when (layout) {
-                ControlLayout.Row -> EntityToggleRow(ui, onTint, onToggle, icon)
+                ControlLayout.Row -> EntityToggleRow(ui, onTint, onToggle, iconContent = icon)
                 ControlLayout.Card -> EntityToggleCard(ui, onTint, onToggle, icon, modifier)
             }
         }
