@@ -28,7 +28,6 @@ fun OfficeScreen(
         ui = ui,
         onBack = onBack,
         onOpenSettings = onOpenSettings,
-        onToggle = vm::toggle,
     )
 }
 
@@ -42,24 +41,7 @@ fun OfficeContent(
     ui: OfficeUiState,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
-    onToggle: (String) -> Unit,
 ) {
-    val onAction: (EntityAction) -> Unit = { action ->
-        when (action) {
-            is EntityAction.Toggle -> onToggle(action.entityId)
-            // The office heater has no metadata entry yet, so no thermostat reaches this screen.
-            is EntityAction.SetTargetTemperature -> Unit
-            is EntityAction.SetHvacMode -> Unit
-            is EntityAction.SetThermostatFanMode -> Unit
-            is EntityAction.SetPresetMode -> Unit
-            is EntityAction.SetExtremeTemperatures -> Unit
-            is EntityAction.OpenGraph -> Unit // Office has no graph navigation
-            is EntityAction.Activate -> Unit // no scene cards on this screen yet
-            is EntityAction.Navigate -> Unit // launcher-only
-            else -> throw IllegalStateException("No longer using onAction")
-        }
-    }
-
     DashboardScaffold(
         title = "Office",
         onBack = onBack,
@@ -110,7 +92,6 @@ private fun OfficeScreenPreview() = PreviewKoin {
                 ui = previewOfficeUiState,
                 onBack = {},
                 onOpenSettings = {},
-                onToggle = {},
             )
         }
     }

@@ -70,44 +70,33 @@ data class OfficeUiState(
  * The flow is de-duplicated so only changes to *displayed* values recompose the screen.
  */
 class OfficeViewModel(
-    private val repo: HomeAssistantRepo,
+    repo: HomeAssistantRepo,
     metadataRepo: EntityMetadataRepo,
-    private val deviceRepo: ExpHomeAssistantRepo,
+    deviceRepo: ExpHomeAssistantRepo,
 ) : ViewModel() {
-
-    /** The screen's roster; static, so it's read once rather than on every state push. */
-    private val entities = metadataRepo.loadOfficeEntityMetadataList()
 
     val uiState: StateFlow<OfficeUiState> =
         combine(
-            repo.states,
             repo.connection,
-            entities.loadDeviceUis(deviceRepo),
-        ) { states, connection, deviceUis ->
-            buildOfficeUiState(entities, states, connection, deviceUis)
+            metadataRepo.loadOfficeEntityMetadataList().loadDeviceUis(deviceRepo),
+        ) { connection, deviceUis ->
+            buildOfficeUiState(connection, deviceUis)
         }
         .distinctUntilChanged()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EMPTY)
 
-    fun toggle(entityId: String) {
-        viewModelScope.launch { repo.toggle(entityId) }
-    }
-
     private companion object {
-        val EMPTY = buildOfficeUiState(emptyList(), emptyMap(), HaConnectionStatus.Disconnected, emptyList())
+        val EMPTY = buildOfficeUiState(HaConnectionStatus.Disconnected, emptyList())
     }
 }
 
 // --- Projection helpers ---
 
 private fun buildOfficeUiState(
-    entities: List<DeviceMetadata>,
-    states: Map<String, EntityState>,
     connection: HaConnectionStatus,
     deviceUis: List<DeviceUi>,
 ): OfficeUiState {
-    val uis = entities.toEntityUis(states)
-    return OfficeUiState(
+   return OfficeUiState(
         connection = connection,
         lights = deviceUis.filterIsInstance<LightDeviceUi>(),
         fans = deviceUis.filterIsInstance<FanDeviceUi>(),
@@ -117,19 +106,3 @@ private fun buildOfficeUiState(
         workstation = deviceUis.filterIsInstance<OfficeWorkstationUi>().firstOrNull(),
     )
 }
-
-/**
- * Office shows dew point as a subvalue under the humidity reading (rather than as its own card, the
- * way the Living Room does) — it needs both sensors, so it can't come from a single-entity projection.
- */
-private fun List<EntityUi.Climate>.withDewPointSubvalue(states: Map<String, EntityState>): List<EntityUi.Climate> {
-    val dewPoint = dewPointText(states[OfficeEntities.TEMPERATURE], states[OfficeEntities.HUMIDITY]) ?: return this
-    return map { climate ->
-        if (climate.metadata.kind == ClimateMetadata.ClimateKind.Humidity) {
-            climate.copy(subvalueText = "Dew pt $dewPoint")
-        } else {
-            climate
-        }
-    }
-}
-
