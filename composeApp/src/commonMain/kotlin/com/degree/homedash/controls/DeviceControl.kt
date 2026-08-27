@@ -9,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.degree.homedash.office.OfficeEntities
 import com.degree.homedash.office.ToggleUi
 import com.degree.homedash.shared.model.entity.ClimateMetadata
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
@@ -95,10 +94,9 @@ fun DeviceControl(
             )
         }
 
-        is OfficeWorkstationUi -> {
-            WorkstationControl(ui = device) {
-
-            }
-        }
+        is OfficeWorkstationUi -> WorkstationControl(
+            ui = device,
+            onToggle = { device.onToggle(repo) },
+        )
     }
 }

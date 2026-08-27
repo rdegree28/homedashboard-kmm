@@ -3,6 +3,7 @@ package com.degree.homedash.shared.repo
 import com.degree.homedash.shared.api.ExpHomeAssistantApi
 import com.degree.homedash.shared.api.PreviewExpHomeAssistantApi
 import com.degree.homedash.shared.model.EntityState
+import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.model.entity.DeviceMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.ToggleableDeviceMetadata
@@ -43,6 +44,15 @@ class ExpHomeAssistantRepo internal constructor(
     /** [entityFor] the entity backing [metadata]. */
     internal fun entityForDevice(metadata: DeviceMetadata): Flow<EntityState?> =
         entityFor(metadata.entityId)
+
+    /**
+     * [hoursBack] hours of numeric history for [entityId], for a device that charts one of its
+     * sensors. Empty until the first fetch lands, and re-fetched on every reconnect.
+     */
+    internal fun historyForEntity(
+        entityId: String,
+        hoursBack: Int,
+    ): Flow<List<HistoryPoint>> = api.loadHistoryForEntity(entityId, hoursBack)
 
     /**
      * Flips [entity] on or off.

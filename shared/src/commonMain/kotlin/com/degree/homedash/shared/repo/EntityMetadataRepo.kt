@@ -75,10 +75,8 @@ class EntityMetadataRepo(
         authRepo.loadCurrentUser().value?.let(featureFlagDao::getFeatureFlagsForUser).orEmpty()
 
     /**
-     * The Office lights, fans, climate sensors, and door.
-     *
-     * Deliberately excludes the rest of the Office dashboard, none of which has an [DeviceMetadata]
-     * type yet: the workstation switch, and the power/energy sensors.
+     * The Office lights, fans, climate sensors, door, signal, and workstation — the whole dashboard;
+     * nothing on this screen is hand-wired any more.
      */
     fun loadOfficeEntityMetadataList(): List<DeviceMetadata> = listOf(
         LightMetadata("light.office_light", "Office"),
@@ -118,7 +116,7 @@ class EntityMetadataRepo(
             toggleEntityId = "switch.office_workstation",
             displayName = "Workstation",
             currentPowerEntityId = "sensor.office_workstation_power",
-            totalPowerEntityId = "office_workstation_summation_delivered"
+            totalPowerEntityId = "sensor.office_workstation_summation_delivered"
         )
     )
 

@@ -2,6 +2,7 @@ package com.degree.homedash.ui
 
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.states.ClimateState
+import com.degree.homedash.shared.model.HistoricalEntityReading
 import kotlin.math.pow
 import kotlin.math.round
 
@@ -33,5 +34,14 @@ fun EntityState?.readingText(decimals: Int, dashWhenUnavailable: Boolean = true)
 fun ClimateState?.readingText(decimals: Int): String {
     if (this == null || isOffline || value == null) return "—"
     val number = value ?: return "-"
+    return "${formatNumber(number, decimals)} $unit".trim()
+}
+
+/**
+ * A sensor reading formatted for display: the value rounded to [decimals] with its unit appended, or
+ * "—" when the sensor has nothing usable to report.
+ */
+fun HistoricalEntityReading.readingText(decimals: Int): String {
+    val number = value ?: return "—"
     return "${formatNumber(number, decimals)} $unit".trim()
 }

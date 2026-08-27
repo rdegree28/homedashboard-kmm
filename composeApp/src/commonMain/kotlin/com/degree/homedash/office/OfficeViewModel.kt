@@ -19,11 +19,8 @@ import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.api.HaConnectionStatus
 import com.degree.homedash.ui.dewPointText
-import com.degree.homedash.ui.readingText
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -66,9 +63,6 @@ data class OfficeUiState(
     val doors: List<DoorDeviceUi>,
     val signal: OfficeSignalDeviceUi?,
     val workstation: OfficeWorkstationUi?,
-    val power: SensorUi,
-    val energy: SensorUi,
-    val powerHistory: List<HistoryPoint>,
 )
 
 /**
@@ -81,8 +75,6 @@ class OfficeViewModel(
     private val deviceRepo: ExpHomeAssistantRepo,
 ) : ViewModel() {
 
-    private val powerHistory = MutableStateFlow<List<HistoryPoint>>(emptyList())
-
     /** The screen's roster; static, so it's read once rather than on every state push. */
     private val entities = metadataRepo.loadOfficeEntityMetadataList()
 
@@ -90,32 +82,19 @@ class OfficeViewModel(
         combine(
             repo.states,
             repo.connection,
-            powerHistory,
             entities.loadDeviceUis(deviceRepo),
-        ) { states, connection, history, deviceUis ->
-            buildOfficeUiState(entities, states, connection, history, deviceUis)
+        ) { states, connection, deviceUis ->
+            buildOfficeUiState(entities, states, connection, deviceUis)
         }
         .distinctUntilChanged()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EMPTY)
-
-    init {
-        viewModelScope.launch {
-            repo.connection.collect { status ->
-                if (status == HaConnectionStatus.Connected) {
-                    runCatching {
-                        powerHistory.value = repo.history(OfficeEntities.POWER, hoursBack = 168)
-                    }
-                }
-            }
-        }
-    }
 
     fun toggle(entityId: String) {
         viewModelScope.launch { repo.toggle(entityId) }
     }
 
     private companion object {
-        val EMPTY = buildOfficeUiState(emptyList(), emptyMap(), HaConnectionStatus.Disconnected, emptyList(), emptyList())
+        val EMPTY = buildOfficeUiState(emptyList(), emptyMap(), HaConnectionStatus.Disconnected, emptyList())
     }
 }
 
@@ -125,7 +104,6 @@ private fun buildOfficeUiState(
     entities: List<DeviceMetadata>,
     states: Map<String, EntityState>,
     connection: HaConnectionStatus,
-    powerHistory: List<HistoryPoint>,
     deviceUis: List<DeviceUi>,
 ): OfficeUiState {
     val uis = entities.toEntityUis(states)
@@ -136,11 +114,7 @@ private fun buildOfficeUiState(
         climate = deviceUis.filterIsInstance<ClimateDeviceUi>(),
         doors = deviceUis.filterIsInstance<DoorDeviceUi>(),
         signal = deviceUis.filterIsInstance<OfficeSignalDeviceUi>().firstOrNull(),
-        // The remaining Office controls have no DeviceMetadata type, so they stay hand-wired.
         workstation = deviceUis.filterIsInstance<OfficeWorkstationUi>().firstOrNull(),
-        power = states[OfficeEntities.POWER].toSensorUi("Power", decimals = 2, dashWhenUnavailable = false),
-        energy = states[OfficeEntities.ENERGY].toSensorUi("Total Power Used", decimals = 2, dashWhenUnavailable = false),
-        powerHistory = powerHistory,
     )
 }
 
@@ -159,12 +133,3 @@ private fun List<EntityUi.Climate>.withDewPointSubvalue(states: Map<String, Enti
     }
 }
 
-private fun EntityState?.toToggleUi(name: String) = ToggleUi(
-    name = name,
-    isOn = this?.isOn == true,
-    offline = this == null || this.isUnavailable,
-)
-
-/** Formatted sensor readout. [dashWhenUnavailable] shows "—" for unavailable states. */
-private fun EntityState?.toSensorUi(label: String, decimals: Int, dashWhenUnavailable: Boolean): SensorUi =
-    SensorUi(label, readingText(decimals, dashWhenUnavailable))

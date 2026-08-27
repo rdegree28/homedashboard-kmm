@@ -1,6 +1,7 @@
 package com.degree.homedash.shared.api
 
 import com.degree.homedash.shared.model.EntityState
+import com.degree.homedash.shared.model.HistoryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.JsonObject
 
@@ -20,6 +21,16 @@ internal interface ExpHomeAssistantApi {
      * happens in `StatefulDeviceMetadata.toState`, not here.
      */
     fun loadAllStates(): Flow<Map<String, EntityState>>
+
+    /**
+     * Numeric history for [entityId] over the last [hoursBack] hours — the samples behind a device's
+     * chart.
+     *
+     * Emits an empty list straight away and the fetched samples once they land, re-fetching whenever
+     * the socket (re)connects: a history query is a request/response round trip, so it can only run
+     * while connected, and the window it covers moves on as the app stays open.
+     */
+    fun loadHistoryForEntity(entityId: String, hoursBack: Int): Flow<List<HistoryPoint>>
 
     /**
      * Calls the entity's toggle service on HA.

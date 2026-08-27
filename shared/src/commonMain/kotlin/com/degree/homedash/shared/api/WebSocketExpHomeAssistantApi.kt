@@ -1,12 +1,21 @@
 package com.degree.homedash.shared.api
 
+import co.touchlab.kermit.Logger
 import com.degree.homedash.shared.model.EntityState
+import com.degree.homedash.shared.model.HistoryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.ExperimentalTime
 
 /**
  * [ExpHomeAssistantApi] over the live WebSocket connection.
@@ -20,7 +29,40 @@ internal class WebSocketExpHomeAssistantApi(
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
 ) : ExpHomeAssistantApi {
 
+    private val log = Logger.withTag("WebSocketExpHomeAssistantApi")
+
     override fun loadAllStates(): Flow<Map<String, EntityState>> = client.states
+
+    /**
+     * Raw recorder states, so [hoursBack] has to stay inside the recorder's retention
+     * (`purge_keep_days`, 10 by default) — a longer window comes back silently truncated at the purge
+     * horizon. `HomeAssistantRepo.history` has the long-term-statistics path for windows past that.
+     *
+     * A failed fetch reads as no data rather than taking the device's whole state flow down with it:
+     * the chart says so itself, and the next reconnect tries again.
+     */
+    override fun loadHistoryForEntity(entityId: String, hoursBack: Int): Flow<List<HistoryPoint>> =
+        client.connection
+            .filter { it == HaConnectionStatus.Connected }
+            .map { fetchHistory(entityId, hoursBack) }
+            .onStart { emit(emptyList()) }
+
+    @OptIn(ExperimentalTime::class)
+    private suspend fun fetchHistory(entityId: String, hoursBack: Int): List<HistoryPoint> {
+        val end = Clock.System.now()
+        val start = end.minus(hoursBack.hours)
+        return try {
+            val text = client.request { id ->
+                HaProtocolHelper.encodeHistory(id, entityId, start.toString(), end.toString())
+            }
+            HaProtocolHelper.parseHistory(text, entityId)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            log.e(e) { "history fetch failed for $entityId" }
+            emptyList()
+        }
+    }
 
     override fun toggleEntity(entityId: String) {
         scope.launch {

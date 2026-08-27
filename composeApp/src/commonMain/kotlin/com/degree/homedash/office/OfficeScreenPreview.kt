@@ -2,13 +2,13 @@ package com.degree.homedash.office
 
 import com.degree.homedash.controls.ClimateDeviceUi
 import com.degree.homedash.shared.model.entity.*
-import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.FanDeviceUi
 import com.degree.homedash.controls.DoorDeviceUi
 import com.degree.homedash.controls.LightDeviceUi
 import com.degree.homedash.controls.OfficeSignalDeviceUi
 import com.degree.homedash.controls.OfficeWorkstationUi
 import com.degree.homedash.shared.model.HistoryPoint
+import com.degree.homedash.shared.model.HistoricalEntityReading
 import com.degree.homedash.shared.api.HaConnectionStatus
 import com.degree.homedash.shared.model.states.ClimateState
 import com.degree.homedash.shared.model.states.FanState
@@ -65,9 +65,20 @@ internal val previewOfficeUiState = OfficeUiState(
             mode = OfficeSignalMetadata.SignalMode.AVAILABLE,
         ),
     ),
-    workstation = OfficeWorkstationUi(metadata = OfficeWorkstationMetadata(displayName = "Workstation", toggleEntityId = "office.workstation", currentPowerEntityId = "current", totalPowerEntityId = "total"),
-        state = OfficeWorkstationState(entityId = "office.workstation", isOn = true, isOffline = false)),
-    power = SensorUi("Power", "61.1 W"),
-    energy = SensorUi("Total Power Used", "34.8 kWh"),
-    powerHistory = previewHistory,
+    workstation = OfficeWorkstationUi(
+        metadata = OfficeWorkstationMetadata(
+            displayName = "Workstation",
+            toggleEntityId = "switch.office_workstation",
+            currentPowerEntityId = "sensor.office_workstation_power",
+            totalPowerEntityId = "sensor.office_workstation_summation_delivered",
+        ),
+        state = OfficeWorkstationState(
+            entityId = "switch.office_workstation",
+            isOn = true,
+            isOffline = false,
+            currentPower = HistoricalEntityReading(61.1, "W"),
+            totalPower = HistoricalEntityReading(34.8, "kWh"),
+            powerHistory = previewHistory,
+        ),
+    ),
 )

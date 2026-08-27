@@ -1,30 +1,17 @@
 package com.degree.homedash.office
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.degree.homedash.controls.PreviewKoin
 import com.degree.homedash.controls.EntityAction
-import com.degree.homedash.controls.WorkstationControl
+import com.degree.homedash.controls.ControlLayout
+import com.degree.homedash.controls.DeviceControl
 import org.koin.compose.viewmodel.koinViewModel
-import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 import com.degree.homedash.ui.icons.RoomIcons
@@ -105,28 +92,11 @@ fun OfficeContent(
             devices = ui.doors,
         )
 
-        ui.workstation?.run {
+        ui.workstation?.let { workstation ->
             ControlGroup("Workstation", titleOutsideCard = true) {
-                WorkstationControl(ui.workstation) { onToggle(OfficeEntities.WORKSTATION) }
-//            Spacer(Modifier.height(8.dp))
-//            Text("Power Usage", style = MaterialTheme.typography.titleMedium)
-//            PowerGraph(ui.powerHistory)
-//            Spacer(Modifier.height(4.dp))
-//            StatRow(ui.power)
-//            StatRow(ui.energy)
+                DeviceControl(workstation, ControlLayout.Card)
             }
         }
-    }
-}
-
-@Composable
-private fun StatRow(ui: SensorUi) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Text(ui.label, style = MaterialTheme.typography.bodyLarge)
-        Text(ui.valueText, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
     }
 }
 
