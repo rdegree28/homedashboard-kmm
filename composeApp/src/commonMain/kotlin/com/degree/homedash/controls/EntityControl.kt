@@ -200,11 +200,6 @@ fun EntityControl(
                 ControlLayout.Card -> NavigationTile(entity, onClick, modifier)
             }
         }
-
-        is EntityUi.WaterLevel -> WaterLevelControl(
-            ui = entity,
-            onClick = { onAction(EntityAction.OpenGraph(entity.entityId)) },
-        )
     }
 }
 

@@ -3,14 +3,18 @@ package com.degree.homedash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.controls.EntityUi
+import com.degree.homedash.controls.PetFountainDeviceUi
+import com.degree.homedash.controls.loadDeviceUis
 import com.degree.homedash.controls.toEntityUis
 import com.degree.homedash.pets.PetsEntities
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.entity.HvacMode
 import com.degree.homedash.shared.repo.EntityMetadataRepo
+import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -34,6 +38,7 @@ data class HomeWarning(val message: String, val severity: WarningSeverity)
 class HomeViewModel(
     private val repo: HomeAssistantRepo,
     metadataRepo: EntityMetadataRepo,
+    deviceRepo: ExpHomeAssistantRepo,
 ) : ViewModel() {
 
     private val petEntities = metadataRepo.loadPetsEntityMetadataList()
@@ -63,14 +68,16 @@ class HomeViewModel(
             .toEntityUis(emptyMap())
             .filterIsInstance<EntityUi.Navigation>()
 
+    /**
+     * Two sources: the fountain is a device, projected through its own metadata exactly as the Pets
+     * screen renders it, while the medication reminders are read straight off raw state (see
+     * [catMedicationWarning]).
+     */
     val warnings: StateFlow<List<HomeWarning>> =
-        repo.states
-            .map { states ->
-                petEntities.toEntityUis(states)
-                    .filterIsInstance<EntityUi.WaterLevel>()
-                    .mapNotNull(::catWaterWarning) +
-                    listOfNotNull(catMedicationWarning(states))
-            }
+        combine(petEntities.loadDeviceUis(deviceRepo), repo.states) { devices, states ->
+            devices.filterIsInstance<PetFountainDeviceUi>().mapNotNull(::catWaterWarning) +
+                listOfNotNull(catMedicationWarning(states))
+        }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     fun setTargetTemperature(entityId: String, temperature: Double) {
@@ -100,9 +107,9 @@ class HomeViewModel(
  * Warn while either of the cat's medication reminders is active, as one card naming whichever doses
  * are still owed.
  *
- * These are read straight from [states] rather than projected through [EntityUi] like the fountain
- * above: they're plain `input_boolean` helpers with nothing to render — no card, no control, no
- * metadata type — and the launcher only ever asks whether they're on.
+ * These are read straight from [states] rather than projected as devices like the fountain above:
+ * they're plain `input_boolean` helpers with nothing to render — no card, no control, no metadata
+ * type — and the launcher only ever asks whether they're on.
  *
  * Blue, not amber: a due dose is a standing to-do rather than something going wrong, so it sits
  * below the fountain's warnings on the urgency scale. Home Assistant clears the helper once the dose
@@ -121,7 +128,7 @@ internal fun catMedicationWarning(states: Map<String, EntityState>): HomeWarning
 }
 
 /** Warn once the fountain drops into the amber/red band (mirrors `waterLevelColor`: <10 red, <35 amber). */
-private fun catWaterWarning(level: EntityUi.WaterLevel): HomeWarning? {
+private fun catWaterWarning(level: PetFountainDeviceUi): HomeWarning? {
     val pct = level.pct ?: return null
     if (pct >= 35) return null
     return if (pct < 10) {

@@ -14,8 +14,7 @@ import com.degree.homedash.shared.model.entity.OfficeWorkstationMetadata
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
 import com.degree.homedash.shared.model.entity.ThermostatMetadata
 import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
-import com.degree.homedash.shared.model.entity.WaterLevelMetadata
-import com.degree.homedash.ui.formatNumber
+import com.degree.homedash.shared.model.entity.PetFountainMetadata
 import com.degree.homedash.ui.readingText
 import kotlin.math.roundToInt
 
@@ -95,17 +94,8 @@ fun DeviceMetadata.toEntityUi(
     // Fully migrated to the device stack — rendered by SoilMoistureControl, with no [EntityUi] form.
     is SoilMoistureMetadata -> null
 
-    is WaterLevelMetadata -> {
-        val pct = state.percentOrNull()
-        EntityUi.WaterLevel(
-            metadata = this,
-            pct = pct,
-            valueText = pct?.let { "${formatNumber(it, decimals = 0)} %" } ?: "—",
-            // Read off the filter's own sensor, not the water level's — the same second-entity
-            // arrangement as a fan's mister.
-            filterDaysRemaining = filterHealth?.let { allStates[it.entityId].daysOrNull() },
-        )
-    }
+    // Fully migrated to the device stack — rendered by WaterLevelControl, with no [EntityUi] form.
+    is PetFountainMetadata -> null
 
     // Deliberately ignores [state]: a launcher card has no Home Assistant entity behind it.
     is NavigationMetadata -> EntityUi.Navigation(this)
@@ -126,11 +116,3 @@ fun List<DeviceMetadata>.toEntityUis(states: Map<String, EntityState>): List<Ent
 
 /** Missing and unavailable are the same thing to a control: nothing to show. */
 private fun EntityState?.isOffline(): Boolean = this == null || this.isUnavailable
-
-/** The numeric state, or null when it isn't a usable reading. */
-private fun EntityState?.percentOrNull(): Double? =
-    this?.state?.toDoubleOrNull()?.takeUnless { isUnavailable }
-
-/** A whole-day countdown, or null when the sensor is missing, unavailable, or non-numeric. */
-private fun EntityState?.daysOrNull(): Int? =
-    this?.state?.toDoubleOrNull()?.takeUnless { isUnavailable }?.roundToInt()

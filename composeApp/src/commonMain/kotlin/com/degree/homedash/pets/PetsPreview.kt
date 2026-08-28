@@ -1,33 +1,31 @@
 package com.degree.homedash.pets
 
-import com.degree.homedash.shared.model.entity.*
-import com.degree.homedash.controls.EntityUi
+import com.degree.homedash.controls.PetFountainDeviceUi
+import com.degree.homedash.shared.model.HistoricalEntityReading
 import com.degree.homedash.shared.model.HistoryPoint
+import com.degree.homedash.shared.model.entity.PetFountainMetadata
+import com.degree.homedash.shared.model.states.PetFilterState
 
 // Sample data for the Pets @Previews (which live next to their composables in this package).
 
-private val previewFountainMetadata = WaterLevelMetadata(
+private val previewFountainMetadata = PetFountainMetadata(
     PetsEntities.CAT_WATER_LEVEL,
     "Remaining Water",
-    filterHealth = WaterLevelMetadata.FilterHealth(PetsEntities.CAT_FILTER_DAYS, maxDays = 31),
+    filterHealth = PetFountainMetadata.FilterHealth(PetsEntities.CAT_FILTER_DAYS, maxDays = 31),
 )
 
-internal val previewLevels: List<EntityUi.WaterLevel> = listOf(
-    EntityUi.WaterLevel(
-        metadata = previewFountainMetadata,
-        pct = 68.0,
-        valueText = "68 %",
-        filterDaysRemaining = 26,
-    ),
-)
+internal val previewLevels: List<PetFountainDeviceUi> = listOf(previewFountain(pct = 68.0, filterDays = 26))
 
 /** A fountain near both limits, so the preview shows the amber end of both bars beside the green. */
-internal val previewLevelsLow: List<EntityUi.WaterLevel> = listOf(
-    EntityUi.WaterLevel(
-        metadata = previewFountainMetadata,
-        pct = 38.0,
-        valueText = "38 %",
-        filterDaysRemaining = 2,
+internal val previewLevelsLow: List<PetFountainDeviceUi> = listOf(previewFountain(pct = 38.0, filterDays = 2))
+
+private fun previewFountain(pct: Double, filterDays: Int) = PetFountainDeviceUi(
+    metadata = previewFountainMetadata,
+    state = PetFilterState(
+        entityId = PetsEntities.CAT_WATER_LEVEL,
+        isOffline = false,
+        waterLevel = HistoricalEntityReading(pct, "%"),
+        filterDaysRemaining = filterDays,
     ),
 )
 

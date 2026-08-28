@@ -17,7 +17,7 @@ import com.degree.homedash.shared.model.entity.OfficeWorkstationMetadata
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
 import com.degree.homedash.shared.model.entity.ThermostatMetadata
 import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
-import com.degree.homedash.shared.model.entity.WaterLevelMetadata
+import com.degree.homedash.shared.model.entity.PetFountainMetadata
 import com.degree.homedash.shared.model.entity.bedroomLightsFull
 import com.degree.homedash.shared.model.entity.bedroomLightsLow
 import com.degree.homedash.shared.model.entity.bedroomLightsNight
@@ -166,11 +166,11 @@ class EntityMetadataRepo(
 
     /** The Pets sensors — currently just the cat water fountain: its water level and its filter. */
     fun loadPetsEntityMetadataList(): List<DeviceMetadata> = listOf(
-        WaterLevelMetadata(
+        PetFountainMetadata(
             "sensor.cat_water_fountain_remaining_water_pct",
             "Remaining Water",
             // 31 days is what the fountain's own `number.cat_water_fountain_filter_cycle` holds.
-            filterHealth = WaterLevelMetadata.FilterHealth(
+            filterHealth = PetFountainMetadata.FilterHealth(
                 "sensor.cat_water_fountain_remaining_filter_day",
                 maxDays = 31,
             ),

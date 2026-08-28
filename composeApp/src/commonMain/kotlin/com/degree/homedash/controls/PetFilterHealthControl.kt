@@ -13,8 +13,8 @@ import com.degree.homedash.ui.AppColors
  * only ever ticks down and resets.
  */
 @Composable
-fun PetFilterHealthControl(ui: EntityUi.WaterLevel) {
-    val maxDays = ui.metadata.filterHealth?.maxDays
+fun PetFilterHealthControl(ui: PetFountainDeviceUi) {
+    val maxDays = ui.filterMaxDays
     val days = ui.filterDaysRemaining
 
     LevelBarRow(

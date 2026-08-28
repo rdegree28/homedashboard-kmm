@@ -26,7 +26,7 @@ import org.koin.dsl.module
  */
 fun appModule(defaultConfig: HaConfig?) = module {
     viewModel { AppViewModel(defaultConfig, get(), get(), get(), get()) }
-    viewModel { HomeViewModel(get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get()) }
     viewModel {
         OfficeViewModel(
             metadataRepo = get(),
@@ -45,5 +45,12 @@ fun appModule(defaultConfig: HaConfig?) = module {
             deviceRepo = get(),
         )
     }
-    viewModel { (entityId: String) -> WaterGraphViewModel(get(), entityId, get()) }
+    viewModel { (entityId: String) ->
+        WaterGraphViewModel(
+            repo = get(),
+            entityId = entityId,
+            metadataRepo = get(),
+            deviceRepo = get(),
+        )
+    }
 }

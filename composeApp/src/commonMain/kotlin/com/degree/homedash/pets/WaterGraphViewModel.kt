@@ -3,11 +3,11 @@ package com.degree.homedash.pets
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.degree.homedash.controls.EntityUi
-import com.degree.homedash.controls.toEntityUi
+import com.degree.homedash.controls.PetFountainDeviceUi
 import com.degree.homedash.plants.TimeRange
-import com.degree.homedash.shared.model.entity.WaterLevelMetadata
+import com.degree.homedash.shared.model.entity.PetFountainMetadata
 import com.degree.homedash.shared.repo.EntityMetadataRepo
+import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.api.HaConnectionStatus
@@ -16,36 +16,48 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @Immutable
 data class WaterGraphUiState(
-    val item: EntityUi.WaterLevel?,
+    val item: PetFountainDeviceUi?,
     val history: List<HistoryPoint>,
     val range: TimeRange,
 )
 
-/** Owns the selected [TimeRange] and re-fetches level history for [entityId] as it/connection change. */
+/**
+ * Owns the selected [TimeRange] and re-fetches level history for [entityId] as it/connection change.
+ *
+ * Two repos, deliberately: the reading at the top of the screen is a device, projected through
+ * [ExpHomeAssistantRepo] like every other card, while the chart's history still comes from
+ * [HomeAssistantRepo] — its ranges reach a year back, where the recorder's raw states are long purged
+ * and only that repo's long-term-statistics path returns anything.
+ */
 class WaterGraphViewModel(
     private val repo: HomeAssistantRepo,
     private val entityId: String,
     metadataRepo: EntityMetadataRepo,
+    deviceRepo: ExpHomeAssistantRepo,
 ) : ViewModel() {
 
     /** The graphed entity's descriptor, so this screen's title matches the Pets list it was opened from. */
-    private val metadata: WaterLevelMetadata =
+    private val metadata: PetFountainMetadata =
         metadataRepo.loadPetsEntityMetadataList()
-            .filterIsInstance<WaterLevelMetadata>()
+            .filterIsInstance<PetFountainMetadata>()
             .firstOrNull { it.entityId == entityId }
-            ?: WaterLevelMetadata(entityId, "Water Level")
+            ?: PetFountainMetadata(entityId, "Water Level")
 
     private val range = MutableStateFlow(TimeRange.DAY)
     private val history = MutableStateFlow<List<HistoryPoint>>(emptyList())
 
+    /** The fountain itself, projected through its own metadata the way the Pets list renders it. */
+    private val item = metadata.loadState(deviceRepo)
+        .map { state -> PetFountainDeviceUi(metadata = metadata, state = state) }
+
     val uiState: StateFlow<WaterGraphUiState> =
-        combine(repo.states, range, history) { states, range, history ->
-            val item = states[entityId]?.let { metadata.toEntityUi(it) as EntityUi.WaterLevel }
+        combine(item, range, history) { item, range, history ->
             WaterGraphUiState(item = item, history = history, range = range)
         }
             .distinctUntilChanged()

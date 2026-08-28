@@ -10,7 +10,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.degree.homedash.controls.PetFilterHealthControl
 import com.degree.homedash.controls.WaterLevelControl
-import com.degree.homedash.controls.entityId
 import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
@@ -24,7 +23,12 @@ fun PetsScreen(
 ) {
     val vm: PetsViewModel = koinViewModel()
     val ui by vm.uiState.collectAsStateWithLifecycle()
-    PetsContent(ui = ui, onBack = onBack, onOpenSettings = onOpenSettings, onOpenGraph = onOpenGraph)
+    PetsContent(
+        ui = ui,
+        onBack = onBack,
+        onOpenSettings = onOpenSettings,
+        onOpenGraph = onOpenGraph
+    )
 }
 
 /** Stateless Pets UI — projected sensor readings in, navigation actions out. */
@@ -38,7 +42,7 @@ fun PetsContent(
     DashboardScaffold(title = "Pets", onBack = onBack, onOpenSettings = onOpenSettings, icon = RoomIcons.Paw) {
         // The content overload rather than the entities one, because a fountain contributes two rows
         // — its water level and its filter — and only the first of them opens a graph.
-        ControlGroup(title = "Cat Water Fountain") {
+        ControlGroup(title = "Cat Water Fountain", titleOutsideCard = true) {
             if (ui.items.isEmpty()) {
                 Text(
                     "No water level sensor found.",
@@ -47,7 +51,7 @@ fun PetsContent(
                 )
             }
             ui.items.forEach { item ->
-                WaterLevelControl(item, onClick = { onOpenGraph(item.entityId) })
+                WaterLevelControl(item, onClick = { onOpenGraph(item.id) })
                 // Absent on a fountain that declares no filter, or whose sensor has gone quiet.
                 if (item.filterDaysRemaining != null) PetFilterHealthControl(item)
             }

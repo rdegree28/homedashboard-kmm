@@ -98,6 +98,9 @@ fun DeviceControl(
         // renders its own tappable rows rather than going through this dispatcher.
         is SoilMoistureDeviceUi -> SoilMoistureControl(ui = device)
 
+        // Likewise — and the Pets screen draws the filter row underneath, which no grid cell can.
+        is PetFountainDeviceUi -> WaterLevelControl(ui = device)
+
         // One-shot action, so the same tile whatever the layout.
         is TriggerDeviceUi -> TriggerCard(
             ui = device,

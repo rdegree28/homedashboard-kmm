@@ -33,11 +33,11 @@ import com.degree.homedash.ui.AppColors
  */
 @Composable
 fun WaterLevelControl(
-    ui: EntityUi.WaterLevel,
+    ui: PetFountainDeviceUi,
     onClick: (() -> Unit)? = null,
 ) {
     LevelBarRow(
-        label = ui.displayName,
+        label = ui.name,
         valueText = ui.valueText,
         fraction = (ui.pct?.let { (it / 100.0).coerceIn(0.0, 1.0) } ?: 0.0).toFloat(),
         barColor = waterLevelColor(ui.pct),

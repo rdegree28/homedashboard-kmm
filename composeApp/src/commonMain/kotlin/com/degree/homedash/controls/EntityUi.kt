@@ -74,19 +74,6 @@ sealed interface EntityUi {
         val unavailable: Boolean,
     ) : EntityUi
 
-    @Immutable
-    data class WaterLevel(
-        override val metadata: WaterLevelMetadata,
-        val pct: Double?,
-        val valueText: String,
-        /**
-         * Days left on the filter, off the separate sensor [WaterLevelMetadata.FilterHealth] names.
-         * null when the fountain declares no filter, or its sensor isn't reporting — which is not
-         * the same as 0, and mustn't render as "change it now".
-         */
-        val filterDaysRemaining: Int?,
-    ) : EntityUi
-
     /** A launcher card. Alone among these it has nothing that changes — the metadata is the whole state. */
     @Immutable
     data class Navigation(
