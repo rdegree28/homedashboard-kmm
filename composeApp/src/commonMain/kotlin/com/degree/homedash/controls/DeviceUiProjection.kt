@@ -7,7 +7,7 @@ import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.LightMetadata
 import com.degree.homedash.shared.model.entity.OfficeSignalMetadata
 import com.degree.homedash.shared.model.entity.OfficeWorkstationMetadata
-import com.degree.homedash.shared.model.states.OfficeWorkstationState
+import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -54,6 +54,10 @@ fun DeviceMetadata.loadUi(repo: ExpHomeAssistantRepo): Flow<DeviceUi>? = when (t
         val metadata = this
         loadState(repo).map { state -> OfficeWorkstationUi(metadata = metadata, state = state) }
     }
+
+    // Stateless: a trigger fires a service and reports nothing, so its card never changes. A constant
+    // flow rather than no flow, so the roster's `combine` still sees it.
+    is TriggerDeviceMetadata -> flowOf(TriggerDeviceUi(metadata = this))
 
     else -> null
 //
@@ -133,8 +137,6 @@ fun DeviceMetadata.loadUi(repo: ExpHomeAssistantRepo): Flow<DeviceUi>? = when (t
 //    // Deliberately ignores [state]: a launcher card has no Home Assistant entity behind it.
 //    is NavigationMetadata -> EntityUi.Navigation(this)
 //
-//    // Likewise stateless — a trigger fires a service, it doesn't report anything.
-//    is TriggerDeviceMetadata -> EntityUi.Trigger(this)
 }
 
 /**

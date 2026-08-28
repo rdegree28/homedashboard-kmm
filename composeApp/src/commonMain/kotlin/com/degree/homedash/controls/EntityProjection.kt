@@ -116,8 +116,8 @@ fun DeviceMetadata.toEntityUi(
     // Deliberately ignores [state]: a launcher card has no Home Assistant entity behind it.
     is NavigationMetadata -> EntityUi.Navigation(this)
 
-    // Likewise stateless — a trigger fires a service, it doesn't report anything.
-    is TriggerDeviceMetadata -> EntityUi.Trigger(this)
+    // Fully migrated to the device stack — rendered by DeviceControl, with no [EntityUi] form at all.
+    is TriggerDeviceMetadata -> null
 
     // Fully migrated to the device stack — rendered by DeviceControl, with no [EntityUi] form at all.
     is OfficeSignalMetadata -> null

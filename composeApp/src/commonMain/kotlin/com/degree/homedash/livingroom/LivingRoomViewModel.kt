@@ -5,24 +5,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.controls.ClimateDeviceUi
 import com.degree.homedash.controls.DeviceUi
-import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.FanDeviceUi
 import com.degree.homedash.controls.LightDeviceUi
+import com.degree.homedash.controls.TriggerDeviceUi
 import com.degree.homedash.controls.loadDeviceUis
-import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
-import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 
 @Immutable
 data class LivingRoomUiState(
-    val triggers: List<EntityUi.Trigger>,
+    val triggers: List<TriggerDeviceUi>,
     val lights: List<LightDeviceUi>,
     val fans: List<FanDeviceUi>,
     val climate: List<ClimateDeviceUi>,
@@ -30,38 +27,20 @@ data class LivingRoomUiState(
 
 /** Projects the configured Living Room devices into [LivingRoomUiState]. */
 class LivingRoomViewModel(
-    private val repo: HomeAssistantRepo,
     metadataRepo: EntityMetadataRepo,
     deviceRepo: ExpHomeAssistantRepo,
 ) : ViewModel() {
 
-    /** The screen's roster; static, so it's read once rather than on every state push. */
-    private val entities = metadataRepo.loadLivingRoomEntityMetadataList()
-
-    /**
-     * The scene cards. Static: a trigger fires a service and reports nothing, so unlike the devices
-     * below there is no state to project — they are built once and never change.
-     */
-    private val triggers: List<EntityUi.Trigger> =
-        entities.filterIsInstance<TriggerDeviceMetadata>().map(EntityUi::Trigger)
-
     val uiState: StateFlow<LivingRoomUiState> =
-        entities.loadDeviceUis(deviceRepo)
-            .map { deviceUis -> buildUiState(triggers, deviceUis) }
+        metadataRepo.loadLivingRoomEntityMetadataList()
+            .loadDeviceUis(deviceRepo)
+            .map(::buildUiState)
             .distinctUntilChanged()
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), buildUiState(triggers, emptyList()))
-
-    /** Fires a trigger card's service call — activating a scene, running a script. */
-    fun activate(call: TriggerDeviceMetadata.ServiceCall) {
-        viewModelScope.launch { repo.callService(call.domain, call.service, call.entityId) }
-    }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), buildUiState(emptyList()))
 }
 
-private fun buildUiState(
-    triggers: List<EntityUi.Trigger>,
-    deviceUis: List<DeviceUi>,
-) = LivingRoomUiState(
-    triggers = triggers,
+private fun buildUiState(deviceUis: List<DeviceUi>) = LivingRoomUiState(
+    triggers = deviceUis.filterIsInstance<TriggerDeviceUi>(),
     lights = deviceUis.filterIsInstance<LightDeviceUi>(),
     fans = deviceUis.filterIsInstance<FanDeviceUi>(),
     climate = deviceUis.filterIsInstance<ClimateDeviceUi>(),

@@ -159,10 +159,12 @@ private fun defaultTintFor(target: NavigationMetadata.NavigationTarget) = when (
     NavigationMetadata.NavigationTarget.Pets -> 0xFFC29844
 }
 
-internal fun previewTrigger(label: String) = EntityUi.Trigger(
-    object : TriggerDeviceMetadata("trigger.${label.lowercase().replace(' ', '_')}", label) {
-        override fun action() = ServiceCall.turnOn("scene.${label.lowercase().replace(' ', '_')}")
-    },
+internal fun previewTrigger(label: String) = TriggerDeviceUi(
+    TriggerDeviceMetadata(
+        entityId = "trigger.${label.lowercase().replace(' ', '_')}",
+        displayName = label,
+        targetEntityId = "scene.${label.lowercase().replace(' ', '_')}",
+    ),
 )
 
 /** Defaults mirror the live Living Room thermostat, so previews match what the app really shows. */

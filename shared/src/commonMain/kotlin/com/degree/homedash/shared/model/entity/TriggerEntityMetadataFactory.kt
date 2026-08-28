@@ -6,63 +6,58 @@ package com.degree.homedash.shared.model.entity
 
  */
 
-/** Living Room "Main Lights" scene. */
+/** A card wired to nothing — fires a call with no domain, service or target. */
 fun TriggerDeviceMetadata.Companion.testCard(): TriggerDeviceMetadata {
-    return object : TriggerDeviceMetadata(
+    return TriggerDeviceMetadata(
         entityId = "trigger.testcard",
         displayName = "TestCard",
-    ) {
-        override fun action() = ServiceCall(domain = "", service = "", entityId = "")
-    }
+        targetEntityId = "",
+        service = "",
+        serviceDomain = "",
+    )
 }
 
 /** Living Room "Main Lights" scene. */
 fun TriggerDeviceMetadata.Companion.mainLights(): TriggerDeviceMetadata {
-    return object : TriggerDeviceMetadata(
+    return TriggerDeviceMetadata(
         entityId = "trigger.main_lights",
         displayName = "Main Lights",
-    ) {
-        override fun action() = ServiceCall.turnOn("scene.living_room_lights_main_lights")
-    }
+        targetEntityId = "scene.living_room_lights_main_lights",
+    )
 }
 
-/** Living Room "Main Lights" scene. */
+/** Living Room "Movie Lights" scene. */
 fun TriggerDeviceMetadata.Companion.movieLights(): TriggerDeviceMetadata {
-    return object : TriggerDeviceMetadata(
+    return TriggerDeviceMetadata(
         entityId = "trigger.movie_lights",
         displayName = "Movie Lights",
-    ) {
-        override fun action() = ServiceCall.turnOn("scene.living_room_lights_movie_lights")
-    }
+        targetEntityId = "scene.living_room_lights_movie_lights",
+    )
 }
 
-/** Living Room "Main Lights" scene. */
+/** Bedroom "Full Lights" script. */
 fun TriggerDeviceMetadata.Companion.bedroomLightsFull(): TriggerDeviceMetadata {
-    return object : TriggerDeviceMetadata(
+    return TriggerDeviceMetadata(
         entityId = "trigger.bedroom_lights_full",
         displayName = "Full Lights",
-    ) {
-        override fun action() = ServiceCall.turnOn("script.bedroom_lights_full")
-    }
+        targetEntityId = "script.bedroom_lights_full",
+    )
 }
 
-/** Living Room "Main Lights" scene. */
+/** Bedroom "Low Lights" script. */
 fun TriggerDeviceMetadata.Companion.bedroomLightsLow(): TriggerDeviceMetadata {
-    return object : TriggerDeviceMetadata(
+    return TriggerDeviceMetadata(
         entityId = "trigger.bedroom_lights_low",
         displayName = "Low Lights",
-    ) {
-        override fun action() = ServiceCall.turnOn("script.bedroom_lights_low")
-    }
+        targetEntityId = "script.bedroom_lights_low",
+    )
 }
 
-/** Living Room "Main Lights" scene. */
+/** Bedroom "Night Lights" script. */
 fun TriggerDeviceMetadata.Companion.bedroomLightsNight(): TriggerDeviceMetadata {
-    return object : TriggerDeviceMetadata(
+    return TriggerDeviceMetadata(
         entityId = "trigger.bedroom_lights_night",
         displayName = "Night Lights",
-    ) {
-        override fun action() = ServiceCall.turnOn("script.bedroom_lights_night")
-    }
+        targetEntityId = "script.bedroom_lights_night",
+    )
 }
-

@@ -9,10 +9,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.PreviewKoin
 import com.degree.homedash.controls.previewLightDevice
-import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 import com.degree.homedash.ui.icons.RoomIcons
@@ -30,7 +28,6 @@ fun BedroomScreen(
         ui = ui,
         onBack = onBack,
         onOpenSettings = onOpenSettings,
-        onActivate = vm::activate,
         modifier = modifier,
     )
 }
@@ -46,16 +43,8 @@ fun BedroomContent(
     ui: BedroomUiState,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
-    onActivate: (TriggerDeviceMetadata.ServiceCall) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Scene cards are the only entities left on the action path; the devices carry their own behavior.
-    val onAction: (EntityAction) -> Unit = { action ->
-        when (action) {
-            is EntityAction.Activate -> onActivate(action.call)
-            else -> Unit
-        }
-    }
 
     DashboardScaffold(
         modifier = modifier,
@@ -65,7 +54,7 @@ fun BedroomContent(
         icon = RoomIcons.Bed,
     ) {
         if (ui.triggers.isNotEmpty()) {
-            ControlGroup(title = "Scenes", entities = ui.triggers, useCardUis = true, onAction = onAction)
+            ControlGroup(title = "Scenes", devices = ui.triggers)
         }
         if (ui.lights.isEmpty() && ui.fans.isEmpty() && ui.climate.isEmpty()) {
             ControlGroup("Devices") {
@@ -107,7 +96,6 @@ private fun BedroomScreenPreview() = PreviewKoin {
                 ),
                 onBack = {},
                 onOpenSettings = {},
-                onActivate = {},
             )
         }
     }
@@ -123,7 +111,6 @@ private fun BedroomEmptyPreview() = PreviewKoin {
                 ui = BedroomUiState(emptyList(), emptyList(), emptyList(), emptyList()),
                 onBack = {},
                 onOpenSettings = {},
-                onActivate = {},
             )
         }
     }

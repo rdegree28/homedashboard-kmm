@@ -94,6 +94,13 @@ fun DeviceControl(
             )
         }
 
+        // One-shot action, so the same tile whatever the layout.
+        is TriggerDeviceUi -> TriggerCard(
+            ui = device,
+            onActivate = { device.onActivate(repo) },
+            modifier = modifier,
+        )
+
         is OfficeWorkstationUi -> WorkstationControl(
             ui = device,
             onToggle = { device.onToggle(repo) },

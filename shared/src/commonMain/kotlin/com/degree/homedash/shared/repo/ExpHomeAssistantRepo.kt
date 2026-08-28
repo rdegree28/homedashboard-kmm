@@ -7,6 +7,7 @@ import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.model.entity.DeviceMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.ToggleableDeviceMetadata
+import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -67,6 +68,16 @@ class ExpHomeAssistantRepo internal constructor(
     internal fun toggleEntity(entity: ToggleableDeviceMetadata) {
         api.toggleEntity(entityId = entity.entityId)
     }
+
+    /**
+     * Fires [trigger] — activating a scene, running a script, triggering an automation.
+     *
+     * Takes metadata rather than an id, the same way [toggleEntity] does: a trigger names the service
+     * it fires and the entity it aims at, and nothing about the call can be read off live state.
+     * Reached through [TriggerDeviceMetadata.onActivate] rather than called directly.
+     */
+    internal fun activateTrigger(trigger: TriggerDeviceMetadata) =
+        api.callService(trigger.serviceDomain, trigger.service, trigger.targetEntityId)
 
     /** Turn [entityId] off, whatever its domain. */
     internal fun turnOff(entityId: String) =

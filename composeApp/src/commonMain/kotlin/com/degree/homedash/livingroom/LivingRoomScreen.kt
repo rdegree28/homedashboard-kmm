@@ -8,10 +8,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.PreviewKoin
 import com.degree.homedash.controls.previewTrigger
-import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
 import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
@@ -31,7 +29,6 @@ fun LivingRoomScreen(
         ui = ui,
         onBack = onBack,
         onOpenSettings = onOpenSettings,
-        onActivate = vm::activate,
         showLights = showLights,
     )
 }
@@ -43,16 +40,8 @@ fun LivingRoomContent(
     ui: LivingRoomUiState,
     onBack: () -> Unit,
     onOpenSettings: () -> Unit,
-    onActivate: (TriggerDeviceMetadata.ServiceCall) -> Unit,
     showLights: Boolean = false,
 ) {
-    // Scene cards are the only entities left on the action path; the devices carry their own behavior.
-    val onAction: (EntityAction) -> Unit = { action ->
-        when (action) {
-            is EntityAction.Activate -> onActivate(action.call)
-            else -> Unit
-        }
-    }
 
     DashboardScaffold(
         modifier = modifier,
@@ -66,9 +55,7 @@ fun LivingRoomContent(
             if (ui.triggers.isNotEmpty()) {
                 ControlGroup(
                     title = "Scenes",
-                    entities = ui.triggers,
-                    useCardUis = true,
-                    onAction = onAction,
+                    devices = ui.triggers,
                 )
             }
 
@@ -104,7 +91,6 @@ private fun LivingRoomScreenPreview() = PreviewKoin {
                 ),
                 onBack = {},
                 onOpenSettings = {},
-                onActivate = {},
                 showLights = true,
             )
         }

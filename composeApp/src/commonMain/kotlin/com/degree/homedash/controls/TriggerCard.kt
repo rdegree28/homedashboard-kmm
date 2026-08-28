@@ -47,7 +47,7 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun TriggerCard(
-    ui: EntityUi.Trigger,
+    ui: TriggerDeviceUi,
     onActivate: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -96,7 +96,7 @@ fun TriggerCard(
             )
             Text(
                 modifier = Modifier.weight(1f),
-                text = ui.displayName,
+                text = ui.name,
                 style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface
