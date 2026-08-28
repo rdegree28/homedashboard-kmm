@@ -4,15 +4,19 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.controls.SoilMoistureDeviceUi
+import com.degree.homedash.controls.loadDeviceUis
+import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.api.HaConnectionStatus
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -26,6 +30,10 @@ data class PlantGraphUiState(
 /**
  * Owns the selected [TimeRange] and re-fetches moisture history for [entityId] as it/connection change.
  *
+ * [entityId] arrives as the destination's navigation argument — the row the user tapped on the Plants
+ * list — and is looked up in the same roster that list renders, so this screen shows the sensor under
+ * the name and metadata the rest of the app uses rather than a second description of it.
+ *
  * Two repos, deliberately: the reading at the top of the screen is a device, projected through
  * [ExpHomeAssistantRepo] like every other card, while the chart's history still comes from
  * [HomeAssistantRepo] — its ranges reach a year back, where the recorder's raw states are long purged
@@ -34,17 +42,27 @@ data class PlantGraphUiState(
 class PlantGraphViewModel(
     private val repo: HomeAssistantRepo,
     private val entityId: String,
+    metadataRepo: EntityMetadataRepo,
     deviceRepo: ExpHomeAssistantRepo,
 ) : ViewModel() {
 
     private val range = MutableStateFlow(TimeRange.WEEK)
     private val history = MutableStateFlow<List<HistoryPoint>>(emptyList())
 
-    private val plant = deviceRepo.loadSoilMoistureUis { it.entityId == entityId }
+    /**
+     * The one rostered sensor this screen was opened for. Projected as a one-entry roster so it goes
+     * through the same path the list does; an id the roster doesn't name yields no device, and the
+     * screen renders its chart with no reading above it rather than failing.
+     */
+    private val plant: Flow<SoilMoistureDeviceUi?> =
+        metadataRepo.loadPlantsEntityMetadataList()
+            .filter { it.entityId == entityId }
+            .loadDeviceUis(deviceRepo)
+            .map { devices -> devices.filterIsInstance<SoilMoistureDeviceUi>().firstOrNull() }
 
     val uiState: StateFlow<PlantGraphUiState> =
         combine(plant, range, history) { plant, range, history ->
-            PlantGraphUiState(plant = plant.firstOrNull(), history = history, range = range)
+            PlantGraphUiState(plant = plant, history = history, range = range)
         }
             .distinctUntilChanged()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PlantGraphUiState(null, emptyList(), TimeRange.WEEK))

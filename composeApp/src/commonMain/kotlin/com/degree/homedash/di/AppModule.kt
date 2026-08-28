@@ -37,6 +37,13 @@ fun appModule(defaultConfig: HaConfig?) = module {
     viewModel { BedroomViewModel(get(), get()) }
     viewModel { PetsViewModel(get(), get()) }
     viewModel { PlantsViewModel(get(), get()) }
-    viewModel { (entityId: String) -> PlantGraphViewModel(get(), entityId, get()) }
+    viewModel { (entityId: String) ->
+        PlantGraphViewModel(
+            repo = get(),
+            entityId = entityId,
+            metadataRepo = get(),
+            deviceRepo = get(),
+        )
+    }
     viewModel { (entityId: String) -> WaterGraphViewModel(get(), entityId, get()) }
 }
