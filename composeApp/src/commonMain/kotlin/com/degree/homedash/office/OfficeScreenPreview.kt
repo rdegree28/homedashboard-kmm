@@ -9,7 +9,6 @@ import com.degree.homedash.controls.OfficeSignalDeviceUi
 import com.degree.homedash.controls.OfficeWorkstationUi
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.model.HistoricalEntityReading
-import com.degree.homedash.shared.api.HaConnectionStatus
 import com.degree.homedash.shared.model.states.ClimateState
 import com.degree.homedash.shared.model.states.FanState
 import com.degree.homedash.shared.model.states.DoorState
@@ -24,7 +23,6 @@ internal val previewHistory: List<HistoryPoint> =
     List(48) { i -> HistoryPoint(timeSeconds = i.toDouble(), value = (sin(i * 0.4) * 40 + 55).coerceAtLeast(0.0)) }
 
 internal val previewOfficeUiState = OfficeUiState(
-    connection = HaConnectionStatus.Connected,
     lights = listOf(
         LightDeviceUi(LightMetadata("light.office", "Office"), state = LightState(entityId = "light.office", isOn = true, isOffline = false)),
         LightDeviceUi(LightMetadata("light.small", "Small"), state = LightState(entityId = "light.small", isOn = false, isOffline = false)),

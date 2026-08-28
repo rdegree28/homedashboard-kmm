@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.controls.ClimateDeviceUi
 import com.degree.homedash.shared.model.entity.*
-import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.FanDeviceUi
 import com.degree.homedash.controls.LightDeviceUi
 import com.degree.homedash.controls.DeviceUi
@@ -13,19 +12,14 @@ import com.degree.homedash.controls.DoorDeviceUi
 import com.degree.homedash.controls.OfficeSignalDeviceUi
 import com.degree.homedash.controls.OfficeWorkstationUi
 import com.degree.homedash.controls.loadDeviceUis
-import com.degree.homedash.controls.toEntityUis
-import com.degree.homedash.shared.model.entity.DeviceMetadata
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
-import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.shared.api.HaConnectionStatus
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 
 // --- UI models: small immutable projections the Office composables render (no raw EntityState). ---
 
@@ -55,7 +49,6 @@ data class DoorUi(val label: String, val statusText: String, val open: Boolean, 
 
 @Immutable
 data class OfficeUiState(
-    val connection: HaConnectionStatus,
     val lights: List<LightDeviceUi>,
     val fans: List<FanDeviceUi>,
     val climate: List<ClimateDeviceUi>,
@@ -69,34 +62,26 @@ data class OfficeUiState(
  * The flow is de-duplicated so only changes to *displayed* values recompose the screen.
  */
 class OfficeViewModel(
-    repo: HomeAssistantRepo,
     metadataRepo: EntityMetadataRepo,
     deviceRepo: ExpHomeAssistantRepo,
 ) : ViewModel() {
 
     val uiState: StateFlow<OfficeUiState> =
-        combine(
-            repo.connection,
-            metadataRepo.loadOfficeEntityMetadataList().loadDeviceUis(deviceRepo),
-        ) { connection, deviceUis ->
-            buildOfficeUiState(connection, deviceUis)
-        }
-        .distinctUntilChanged()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EMPTY)
+        metadataRepo.loadOfficeEntityMetadataList()
+            .loadDeviceUis(deviceRepo)
+            .map(::buildOfficeUiState)
+            .distinctUntilChanged()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), EMPTY)
 
     private companion object {
-        val EMPTY = buildOfficeUiState(HaConnectionStatus.Disconnected, emptyList())
+        val EMPTY = buildOfficeUiState(emptyList())
     }
 }
 
 // --- Projection helpers ---
 
-private fun buildOfficeUiState(
-    connection: HaConnectionStatus,
-    deviceUis: List<DeviceUi>,
-): OfficeUiState {
-   return OfficeUiState(
-        connection = connection,
+private fun buildOfficeUiState(deviceUis: List<DeviceUi>): OfficeUiState {
+    return OfficeUiState(
         lights = deviceUis.filterIsInstance<LightDeviceUi>(),
         fans = deviceUis.filterIsInstance<FanDeviceUi>(),
         climate = deviceUis.filterIsInstance<ClimateDeviceUi>(),

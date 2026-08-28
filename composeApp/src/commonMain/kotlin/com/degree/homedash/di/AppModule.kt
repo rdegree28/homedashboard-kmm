@@ -29,7 +29,6 @@ fun appModule(defaultConfig: HaConfig?) = module {
     viewModel { HomeViewModel(get(), get()) }
     viewModel {
         OfficeViewModel(
-            repo = get(),
             metadataRepo = get(),
             deviceRepo = get(),
         )

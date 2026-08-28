@@ -8,7 +8,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.degree.homedash.controls.PreviewKoin
-import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.ControlLayout
 import com.degree.homedash.controls.DeviceControl
 import org.koin.compose.viewmodel.koinViewModel
@@ -46,7 +45,6 @@ fun OfficeContent(
         title = "Office",
         onBack = onBack,
         onOpenSettings = onOpenSettings,
-        connection = ui.connection,
         icon = RoomIcons.Desk,
     ) {
         ControlGroup(
