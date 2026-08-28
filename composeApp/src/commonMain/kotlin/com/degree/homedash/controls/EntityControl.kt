@@ -201,11 +201,6 @@ fun EntityControl(
             }
         }
 
-        is EntityUi.SoilMoisture -> SoilMoistureControl(
-            ui = entity,
-            onClick = { onAction(EntityAction.OpenGraph(entity.entityId)) },
-        )
-
         is EntityUi.WaterLevel -> WaterLevelControl(
             ui = entity,
             onClick = { onAction(EntityAction.OpenGraph(entity.entityId)) },

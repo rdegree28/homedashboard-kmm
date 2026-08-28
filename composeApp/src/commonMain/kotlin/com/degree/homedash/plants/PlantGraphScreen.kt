@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.degree.homedash.controls.SoilMoistureControl
 import com.degree.homedash.controls.moistureColor
-import com.degree.homedash.controls.displayName
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import com.degree.homedash.ui.ControlGroup
@@ -50,7 +49,7 @@ fun PlantGraphContent(
     onRangeChange: (TimeRange) -> Unit,
     onBack: () -> Unit,
 ) {
-    DashboardScaffold(title = ui.plant?.displayName ?: "Plant", onBack = onBack) {
+    DashboardScaffold(title = ui.plant?.name ?: "Plant", onBack = onBack) {
         ControlGroup("Soil Moisture") {
             ui.plant?.let { SoilMoistureControl(it) }
             Spacer(Modifier.height(8.dp))

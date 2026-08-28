@@ -94,6 +94,10 @@ fun DeviceControl(
             )
         }
 
+        // Read-only here: the tap that opens its history graph is navigation, so the Plants screen
+        // renders its own tappable rows rather than going through this dispatcher.
+        is SoilMoistureDeviceUi -> SoilMoistureControl(ui = device)
+
         // One-shot action, so the same tile whatever the layout.
         is TriggerDeviceUi -> TriggerCard(
             ui = device,

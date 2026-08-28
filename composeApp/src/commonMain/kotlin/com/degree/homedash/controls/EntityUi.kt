@@ -75,13 +75,6 @@ sealed interface EntityUi {
     ) : EntityUi
 
     @Immutable
-    data class SoilMoisture(
-        override val metadata: SoilMoistureMetadata,
-        val pct: Double?,
-        val valueText: String,
-    ) : EntityUi
-
-    @Immutable
     data class WaterLevel(
         override val metadata: WaterLevelMetadata,
         val pct: Double?,

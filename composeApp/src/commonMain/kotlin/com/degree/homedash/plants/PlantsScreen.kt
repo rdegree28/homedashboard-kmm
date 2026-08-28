@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.degree.homedash.controls.EntityAction
+import com.degree.homedash.controls.SoilMoistureControl
 import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
@@ -39,20 +39,24 @@ fun PlantsContent(
     onOpenGraph: (String) -> Unit,
 ) {
     DashboardScaffold(title = "Plants", onBack = onBack, onOpenSettings = onOpenSettings, icon = RoomIcons.Plant) {
-        ControlGroup(
-            title = "Soil Moisture",
-            entities = ui.plants,
-            onAction = { action ->
-                if (action is EntityAction.OpenGraph) onOpenGraph(action.entityId)
-            },
-            empty = {
+        ControlGroup(title = "Soil Moisture", titleOutsideCard = true) {
+            if (ui.plants.isEmpty()) {
                 Text(
                     "No moisture sensors found.",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-            },
-        )
+            } else {
+                // Rendered here rather than through `DeviceControl` because the tap is navigation:
+                // the row opens this sensor's history graph, which no device can do for itself.
+                ui.plants.forEach { plant ->
+                    SoilMoistureControl(
+                        ui = plant,
+                        onClick = { onOpenGraph(plant.id) }
+                    )
+                }
+            }
+        }
     }
 }
 

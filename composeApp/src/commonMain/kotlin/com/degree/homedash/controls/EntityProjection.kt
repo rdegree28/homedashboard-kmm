@@ -92,14 +92,8 @@ fun DeviceMetadata.toEntityUi(
         )
     }
 
-    is SoilMoistureMetadata -> {
-        val pct = state.percentOrNull()
-        EntityUi.SoilMoisture(
-            metadata = this,
-            pct = pct,
-            valueText = pct?.let { "${formatNumber(it, decimals = 1)} %" } ?: "—",
-        )
-    }
+    // Fully migrated to the device stack — rendered by SoilMoistureControl, with no [EntityUi] form.
+    is SoilMoistureMetadata -> null
 
     is WaterLevelMetadata -> {
         val pct = state.percentOrNull()

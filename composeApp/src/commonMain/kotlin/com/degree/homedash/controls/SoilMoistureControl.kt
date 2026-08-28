@@ -34,7 +34,7 @@ import com.degree.homedash.ui.AppColors
  */
 @Composable
 fun SoilMoistureControl(
-    ui: EntityUi.SoilMoisture,
+    ui: SoilMoistureDeviceUi,
     onClick: (() -> Unit)? = null,
 ) {
     val fraction = ui.pct?.let { (it / 100.0).coerceIn(0.0, 1.0) } ?: 0.0
@@ -49,7 +49,7 @@ fun SoilMoistureControl(
     ) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = ui.displayName,
+                text = ui.name,
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.titleMedium,
             )

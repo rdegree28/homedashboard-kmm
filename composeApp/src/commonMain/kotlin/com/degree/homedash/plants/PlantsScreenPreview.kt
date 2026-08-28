@@ -1,17 +1,22 @@
 package com.degree.homedash.plants
 
-import com.degree.homedash.shared.model.entity.*
-import com.degree.homedash.controls.EntityUi
+import com.degree.homedash.controls.SoilMoistureDeviceUi
+import com.degree.homedash.shared.model.HistoricalEntityReading
 import com.degree.homedash.shared.model.HistoryPoint
+import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
+import com.degree.homedash.shared.model.states.SoilMoistureState
 import kotlin.math.sin
 
 // Sample data for the Plants @Previews (which live next to their composables in this package).
 
-internal val previewPlants: List<EntityUi.SoilMoisture> = listOf(
-    EntityUi.SoilMoisture(
+internal val previewPlants: List<SoilMoistureDeviceUi> = listOf(
+    SoilMoistureDeviceUi(
         metadata = SoilMoistureMetadata("sensor.louie_moisture_sensor_soil_moisture", "Louie"),
-        pct = 58.0,
-        valueText = "58 %",
+        state = SoilMoistureState(
+            entityId = "sensor.louie_moisture_sensor_soil_moisture",
+            isOffline = false,
+            reading = HistoricalEntityReading(58.0, "%"),
+        ),
     ),
 )
 

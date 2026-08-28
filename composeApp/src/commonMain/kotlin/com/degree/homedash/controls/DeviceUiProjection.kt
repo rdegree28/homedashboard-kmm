@@ -7,6 +7,7 @@ import com.degree.homedash.shared.model.entity.FanMetadata
 import com.degree.homedash.shared.model.entity.LightMetadata
 import com.degree.homedash.shared.model.entity.OfficeSignalMetadata
 import com.degree.homedash.shared.model.entity.OfficeWorkstationMetadata
+import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
 import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
@@ -53,6 +54,11 @@ fun DeviceMetadata.loadUi(repo: ExpHomeAssistantRepo): Flow<DeviceUi>? = when (t
     is OfficeWorkstationMetadata -> {
         val metadata = this
         loadState(repo).map { state -> OfficeWorkstationUi(metadata = metadata, state = state) }
+    }
+
+    is SoilMoistureMetadata -> {
+        val metadata = this
+        loadState(repo).map { state -> SoilMoistureDeviceUi(metadata = metadata, state = state) }
     }
 
     // Stateless: a trigger fires a service and reports nothing, so its card never changes. A constant
