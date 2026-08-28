@@ -27,7 +27,6 @@ import org.koin.compose.koinInject
 @Composable
 fun DeviceControl(
     device: DeviceUi,
-    layout: ControlLayout,
     modifier: Modifier = Modifier,
 ) {
     val repo: ExpHomeAssistantRepo = koinInject()

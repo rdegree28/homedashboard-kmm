@@ -8,7 +8,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.degree.homedash.controls.PreviewKoin
-import com.degree.homedash.controls.ControlLayout
 import com.degree.homedash.controls.DeviceControl
 import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.ControlGroup
@@ -74,7 +73,7 @@ fun OfficeContent(
 
         ui.workstation?.let { workstation ->
             ControlGroup("Workstation", titleOutsideCard = true) {
-                DeviceControl(workstation, ControlLayout.Card)
+                DeviceControl(workstation)
             }
         }
     }

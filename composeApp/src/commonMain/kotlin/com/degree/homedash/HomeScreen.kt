@@ -28,7 +28,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
-import com.degree.homedash.controls.ControlLayout
 import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.EntityControl
 import com.degree.homedash.controls.EntityUi
@@ -99,7 +98,7 @@ fun HomeContent(
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     pair.forEach { entity ->
                         Box(Modifier.weight(1f)) {
-                            EntityControl(entity, ControlLayout.Card, onAction, Modifier.fillMaxWidth())
+                            EntityControl(entity, onAction, Modifier.fillMaxWidth())
                         }
                     }
                     // Pad an odd final row so its tile keeps the grid's column width.
@@ -115,7 +114,6 @@ fun HomeContent(
         Spacer(modifier = Modifier.height(16.dp))
         ControlGroup(
             title = "Climate",
-            useCardUis = true,
             entities = thermostats,
             onAction = onAction,
         )

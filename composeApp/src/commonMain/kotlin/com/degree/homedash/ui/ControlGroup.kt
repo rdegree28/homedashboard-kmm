@@ -22,7 +22,6 @@ import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.controls.ControlLayout
 import com.degree.homedash.controls.ControlPreview
 import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.EntityControl
@@ -31,7 +30,6 @@ import com.degree.homedash.controls.DeviceControl
 import com.degree.homedash.controls.DeviceUi
 import com.degree.homedash.controls.cardSpan
 import com.degree.homedash.controls.entityId
-import com.degree.homedash.controls.hasCard
 import com.degree.homedash.controls.previewFanUi
 import com.degree.homedash.controls.previewLight
 
@@ -80,27 +78,15 @@ fun ControlGroup(
 fun ControlGroup(
     title: String,
     entities: List<EntityUi>,
-    useCardUis: Boolean = false,
     onAction: (EntityAction) -> Unit,
     empty: @Composable () -> Unit = {},
 ) {
-    val asCards = useCardUis && entities.isNotEmpty() && entities.all { it.hasCard() }
-    if (asCards) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            GroupTitle(title)
-            CardGrid(entities, onAction)
-        }
-    } else {
-        ControlGroup(title) {
-            if (entities.isEmpty()) {
-                empty()
-            } else {
-                entities.forEach { EntityControl(it, ControlLayout.Row, onAction) }
-            }
-        }
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        GroupTitle(title)
+        CardGrid(entities, onAction)
     }
 }
 
@@ -151,7 +137,6 @@ private fun CardGrid(
                 movableContentOf { latest: EntityUi ->
                     EntityControl(
                         entity = latest,
-                        layout = ControlLayout.Card,
                         onAction = onAction,
                         modifier = Modifier.fillMaxWidth().animateBounds(lookaheadScope),
                     )
@@ -203,7 +188,6 @@ private fun ExpCardGrid(
                 movableContentOf { latest: DeviceUi ->
                     DeviceControl(
                         device = latest,
-                        layout = ControlLayout.Card,
                         modifier = Modifier.fillMaxWidth().animateBounds(lookaheadScope),
                     )
                 }
@@ -299,7 +283,6 @@ private fun ControlGroupFlexPreview() = ControlPreview {
             previewFanUi("Tower", isOn = false),
             previewLight("Reading", isOn = true),
         ),
-        useCardUis = true,
         onAction = {},
     )
 }

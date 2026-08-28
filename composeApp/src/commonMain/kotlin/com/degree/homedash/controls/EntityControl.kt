@@ -47,14 +47,6 @@ sealed interface EntityAction {
     data class Navigate(val target: NavigationMetadata.NavigationTarget) : EntityAction
 }
 
-/** How a control should render. `ControlGroup` picks this per group; individual controls don't. */
-enum class ControlLayout { Row, Card }
-
-/** True for entity types that have a card rendering (lights, fans, climate, and launcher tiles). */
-fun EntityUi.hasCard(): Boolean =
-    this is EntityUi.Light || this is EntityUi.Fan || this is EntityUi.Climate ||
-        this is EntityUi.Thermostat || this is EntityUi.Navigation
-
 /**
  * How many grid columns this entity's card should span (out of the grid's 2). Two types go wide:
  * a thermostat always (its stepper and mode pills need the room, and a card that changed width as
@@ -81,89 +73,13 @@ fun EntityUi.cardSpan(): Int = when {
 @Composable
 fun EntityControl(
     entity: EntityUi,
-    layout: ControlLayout,
     onAction: (EntityAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when (entity) {
-        is EntityUi.Light -> {
-            val onToggle = { onAction(EntityAction.Toggle(entity.entityId)) }
-            val icon: @Composable (Color) -> Unit = { tint ->
-                LightIcon(
-                    on = entity.isOn,
-                    tint = tint,
-                    modifier = Modifier.size(Dimens.RowIconSize),
-                    icon = entity.metadata.icon,
-                )
-            }
-            val onTint = Color(entity.metadata.tint)
-            val ui = ToggleUi(name = entity.displayName, isOn = entity.isOn, offline = entity.offline)
-            when (layout) {
-                ControlLayout.Row -> EntityToggleRow(ui, onTint, onToggle, iconContent = icon)
-                ControlLayout.Card -> EntityToggleCard(ui, onTint, onToggle, icon, modifier)
-            }
-        }
-
-        is EntityUi.Fan -> {
-            val onToggle = { onAction(EntityAction.Toggle(entity.entityId)) }
-            val fanUi = FanUi(
-                name = entity.displayName,
-                isOn = entity.isOn,
-                offline = entity.offline,
-                levelCount = entity.metadata.speedAdjustment?.levelCount ?: 0,
-                percentage = entity.percentage,
-                canOscillate = entity.metadata.hasOscillationFeature,
-                oscillating = entity.oscillating,
-                canMist = entity.metadata.misting != null,
-                misting = entity.misting,
-            )
-            val onSetSpeed = { pct: Int -> onAction(EntityAction.SetSpeed(entity.entityId, pct)) }
-            val onSetOscillating = { on: Boolean ->
-                onAction(EntityAction.SetOscillating(entity.entityId, on))
-            }
-            // Targets the mister entity, so a fan without one can't emit this at all.
-            val onSetMisting = { on: Boolean ->
-                entity.metadata.misting?.let { onAction(EntityAction.SetMisting(it.entityId, on)) }
-                Unit
-            }
-            when (layout) {
-                ControlLayout.Row -> FanControl(
-                    ui = fanUi,
-                    onSetSpeed = onSetSpeed,
-                    onToggle = onToggle,
-                )
-                ControlLayout.Card -> FanControlCard(
-                    ui = fanUi,
-                    onSetSpeed = onSetSpeed,
-                    onSetOscillating = onSetOscillating,
-                    onSetMisting = onSetMisting,
-                    onToggle = onToggle,
-                    modifier = modifier,
-                )
-            }
-        }
-
-        is EntityUi.Climate -> {
-            val (icon: ImageVector, tint: Color) = when (entity.metadata.kind) {
-                ClimateMetadata.ClimateKind.Temperature -> Icons.Filled.Thermostat to AppColors.TempWarm
-                ClimateMetadata.ClimateKind.Humidity -> Icons.Filled.WaterDrop to AppColors.Wet
-                ClimateMetadata.ClimateKind.DewPoint -> Icons.Filled.Opacity to AppColors.Wet
-            }
-            when (layout) {
-                ControlLayout.Row -> ClimateRow(
-                    ui = SensorUi(entity.displayName, entity.valueText),
-                    icon = icon,
-                    tint = tint
-                )
-                ControlLayout.Card -> ClimateCard(
-                    label = entity.displayName,
-                    valueText = entity.valueText,
-                    subvalueText = entity.subvalueText,
-                    icon = icon,
-                    tint = tint,
-                    modifier = modifier
-                )
-            }
+        is EntityUi.Navigation -> {
+            val onClick = { onAction(EntityAction.Navigate(entity.metadata.destination)) }
+            NavigationTile(entity, onClick, modifier)
         }
 
         // The card is the only form a thermostat has, so both layouts render it — the controls need
@@ -184,41 +100,17 @@ fun EntityControl(
             modifier = modifier,
         )
 
-        is EntityUi.Door -> DoorRow(
-            DoorUi(
-                label = entity.displayName,
-                statusText = entity.statusText,
-                open = entity.open,
-                unavailable = entity.unavailable,
-            ),
-        )
-
-        is EntityUi.Navigation -> {
-            val onClick = { onAction(EntityAction.Navigate(entity.metadata.destination)) }
-            when (layout) {
-                ControlLayout.Row -> NavigationCard(entity, onClick, modifier)
-                ControlLayout.Card -> NavigationTile(entity, onClick, modifier)
-            }
-        }
+        else -> throw IllegalStateException("Unknown control $entity")
     }
-}
-
-
-@Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
-@Composable
-private fun EntityLightRowPreview() = ControlPreview {
-    EntityControl(previewLight("On", isOn = true), ControlLayout.Row, {})
-    EntityControl(previewLight("Off", isOn = false), ControlLayout.Row, {})
-    EntityControl(previewLight("Offline", offline = true), ControlLayout.Row, {})
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
 @Composable
 private fun EntityLightCardPreview() = ControlPreview {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        EntityControl(previewLight("On", isOn = true), ControlLayout.Card, {}, Modifier.weight(1f))
-        EntityControl(previewLight("Off", isOn = false), ControlLayout.Card, {}, Modifier.weight(1f))
-        EntityControl(previewLight("Offline", offline = true), ControlLayout.Card, {}, Modifier.weight(1f))
+        EntityControl(previewLight("On", isOn = true),  {}, Modifier.weight(1f))
+        EntityControl(previewLight("Off", isOn = false), {}, Modifier.weight(1f))
+        EntityControl(previewLight("Offline", offline = true),  {}, Modifier.weight(1f))
     }
 }
 
@@ -226,24 +118,24 @@ private fun EntityLightCardPreview() = ControlPreview {
 @Composable
 private fun EntityFanCardPreview() = ControlPreview {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        EntityControl(previewFanUi("On", isOn = true, percentage = 75, levelCount = 12), ControlLayout.Card, {}, Modifier.weight(1f))
-        EntityControl(previewFanUi("Off", isOn = false), ControlLayout.Card, {}, Modifier.weight(1f))
-        EntityControl(previewFanUi("Offline", offline = true), ControlLayout.Card, {}, Modifier.weight(1f))
+        EntityControl(previewFanUi("On", isOn = true, percentage = 75, levelCount = 12), {}, Modifier.weight(1f))
+        EntityControl(previewFanUi("Off", isOn = false), {}, Modifier.weight(1f))
+        EntityControl(previewFanUi("Offline", offline = true),  {}, Modifier.weight(1f))
     }
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F, widthDp = 380)
 @Composable
 private fun EntityThermostatCardPreview() = ControlPreview {
-    EntityControl(previewThermostat("Thermostat"), ControlLayout.Card, {})
+    EntityControl(previewThermostat("Thermostat"),  {})
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
 @Composable
 private fun EntityClimateCardPreview() = ControlPreview {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        EntityControl(previewClimate("Temperature", "72.5 °F", ClimateMetadata.ClimateKind.Temperature), ControlLayout.Card, {}, Modifier.weight(1f))
-        EntityControl(previewClimate("Humidity", "48 %", ClimateMetadata.ClimateKind.Humidity), ControlLayout.Card, {}, Modifier.weight(1f))
-        EntityControl(previewClimate("Dew Point", "50.9 °F", ClimateMetadata.ClimateKind.DewPoint), ControlLayout.Card, {}, Modifier.weight(1f))
+        EntityControl(previewClimate("Temperature", "72.5 °F", ClimateMetadata.ClimateKind.Temperature), {}, Modifier.weight(1f))
+        EntityControl(previewClimate("Humidity", "48 %", ClimateMetadata.ClimateKind.Humidity),  {}, Modifier.weight(1f))
+        EntityControl(previewClimate("Dew Point", "50.9 °F", ClimateMetadata.ClimateKind.DewPoint), {}, Modifier.weight(1f))
     }
 }
