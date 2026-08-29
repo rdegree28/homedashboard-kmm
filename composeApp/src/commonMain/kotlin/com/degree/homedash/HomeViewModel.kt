@@ -6,7 +6,6 @@ import com.degree.homedash.core.device.NavigationDeviceUi
 import com.degree.homedash.core.device.PetFountainDeviceUi
 import com.degree.homedash.core.device.ThermostatDeviceUi
 import com.degree.homedash.core.loadDeviceUis
-import com.degree.homedash.pets.PetsEntities
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.device_metadata.NavigationMetadata
 import com.degree.homedash.shared.repo.EntityMetadataRepo
@@ -77,6 +76,19 @@ class HomeViewModel(
 }
 
 /**
+ * The cat's medication reminders. Home Assistant's automations turn each helper on when that dose
+ * comes due and off again once it's marked given, so these read as "this dose is still owed" — the
+ * app only ever watches them.
+ *
+ * Spelled out here rather than in a roster because they have no metadata type: there is no card and
+ * no control behind them, and [catMedicationWarning] is the only thing that reads them.
+ */
+internal object CatMedicationEntities {
+    const val AM_REMINDER = "input_boolean.cat_medication_am_reminder_active"
+    const val PM_REMINDER = "input_boolean.cat_medication_pm_reminder_active"
+}
+
+/**
  * Warn while either of the cat's medication reminders is active, as one card naming whichever doses
  * are still owed.
  *
@@ -89,8 +101,8 @@ class HomeViewModel(
  * is marked given, so the card goes away on its own.
  */
 internal fun catMedicationWarning(states: Map<String, EntityState>): HomeWarning? {
-    val am = states[PetsEntities.CAT_MEDICATION_AM_REMINDER]?.isOn == true
-    val pm = states[PetsEntities.CAT_MEDICATION_PM_REMINDER]?.isOn == true
+    val am = states[CatMedicationEntities.AM_REMINDER]?.isOn == true
+    val pm = states[CatMedicationEntities.PM_REMINDER]?.isOn == true
     val due = when {
         am && pm -> "morning and evening"
         am -> "morning"

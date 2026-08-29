@@ -9,9 +9,9 @@ import com.degree.homedash.shared.model.device_state.PetFilterState
 // Sample data for the Pets @Previews (which live next to their composables in this package).
 
 private val previewFountainMetadata = PetFountainMetadata(
-    PetsEntities.CAT_WATER_LEVEL,
+    "sensor.cat_water_fountain_remaining_water_pct",
     "Remaining Water",
-    filterHealth = PetFountainMetadata.FilterHealth(PetsEntities.CAT_FILTER_DAYS, maxDays = 31),
+    filterHealth = PetFountainMetadata.FilterHealth("sensor.cat_water_fountain_remaining_filter_day", maxDays = 31),
 )
 
 internal val previewLevels: List<PetFountainDeviceUi> = listOf(previewFountain(pct = 68.0, filterDays = 26))
@@ -22,7 +22,7 @@ internal val previewLevelsLow: List<PetFountainDeviceUi> = listOf(previewFountai
 private fun previewFountain(pct: Double, filterDays: Int) = PetFountainDeviceUi(
     metadata = previewFountainMetadata,
     state = PetFilterState(
-        entityId = PetsEntities.CAT_WATER_LEVEL,
+        entityId = "sensor.cat_water_fountain_remaining_water_pct",
         isOffline = false,
         waterLevel = HistoricalEntityReading(pct, "%"),
         filterDaysRemaining = filterDays,

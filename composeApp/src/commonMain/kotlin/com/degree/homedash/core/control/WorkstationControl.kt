@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.dp
 import com.degree.homedash.core.device.OfficeWorkstationUi
 import com.degree.homedash.core.util.ControlPreview
 import com.degree.homedash.core.util.DeviceToggleRow
-import com.degree.homedash.office.PowerGraph
-import com.degree.homedash.office.previewHistory
+import com.degree.homedash.core.util.PowerGraph
+import com.degree.homedash.core.util.previewHistory
 import com.degree.homedash.shared.model.HistoricalEntityReading
 import com.degree.homedash.shared.model.device_metadata.OfficeWorkstationMetadata
 import com.degree.homedash.shared.model.device_state.OfficeWorkstationState

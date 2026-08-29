@@ -34,7 +34,7 @@ import com.degree.homedash.di.appModule
 import com.degree.homedash.livingroom.LivingRoomScreen
 import com.degree.homedash.office.OfficeScreen
 import com.degree.homedash.pets.PetsScreen
-import com.degree.homedash.pets.WaterGraphScreen
+import com.degree.homedash.pets.PetFountainGraphScreen
 import com.degree.homedash.plants.PlantGraphScreen
 import com.degree.homedash.plants.PlantsScreen
 import com.degree.homedash.shared.api.HaConfig
@@ -175,11 +175,11 @@ private fun AppContent() {
                             onOpenSettings = { navigate(Screen.Settings) },
                             onOpenGraph = { id ->
                                 graphEntityId = id
-                                navigate(Screen.WaterGraph)
+                                navigate(Screen.PetFountainGraph)
                             },
                         )
 
-                        Screen.WaterGraph -> WaterGraphScreen(
+                        Screen.PetFountainGraph -> PetFountainGraphScreen(
                             entityId = graphEntityId.orEmpty(),
                             onBack = ::goBack,
                         )
@@ -217,7 +217,7 @@ private fun UpdateBanner(onReload: () -> Unit, modifier: Modifier = Modifier) {
 }
 
 /** Top-level destinations; the launcher (Home) is the root of the back stack. */
-private enum class Screen { Home, Office, Plants, LivingRoom, Bedroom, Pets, Settings, Login, PlantGraph, WaterGraph }
+private enum class Screen { Home, Office, Plants, LivingRoom, Bedroom, Pets, Settings, Login, PlantGraph, PetFountainGraph }
 
 /** Maps a launcher card's destination onto this file's private [Screen] stack. */
 private fun NavigationTarget.toScreen(): Screen = when (this) {

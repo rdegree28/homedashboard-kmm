@@ -29,16 +29,16 @@ import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun WaterGraphScreen(entityId: String, onBack: () -> Unit) {
-    val vm: WaterGraphViewModel = koinViewModel(key = entityId) { parametersOf(entityId) }
+fun PetFountainGraphScreen(entityId: String, onBack: () -> Unit) {
+    val vm: PetFountainGraphViewModel = koinViewModel(key = entityId) { parametersOf(entityId) }
     val ui by vm.uiState.collectAsStateWithLifecycle()
-    WaterGraphContent(ui = ui, onRangeChange = vm::setRange, onBack = onBack)
+    PetFountainGraphContent(ui = ui, onRangeChange = vm::setRange, onBack = onBack)
 }
 
 /** Stateless water-level graph view: current reading, a range selector, and the history chart. */
 @Composable
-fun WaterGraphContent(
-    ui: WaterGraphUiState,
+fun PetFountainGraphContent(
+    ui: PetFountainGraphUiState,
     onRangeChange: (TimeRange) -> Unit,
     onBack: () -> Unit,
 ) {
@@ -81,11 +81,11 @@ private fun RangeSelector(selected: TimeRange, onSelect: (TimeRange) -> Unit) {
 
 @Preview(widthDp = 380, heightDp = 540)
 @Composable
-private fun WaterGraphScreenPreview() {
+private fun PetFountainGraphScreenPreview() {
     MaterialTheme(colorScheme = darkColorScheme()) {
         Surface(color = MaterialTheme.colorScheme.background) {
-            WaterGraphContent(
-                ui = WaterGraphUiState(previewLevels.first(), previewLevelHistory, TimeRange.DAY),
+            PetFountainGraphContent(
+                ui = PetFountainGraphUiState(previewLevels.first(), previewLevelHistory, TimeRange.DAY),
                 onRangeChange = {},
                 onBack = {},
             )

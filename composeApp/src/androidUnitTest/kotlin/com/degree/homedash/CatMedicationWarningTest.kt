@@ -1,6 +1,5 @@
 package com.degree.homedash
 
-import com.degree.homedash.pets.PetsEntities
 import com.degree.homedash.shared.model.EntityState
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -14,10 +13,10 @@ import kotlin.test.assertNull
 class CatMedicationWarningTest {
 
     private fun states(am: Boolean, pm: Boolean): Map<String, EntityState> = mapOf(
-        PetsEntities.CAT_MEDICATION_AM_REMINDER to
-            EntityState(PetsEntities.CAT_MEDICATION_AM_REMINDER, if (am) "on" else "off"),
-        PetsEntities.CAT_MEDICATION_PM_REMINDER to
-            EntityState(PetsEntities.CAT_MEDICATION_PM_REMINDER, if (pm) "on" else "off"),
+        CatMedicationEntities.AM_REMINDER to
+            EntityState(CatMedicationEntities.AM_REMINDER, if (am) "on" else "off"),
+        CatMedicationEntities.PM_REMINDER to
+            EntityState(CatMedicationEntities.PM_REMINDER, if (pm) "on" else "off"),
     )
 
     @Test

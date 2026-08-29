@@ -1,6 +1,7 @@
 package com.degree.homedash.office
 
 import com.degree.homedash.core.device.ClimateDeviceUi
+import com.degree.homedash.core.util.previewHistory
 import com.degree.homedash.core.device.DoorDeviceUi
 import com.degree.homedash.core.device.FanDeviceUi
 import com.degree.homedash.core.device.LightDeviceUi
@@ -15,12 +16,8 @@ import com.degree.homedash.shared.model.device_state.FanState
 import com.degree.homedash.shared.model.device_state.LightState
 import com.degree.homedash.shared.model.device_state.OfficeSignalState
 import com.degree.homedash.shared.model.device_state.OfficeWorkstationState
-import kotlin.math.sin
 
 // Shared sample data for the Office screen preview.
-
-internal val previewHistory: List<HistoryPoint> =
-    List(48) { i -> HistoryPoint(timeSeconds = i.toDouble(), value = (sin(i * 0.4) * 40 + 55).coerceAtLeast(0.0)) }
 
 internal val previewOfficeUiState = OfficeUiState(
     lights = listOf(

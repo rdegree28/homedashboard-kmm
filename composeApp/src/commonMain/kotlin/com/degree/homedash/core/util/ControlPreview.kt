@@ -17,16 +17,22 @@ import com.degree.homedash.core.device.LightDeviceUi
 import com.degree.homedash.core.device.NavigationDeviceUi
 import com.degree.homedash.core.device.ThermostatDeviceUi
 import com.degree.homedash.core.device.TriggerDeviceUi
+import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.model.device_metadata.*
 import com.degree.homedash.shared.model.device_metadata.factories.livingRoomThermostat
 import com.degree.homedash.shared.model.device_state.FanState
 import com.degree.homedash.shared.model.device_state.LightState
 import com.degree.homedash.shared.model.device_state.ThermostatState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import kotlin.math.sin
 import org.koin.compose.KoinApplicationPreview
 import org.koin.dsl.module
 
 // Shared sample data + scaffolding for the control previews (which live next to each composable).
+
+/** Two days of half-hourly samples, for previews of the controls that chart history. */
+internal val previewHistory: List<HistoryPoint> =
+    List(48) { i -> HistoryPoint(timeSeconds = i.toDouble(), value = (sin(i * 0.4) * 40 + 55).coerceAtLeast(0.0)) }
 
 /**
  * Supplies the Koin graph a preview needs.

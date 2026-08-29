@@ -1,4 +1,4 @@
-package com.degree.homedash.office
+package com.degree.homedash.core.util
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer

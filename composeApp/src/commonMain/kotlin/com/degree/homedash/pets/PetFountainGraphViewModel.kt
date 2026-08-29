@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 @Immutable
-data class WaterGraphUiState(
+data class PetFountainGraphUiState(
     val item: PetFountainDeviceUi?,
     val history: List<HistoryPoint>,
     val range: TimeRange,
@@ -29,7 +29,7 @@ data class WaterGraphUiState(
 /**
  * Owns the selected [TimeRange] and re-fetches level history for [entityId] as it/connection change.
  */
-class WaterGraphViewModel(
+class PetFountainGraphViewModel(
     private val entityId: String,
     metadataRepo: EntityMetadataRepo,
     private val repo: ExpHomeAssistantRepo,
@@ -49,12 +49,12 @@ class WaterGraphViewModel(
     private val item = metadata.loadState(repo)
         .map { state -> PetFountainDeviceUi(metadata = metadata, state = state) }
 
-    val uiState: StateFlow<WaterGraphUiState> =
+    val uiState: StateFlow<PetFountainGraphUiState> =
         combine(item, range, history) { item, range, history ->
-            WaterGraphUiState(item = item, history = history, range = range)
+            PetFountainGraphUiState(item = item, history = history, range = range)
         }
             .distinctUntilChanged()
-            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), WaterGraphUiState(null, emptyList(), TimeRange.DAY))
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), PetFountainGraphUiState(null, emptyList(), TimeRange.DAY))
 
     init {
         viewModelScope.launch {

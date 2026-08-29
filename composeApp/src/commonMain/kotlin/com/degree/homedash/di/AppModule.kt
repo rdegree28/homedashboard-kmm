@@ -6,7 +6,7 @@ import com.degree.homedash.bedroom.BedroomViewModel
 import com.degree.homedash.livingroom.LivingRoomViewModel
 import com.degree.homedash.office.OfficeViewModel
 import com.degree.homedash.pets.PetsViewModel
-import com.degree.homedash.pets.WaterGraphViewModel
+import com.degree.homedash.pets.PetFountainGraphViewModel
 import com.degree.homedash.plants.PlantGraphViewModel
 import com.degree.homedash.plants.PlantsViewModel
 import com.degree.homedash.shared.api.HaConfig
@@ -78,7 +78,7 @@ fun appModule(defaultConfig: HaConfig?) = module {
         )
     }
     viewModel { (entityId: String) ->
-        WaterGraphViewModel(
+        PetFountainGraphViewModel(
             entityId = entityId,
             metadataRepo = get(),
             repo = get(),
