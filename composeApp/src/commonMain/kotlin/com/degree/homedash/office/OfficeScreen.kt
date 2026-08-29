@@ -7,8 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.degree.homedash.controls.PreviewKoin
 import com.degree.homedash.core.DeviceControl
+import com.degree.homedash.core.util.PreviewKoin
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 import com.degree.homedash.ui.icons.RoomIcons
@@ -78,7 +78,6 @@ fun OfficeContent(
         }
     }
 }
-
 
 @Preview(widthDp = 380, heightDp = 1700)
 @Composable

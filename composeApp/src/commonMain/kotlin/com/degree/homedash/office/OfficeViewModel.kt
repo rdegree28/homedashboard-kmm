@@ -19,32 +19,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-// --- UI models: small immutable projections the Office composables render (no raw EntityState). ---
-
-@Immutable
-data class ToggleUi(val name: String, val isOn: Boolean, val offline: Boolean)
-
-@Immutable
-data class FanUi(
-    val name: String,
-    val isOn: Boolean,
-    val offline: Boolean,
-    val levelCount: Int,
-    val percentage: Int,
-    /** Whether the fan can oscillate at all — drives whether the toggle is offered. */
-    val canOscillate: Boolean = false,
-    val oscillating: Boolean = false,
-    /** Whether the fan can mist at all — drives whether the toggle is offered. */
-    val canMist: Boolean = false,
-    val misting: Boolean = false,
-)
-
-@Immutable
-data class SensorUi(val label: String, val valueText: String)
-
-@Immutable
-data class DoorUi(val label: String, val statusText: String, val open: Boolean, val unavailable: Boolean)
-
 @Immutable
 data class OfficeUiState(
     val lights: List<LightDeviceUi>,

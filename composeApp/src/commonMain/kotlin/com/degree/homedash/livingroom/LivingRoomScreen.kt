@@ -8,8 +8,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.degree.homedash.controls.PreviewKoin
-import com.degree.homedash.controls.previewTrigger
+import com.degree.homedash.core.util.PreviewKoin
+import com.degree.homedash.core.util.previewTrigger
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 import com.degree.homedash.ui.icons.RoomIcons

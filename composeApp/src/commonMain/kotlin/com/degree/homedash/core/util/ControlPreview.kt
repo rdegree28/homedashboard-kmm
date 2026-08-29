@@ -1,4 +1,4 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.util
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,13 +12,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.core.device.DeviceUi
+import com.degree.homedash.core.device.FanDeviceUi
 import com.degree.homedash.core.device.LightDeviceUi
+import com.degree.homedash.core.device.NavigationDeviceUi
 import com.degree.homedash.core.device.ThermostatDeviceUi
 import com.degree.homedash.core.device.TriggerDeviceUi
-import com.degree.homedash.office.FanUi
-import com.degree.homedash.office.ToggleUi
 import com.degree.homedash.shared.model.device_metadata.*
 import com.degree.homedash.shared.model.device_metadata.factories.livingRoomThermostat
+import com.degree.homedash.shared.model.device_state.FanState
 import com.degree.homedash.shared.model.device_state.LightState
 import com.degree.homedash.shared.model.device_state.ThermostatState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
@@ -59,23 +60,7 @@ internal fun ControlPreview(content: @Composable ColumnScope.() -> Unit) {
     }
 }
 
-internal fun previewToggle(
-    name: String,
-    isOn: Boolean = false,
-    offline: Boolean = false,
-) = ToggleUi(name = name, isOn = isOn, offline = offline)
-
-internal fun previewLight(
-    name: String,
-    isOn: Boolean = false,
-    offline: Boolean = false,
-) = EntityUi.Light(
-    metadata = LightMetadata("light.${name.lowercase()}", name),
-    isOn = isOn,
-    offline = offline,
-)
-
-/** The device-stack counterpart of [previewLight], for previews of screens that render [LightDeviceUi]. */
+/** A light device, for previews of screens that render [LightDeviceUi]. */
 internal fun previewLightDevice(
     name: String,
     isOn: Boolean = false,
@@ -88,7 +73,8 @@ internal fun previewLightDevice(
     )
 }
 
-internal fun previewFan(
+/** A fan device, for previews of the fan card's four shapes. */
+internal fun previewFanDevice(
     name: String,
     isOn: Boolean = false,
     offline: Boolean = false,
@@ -98,34 +84,26 @@ internal fun previewFan(
     oscillating: Boolean = false,
     canMist: Boolean = false,
     misting: Boolean = false,
-) = FanUi(
-    name = name,
-    isOn = isOn,
-    offline = offline,
-    levelCount = levelCount,
-    percentage = percentage,
-    canOscillate = canOscillate,
-    oscillating = oscillating,
-    canMist = canMist,
-    misting = misting,
-)
-
-internal fun previewFanUi(
-    name: String,
-    isOn: Boolean = false,
-    offline: Boolean = false,
-    percentage: Int = 0,
-    levelCount: Int = 0,
-) = EntityUi.Fan(
-    metadata = FanMetadata(
-        "fan.${name.lowercase()}",
-        name,
-        FanMetadata.SpeedAdjustment.forLevelCount(levelCount),
-    ),
-    isOn = isOn,
-    offline = offline,
-    percentage = percentage,
-)
+): FanDeviceUi {
+    val entityId = "fan.${name.lowercase().replace(' ', '_')}"
+    return FanDeviceUi(
+        metadata = FanMetadata(
+            entityId = entityId,
+            displayName = name,
+            speedAdjustment = FanMetadata.SpeedAdjustment.forLevelCount(levelCount),
+            hasOscillationFeature = canOscillate,
+            misting = if (canMist) FanMetadata.MistingControl("humidifier.${name.lowercase()}") else null,
+        ),
+        state = FanState(
+            entityId = entityId,
+            isOn = isOn,
+            isOffline = offline,
+            percentage = percentage,
+            isOscillating = oscillating,
+            isMisting = misting,
+        ),
+    )
+}
 
 internal fun previewNavigation(
     target: NavigationMetadata.NavigationTarget,
@@ -133,7 +111,7 @@ internal fun previewNavigation(
     icon: NavigationMetadata.RoomIcon = defaultIconFor(target),
     tint: Long = defaultTintFor(target),
     photo: NavigationMetadata.CardPhoto? = defaultPhotoFor(target),
-) = EntityUi.Navigation(NavigationMetadata(target, label, icon, tint, photo))
+) = NavigationDeviceUi(NavigationMetadata(target, label, icon, tint, photo))
 
 /** Mirrors the pairing the repo declares, so previews match the real launcher. */
 private fun defaultIconFor(target: NavigationMetadata.NavigationTarget) = when (target) {
@@ -224,12 +202,3 @@ internal fun previewThermostat(
         ),
     )
 }
-
-internal fun previewClimate(
-    label: String,
-    valueText: String,
-    kind: ClimateMetadata.ClimateKind,
-) = EntityUi.Climate(
-    metadata = ClimateMetadata("sensor.${label.lowercase()}", label, kind = kind),
-    valueText = valueText,
-)

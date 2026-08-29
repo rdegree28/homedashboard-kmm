@@ -9,9 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.degree.homedash.controls.EntityToggleCard
-import com.degree.homedash.core.util.LightIcon
 import com.degree.homedash.core.control.ClimateControl
+import com.degree.homedash.core.util.DeviceToggleCard
 import com.degree.homedash.core.control.DoorControl
 import com.degree.homedash.core.control.FanControl
 import com.degree.homedash.core.control.OfficeSignalControl
@@ -25,13 +24,14 @@ import com.degree.homedash.core.device.DeviceUi
 import com.degree.homedash.core.device.DoorDeviceUi
 import com.degree.homedash.core.device.FanDeviceUi
 import com.degree.homedash.core.device.LightDeviceUi
+import com.degree.homedash.core.device.NavigationDeviceUi
 import com.degree.homedash.core.device.OfficeSignalDeviceUi
 import com.degree.homedash.core.device.OfficeWorkstationUi
 import com.degree.homedash.core.device.PetFountainDeviceUi
 import com.degree.homedash.core.device.SoilMoistureDeviceUi
 import com.degree.homedash.core.device.ThermostatDeviceUi
 import com.degree.homedash.core.device.TriggerDeviceUi
-import com.degree.homedash.office.ToggleUi
+import com.degree.homedash.core.util.LightIcon
 import com.degree.homedash.shared.model.device_metadata.ClimateMetadata
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import com.degree.homedash.ui.AppColors
@@ -42,7 +42,7 @@ import org.koin.compose.koinInject
  * Central renderer for the [DeviceUi] stack: maps a device to its control in the requested [layout].
  * [modifier] applies to the card cell (grid weighting).
  *
- * Unlike `EntityControl` there is no `onAction` here — a [DeviceUi] carries its own behavior, so this
+ * There is no `onAction` here — a [DeviceUi] carries its own behavior, so this
  * only has to supply the repo to run it through. [ExpHomeAssistantRepo] is resolved from Koin at this
  * one dispatch site rather than threaded down from the screen.
  */
@@ -63,13 +63,14 @@ fun DeviceControl(
                     icon = device.icon,
                 )
             }
-            val ui = ToggleUi(name = device.name, isOn = device.isOn, offline = device.offline)
-            EntityToggleCard(
-                ui,
-                Color(device.tint),
-                { device.onToggle(repo) },
-                icon,
-                modifier,
+            DeviceToggleCard(
+                name = device.name,
+                isOn = device.isOn,
+                offline = device.offline,
+                onTint = Color(device.tint),
+                onToggle = { device.onToggle(repo) },
+                iconContent = icon,
+                modifier = modifier,
             )
         }
 
@@ -138,6 +139,10 @@ fun DeviceControl(
             onActivate = { device.onActivate(repo) },
             modifier = modifier,
         )
+
+        // Not dispatched here: opening a dashboard is navigation, which belongs to whoever owns the
+        // back stack, so `HomeScreen` renders its own tiles and supplies the click.
+        is NavigationDeviceUi -> error("Launcher tiles are rendered by HomeScreen, not DeviceControl")
 
         is OfficeWorkstationUi -> WorkstationControl(
             ui = device,

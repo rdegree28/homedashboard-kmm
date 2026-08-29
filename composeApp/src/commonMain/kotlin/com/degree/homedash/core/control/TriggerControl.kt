@@ -32,10 +32,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.controls.ControlPreview
-import com.degree.homedash.controls.HomeDashboardCard
-import com.degree.homedash.controls.previewTrigger
 import com.degree.homedash.core.device.TriggerDeviceUi
+import com.degree.homedash.core.util.ControlPreview
+import com.degree.homedash.core.util.HomeDashboardCard
+import com.degree.homedash.core.util.previewTrigger
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 import kotlinx.coroutines.Job

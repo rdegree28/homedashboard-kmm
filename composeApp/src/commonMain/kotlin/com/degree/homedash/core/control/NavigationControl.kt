@@ -1,4 +1,4 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.control
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -7,17 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,46 +24,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.degree.homedash.core.device.NavigationDeviceUi
+import com.degree.homedash.core.util.ControlPreview
+import com.degree.homedash.core.util.HomeDashboardCard
+import com.degree.homedash.core.util.previewNavigation
 import com.degree.homedash.shared.model.device_metadata.NavigationMetadata
 import com.degree.homedash.shared.model.device_metadata.NavigationMetadata.NavigationTarget
 import com.degree.homedash.ui.icons.cardPhoto
 import com.degree.homedash.ui.icons.roomIcon
 import com.degree.homedash.ui.roomTint
 import org.jetbrains.compose.resources.painterResource
-
-/**
- * A full-width launcher card: destination icon, label, and a trailing chevron. Tapping it opens the
- * dashboard named by the entity's destination.
- */
-@Composable
-fun NavigationCard(
-    ui: EntityUi.Navigation,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val target = ui.metadata.destination
-    Card(modifier = modifier.fillMaxWidth(), onClick = onClick) {
-        Row(
-            modifier = Modifier.fillMaxWidth().height(88.dp).padding(horizontal = 20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            CardArt(metadata = ui.metadata, glyphSize = 40.dp)
-            Spacer(Modifier.width(20.dp))
-            Text(
-                text = ui.displayName,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.SemiBold,
-            )
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(28.dp),
-            )
-        }
-    }
-}
 
 /**
  * A launcher card's leading art: the photograph it declares, or its glyph when it declares none.
@@ -115,13 +78,13 @@ private fun CardArt(
 }
 
 /**
- * The grid form of a launcher card, for the Home screen's 2-column layout. Reuses [EntityCard] so a
+ * The grid form of a launcher card, for the Home screen's 2-column layout. Reuses `DeviceCard` so a
  * dashboard tile sits at the same size and weight as the light and fan tiles elsewhere; the label
  * wraps to two lines, which "Living Room" needs at half width.
  */
 @Composable
-fun NavigationTile(
-    ui: EntityUi.Navigation,
+fun NavigationControl(
+    ui: NavigationDeviceUi,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -141,7 +104,7 @@ fun NavigationTile(
             )
             Text(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = ui.displayName,
+                text = ui.name,
                 style = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
                 fontWeight = FontWeight.SemiBold,
             )
@@ -149,23 +112,19 @@ fun NavigationTile(
     }
 }
 
-@Preview(widthDp = 380)
-@Composable
-private fun NavigationCardPreview() = ControlPreview {
-    NavigationTarget.entries.forEach { target ->
-        NavigationCard(previewNavigation(target), onClick = {})
-    }
-}
-
 /** The 2-column form, as Home lays it out. */
 @Preview(widthDp = 380)
 @Composable
-private fun NavigationTilePreview() = ControlPreview {
+private fun NavigationControlPreview() = ControlPreview {
     NavigationTarget.entries.toList().chunked(2).forEach { pair ->
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             pair.forEach { target ->
                 Box(Modifier.weight(1f)) {
-                    NavigationTile(previewNavigation(target), onClick = {}, modifier = Modifier.fillMaxWidth())
+                    NavigationControl(
+                        previewNavigation(target),
+                        onClick = {},
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }

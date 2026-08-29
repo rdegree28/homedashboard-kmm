@@ -1,4 +1,4 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.util
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,7 +19,7 @@ import com.degree.homedash.ui.Dimens
  * content (value text or control). Used by the climate, door, and toggle rows so they line up.
  */
 @Composable
-internal fun EntityRow(
+internal fun DeviceRow(
     label: String,
     leading: @Composable () -> Unit,
     trailing: @Composable () -> Unit,

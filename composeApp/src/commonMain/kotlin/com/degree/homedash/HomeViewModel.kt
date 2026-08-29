@@ -2,13 +2,13 @@ package com.degree.homedash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.degree.homedash.controls.EntityUi
-import com.degree.homedash.controls.toEntityUis
+import com.degree.homedash.core.device.NavigationDeviceUi
 import com.degree.homedash.core.device.PetFountainDeviceUi
 import com.degree.homedash.core.device.ThermostatDeviceUi
 import com.degree.homedash.core.loadDeviceUis
 import com.degree.homedash.pets.PetsEntities
 import com.degree.homedash.shared.model.EntityState
+import com.degree.homedash.shared.model.device_metadata.NavigationMetadata
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import kotlinx.coroutines.flow.SharingStarted
@@ -54,14 +54,14 @@ class HomeViewModel(
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     /**
-     * The launcher cards. A plain `val`, not a flow — nothing about them depends on live state, so
-     * projecting against an empty state map is the whole story. Feature-flag filtering happens at the
-     * screen, which is where the flag set lives.
+     * The launcher cards. A plain `val`, not a flow — a launcher card has no Home Assistant entity
+     * behind it, so there is no state to project and nothing to re-emit. Feature-flag filtering
+     * happens in the repo, which is where the flag set lives.
      */
-    val navigation: List<EntityUi.Navigation> =
+    val navigation: List<NavigationDeviceUi> =
         metadataRepo.loadHomeScreenMetadataList()
-            .toEntityUis(emptyMap())
-            .filterIsInstance<EntityUi.Navigation>()
+            .filterIsInstance<NavigationMetadata>()
+            .map(::NavigationDeviceUi)
 
     /**
      * Two sources: the fountain is a device, projected through its own metadata exactly as the Pets

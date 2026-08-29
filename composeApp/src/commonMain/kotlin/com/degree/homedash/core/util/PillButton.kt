@@ -22,7 +22,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.controls.ControlPreview
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 

@@ -29,11 +29,10 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.controls.ControlPreview
-import com.degree.homedash.controls.EntityToggleRow
 import com.degree.homedash.core.device.OfficeWorkstationUi
+import com.degree.homedash.core.util.ControlPreview
+import com.degree.homedash.core.util.DeviceToggleRow
 import com.degree.homedash.office.PowerGraph
-import com.degree.homedash.office.ToggleUi
 import com.degree.homedash.office.previewHistory
 import com.degree.homedash.shared.model.HistoricalEntityReading
 import com.degree.homedash.shared.model.device_metadata.OfficeWorkstationMetadata
@@ -48,8 +47,10 @@ fun WorkstationControl(
     onToggle: () -> Unit,
 ) {
     Column {
-        EntityToggleRow(
-            ui = ToggleUi(name = ui.name, isOn = ui.isOn, offline = ui.isOffline),
+        DeviceToggleRow(
+            name = ui.name,
+            isOn = ui.isOn,
+            offline = ui.isOffline,
             onTint = AppColors.WorkstationOn,
             onToggle = onToggle,
             tintSwitch = true,

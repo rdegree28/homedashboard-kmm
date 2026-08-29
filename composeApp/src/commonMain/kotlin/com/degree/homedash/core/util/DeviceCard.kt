@@ -1,4 +1,4 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.util
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -25,7 +25,7 @@ import com.degree.homedash.ui.Dimens
  * [enabled] = false (dimmed, non-interactive) plus [labelItalic]/[labelMuted] styling.
  */
 @Composable
-internal fun EntityCard(
+internal fun DeviceCard(
     label: String,
     leading: @Composable () -> Unit,
     onClick: () -> Unit,

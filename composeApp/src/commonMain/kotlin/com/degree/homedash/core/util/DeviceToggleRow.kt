@@ -1,4 +1,4 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.util
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -6,36 +6,37 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
-import com.degree.homedash.office.ToggleUi
 
 /**
- * Shared row for toggleable entities: a custom [iconContent] + name + Switch.
- * Offline ([ToggleUi.offline]): faded icon, italic muted label, disabled toggle.
+ * Shared row for toggleable devices: a custom [iconContent] + [name] + Switch.
+ * [offline]: faded icon, italic muted label, disabled toggle.
  *
  * [tintSwitch] carries [onTint] onto the switch as well, so the row reads as one colour instead of
  * a tinted icon beside the theme's purple. Off and disabled keep the theme's colours either way —
  * there is nothing lit to match.
  */
 @Composable
-internal fun EntityToggleRow(
-    ui: ToggleUi,
+internal fun DeviceToggleRow(
+    name: String,
+    isOn: Boolean,
+    offline: Boolean,
     onTint: Color,
     onToggle: () -> Unit,
     tintSwitch: Boolean = false,
     iconContent: @Composable (tint: Color) -> Unit,
 ) {
-    val baseTint = if (ui.isOn) onTint else MaterialTheme.colorScheme.onSurfaceVariant
-    val iconTint = if (ui.offline) baseTint.copy(alpha = 0.3f) else baseTint
+    val baseTint = if (isOn) onTint else MaterialTheme.colorScheme.onSurfaceVariant
+    val iconTint = if (offline) baseTint.copy(alpha = 0.3f) else baseTint
 
-    EntityRow(
-        label = ui.name,
-        labelItalic = ui.offline,
-        labelMuted = ui.offline,
+    DeviceRow(
+        label = name,
+        labelItalic = offline,
+        labelMuted = offline,
         leading = { iconContent(iconTint) },
         trailing = {
             Switch(
-                checked = ui.isOn,
-                enabled = !ui.offline,
+                checked = isOn,
+                enabled = !offline,
                 onCheckedChange = { onToggle() },
                 colors = if (tintSwitch) switchColorsFor(onTint) else SwitchDefaults.colors(),
             )

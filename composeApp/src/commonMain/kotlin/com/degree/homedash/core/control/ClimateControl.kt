@@ -23,13 +23,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.controls.ControlPreview
+import com.degree.homedash.core.util.ControlPreview
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 
 /**
  * Read-only sensor card: tinted [icon] pinned top-left, with the [valueText] (prominent) above the
- * [label], centered. Non-interactive — climate readings have no toggle. Matches `EntityCard`'s tile
+ * [label], centered. Non-interactive — climate readings have no toggle. Matches `DeviceCard`'s tile
  * shape/height so it lines up with the light/fan cards in a shared grid.
  */
 @Composable

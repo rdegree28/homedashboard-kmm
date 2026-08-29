@@ -39,14 +39,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.controls.ControlPreview
-import com.degree.homedash.controls.previewThermostat
 import com.degree.homedash.core.device.ThermostatDeviceUi
 import com.degree.homedash.core.util.AppThermostatTapGuard
+import com.degree.homedash.core.util.ControlPreview
 import com.degree.homedash.core.util.FanIcon
 import com.degree.homedash.core.util.PillButton
 import com.degree.homedash.core.util.ThermostatConfirmationWindow
 import com.degree.homedash.core.util.ThermostatTapGuard
+import com.degree.homedash.core.util.previewThermostat
 import com.degree.homedash.shared.model.device_metadata.HvacAction
 import com.degree.homedash.shared.model.device_metadata.HvacMode
 import com.degree.homedash.shared.model.device_metadata.PresetKind
@@ -633,7 +633,6 @@ private fun LabeledSelectorRow(
         }
     }
 }
-
 
 /**
  * What a mode or an action *means* to the eye, and the single place that meaning becomes a colour.

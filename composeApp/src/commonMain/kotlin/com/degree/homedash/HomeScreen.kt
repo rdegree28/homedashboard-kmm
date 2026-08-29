@@ -27,12 +27,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.degree.homedash.controls.EntityAction
-import com.degree.homedash.controls.EntityControl
-import com.degree.homedash.controls.EntityUi
-import com.degree.homedash.controls.previewNavigation
-import com.degree.homedash.controls.previewThermostat
 import com.degree.homedash.core.DeviceControl
+import com.degree.homedash.core.control.NavigationControl
+import com.degree.homedash.core.util.previewNavigation
+import com.degree.homedash.core.util.previewThermostat
+import com.degree.homedash.core.device.NavigationDeviceUi
 import com.degree.homedash.core.device.ThermostatDeviceUi
 import com.degree.homedash.shared.model.device_metadata.NavigationMetadata.NavigationTarget
 import com.degree.homedash.ui.AppColors
@@ -49,20 +48,11 @@ fun HomeScreen(
     val warnings by vm.warnings.collectAsStateWithLifecycle()
     val thermostats by vm.thermostats.collectAsStateWithLifecycle()
 
-    // The launcher cards are the last controls here still on the entity path; the thermostat carries
-    // its own behavior.
-    val onAction: (EntityAction) -> Unit = { action ->
-        when (action) {
-            is EntityAction.Navigate -> onNavigate(action.target)
-            else -> Unit
-        }
-    }
-
     HomeContent(
         warnings = warnings,
         thermostats = thermostats,
         navigation = vm.navigation,
-        onAction = onAction,
+        onNavigate = onNavigate,
         onOpenSettings = onOpenSettings,
     )
 }
@@ -72,8 +62,8 @@ fun HomeScreen(
 fun HomeContent(
     warnings: List<HomeWarning>,
     thermostats: List<ThermostatDeviceUi>,
-    navigation: List<EntityUi.Navigation>,
-    onAction: (EntityAction) -> Unit,
+    navigation: List<NavigationDeviceUi>,
+    onNavigate: (NavigationTarget) -> Unit,
     onOpenSettings: () -> Unit,
 ) {
     DashboardScaffold(
@@ -90,9 +80,13 @@ fun HomeContent(
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             navigation.chunked(2).forEach { pair ->
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    pair.forEach { entity ->
+                    pair.forEach { card ->
                         Box(Modifier.weight(1f)) {
-                            EntityControl(entity, onAction, Modifier.fillMaxWidth())
+                            NavigationControl(
+                                ui = card,
+                                onClick = { onNavigate(card.destination) },
+                                modifier = Modifier.fillMaxWidth(),
+                            )
                         }
                     }
                     // Pad an odd final row so its tile keeps the grid's column width.
@@ -140,7 +134,7 @@ private fun WarningCard(warning: HomeWarning) {
 }
 
 /** The launcher roster as the repo declares it, for previews. */
-private val previewNavigationCards: List<EntityUi.Navigation> = listOf(
+private val previewNavigationCards: List<NavigationDeviceUi> = listOf(
     previewNavigation(NavigationTarget.Office, "Office"),
     previewNavigation(NavigationTarget.Plants, "Plants"),
     previewNavigation(NavigationTarget.LivingRoom, "Living Room"),
@@ -159,7 +153,7 @@ private fun HomeScreenPreview() {
                 ),
                 thermostats = listOf(previewThermostat("Thermostat")),
                 navigation = previewNavigationCards,
-                onAction = {},
+                onNavigate = {},
                 onOpenSettings = {},
             )
         }
