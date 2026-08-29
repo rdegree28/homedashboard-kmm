@@ -18,15 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.degree.homedash.controls.WaterLevelControl
-import com.degree.homedash.controls.waterLevelColor
+import com.degree.homedash.core.control.WaterLevelControl
+import com.degree.homedash.core.control.waterLevelColor
 import com.degree.homedash.plants.TimeRange
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 import com.degree.homedash.ui.HistoryGraph
 import kotlin.math.roundToInt
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun WaterGraphScreen(entityId: String, onBack: () -> Unit) {

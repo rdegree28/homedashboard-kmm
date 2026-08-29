@@ -1,4 +1,4 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.control
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
@@ -32,6 +32,10 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.degree.homedash.controls.ControlPreview
+import com.degree.homedash.controls.HomeDashboardCard
+import com.degree.homedash.controls.previewTrigger
+import com.degree.homedash.core.device.TriggerDeviceUi
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 import kotlinx.coroutines.Job
@@ -46,7 +50,7 @@ import kotlinx.coroutines.launch
  * size where it started. See [playLaunchAnimation].
  */
 @Composable
-fun TriggerCard(
+fun TriggerControl(
     ui: TriggerDeviceUi,
     onActivate: () -> Unit,
     modifier: Modifier = Modifier,
@@ -146,13 +150,21 @@ private const val FADE_MS = 130
 
 @Preview(widthDp = 380)
 @Composable
-private fun TriggerCardPreview() = ControlPreview {
+private fun TriggerControlPreview() = ControlPreview {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Box(Modifier.weight(1f)) {
-            TriggerCard(previewTrigger("Main Lights"), onActivate = {}, modifier = Modifier.fillMaxWidth())
+            TriggerControl(
+                previewTrigger("Main Lights"),
+                onActivate = {},
+                modifier = Modifier.fillMaxWidth()
+            )
         }
         Box(Modifier.weight(1f)) {
-            TriggerCard(previewTrigger("Movie Night"), onActivate = {}, modifier = Modifier.fillMaxWidth())
+            TriggerControl(
+                previewTrigger("Movie Night"),
+                onActivate = {},
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }

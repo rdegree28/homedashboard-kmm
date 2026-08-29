@@ -1,4 +1,4 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.control
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,17 +23,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.material3.Text
+import com.degree.homedash.controls.ControlPreview
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 
 /**
  * Read-only sensor card: tinted [icon] pinned top-left, with the [valueText] (prominent) above the
- * [label], centered. Non-interactive — climate readings have no toggle. Matches [EntityCard]'s tile
+ * [label], centered. Non-interactive — climate readings have no toggle. Matches `EntityCard`'s tile
  * shape/height so it lines up with the light/fan cards in a shared grid.
  */
 @Composable
-internal fun ClimateCard(
+internal fun ClimateControl(
     label: String,
     valueText: String,
     subvalueText: String? = null,
@@ -84,8 +85,8 @@ internal fun ClimateCard(
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)
 @Composable
-private fun ClimateCardPreview() = ControlPreview {
-    ClimateCard(
+private fun ClimateControlPreview() = ControlPreview {
+    ClimateControl(
         label = "Temperature",
         valueText = "72.5 °F",
         subvalueText = null,
@@ -93,7 +94,7 @@ private fun ClimateCardPreview() = ControlPreview {
         tint = AppColors.TempWarm,
         modifier = Modifier.size(180.dp, height = Dimens.EntityCardHeight)
     )
-    ClimateCard(
+    ClimateControl(
         label = "Humidity",
         valueText = "48.5 °F",
         subvalueText = "39%",

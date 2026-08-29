@@ -2,12 +2,12 @@ package com.degree.homedash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.degree.homedash.shared.dao.AuthRepo
-import com.degree.homedash.shared.model.AuthUser
-import com.degree.homedash.shared.data.ConfigStore
-import com.degree.homedash.shared.model.FeatureFlag
-import com.degree.homedash.shared.dao.FeatureFlagDao
 import com.degree.homedash.shared.api.HaConfig
+import com.degree.homedash.shared.dao.AuthRepo
+import com.degree.homedash.shared.dao.FeatureFlagDao
+import com.degree.homedash.shared.data.ConfigStore
+import com.degree.homedash.shared.model.AuthUser
+import com.degree.homedash.shared.model.FeatureFlag
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

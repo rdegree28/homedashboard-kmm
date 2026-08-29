@@ -1,17 +1,17 @@
 package com.degree.homedash.office
 
-import com.degree.homedash.controls.ClimateDeviceUi
-import com.degree.homedash.shared.model.device_metadata.*
-import com.degree.homedash.controls.FanDeviceUi
-import com.degree.homedash.controls.DoorDeviceUi
-import com.degree.homedash.controls.LightDeviceUi
-import com.degree.homedash.controls.OfficeSignalDeviceUi
-import com.degree.homedash.controls.OfficeWorkstationUi
-import com.degree.homedash.shared.model.HistoryPoint
+import com.degree.homedash.core.device.ClimateDeviceUi
+import com.degree.homedash.core.device.DoorDeviceUi
+import com.degree.homedash.core.device.FanDeviceUi
+import com.degree.homedash.core.device.LightDeviceUi
+import com.degree.homedash.core.device.OfficeSignalDeviceUi
+import com.degree.homedash.core.device.OfficeWorkstationUi
 import com.degree.homedash.shared.model.HistoricalEntityReading
+import com.degree.homedash.shared.model.HistoryPoint
+import com.degree.homedash.shared.model.device_metadata.*
 import com.degree.homedash.shared.model.device_state.ClimateState
-import com.degree.homedash.shared.model.device_state.FanState
 import com.degree.homedash.shared.model.device_state.DoorState
+import com.degree.homedash.shared.model.device_state.FanState
 import com.degree.homedash.shared.model.device_state.LightState
 import com.degree.homedash.shared.model.device_state.OfficeSignalState
 import com.degree.homedash.shared.model.device_state.OfficeWorkstationState

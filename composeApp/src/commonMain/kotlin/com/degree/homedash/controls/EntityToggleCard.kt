@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.degree.homedash.core.util.LightIcon
 import com.degree.homedash.office.ToggleUi
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens

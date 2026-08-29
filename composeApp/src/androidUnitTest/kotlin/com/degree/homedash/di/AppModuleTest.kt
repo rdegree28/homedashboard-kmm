@@ -6,9 +6,9 @@ import com.degree.homedash.shared.dao.FeatureFlagDao
 import com.degree.homedash.shared.data.ConfigStore
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import kotlin.test.Test
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.test.verify.verify
-import kotlin.test.Test
 
 /**
  * Guards the DI graph. A missing binding compiles fine and only blows up when the screen is opened,

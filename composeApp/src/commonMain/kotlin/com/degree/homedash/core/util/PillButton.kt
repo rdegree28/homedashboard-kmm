@@ -1,4 +1,4 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.util
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,6 +22,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.degree.homedash.controls.ControlPreview
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 

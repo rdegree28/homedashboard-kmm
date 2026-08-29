@@ -1,4 +1,4 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.control
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +39,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.degree.homedash.controls.ControlPreview
+import com.degree.homedash.controls.previewThermostat
+import com.degree.homedash.core.device.ThermostatDeviceUi
+import com.degree.homedash.core.util.AppThermostatTapGuard
+import com.degree.homedash.core.util.FanIcon
+import com.degree.homedash.core.util.PillButton
+import com.degree.homedash.core.util.ThermostatConfirmationWindow
+import com.degree.homedash.core.util.ThermostatTapGuard
 import com.degree.homedash.shared.model.device_metadata.HvacAction
 import com.degree.homedash.shared.model.device_metadata.HvacMode
 import com.degree.homedash.shared.model.device_metadata.PresetKind
@@ -49,9 +57,9 @@ import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 import com.degree.homedash.ui.formatNumber
 import com.degree.homedash.ui.icons.ControlIcons
-import kotlinx.coroutines.delay
 import kotlin.math.abs
 import kotlin.math.round
+import kotlinx.coroutines.delay
 
 /** Pills per selector row. Fixed so the card's height can be computed rather than measured. */
 private const val ModesPerRow = 4
@@ -70,7 +78,7 @@ private const val EchoTimeoutMs = 8_000L
 private const val TemperatureEpsilon = 0.01
 
 /**
- * Thermostat card. Always full-width (see [cardSpan]) with everything visible: the current status,
+ * Thermostat card. Always full-width (see `cardSpan`) with everything visible: the current status,
  * a −/+ setpoint stepper over the ambient reading, and a pill row per selector the thermostat's
  * [ThermostatMetadata] declares.
  *
@@ -79,7 +87,7 @@ private const val TemperatureEpsilon = 0.01
  * projected state feels broken.
  */
 @Composable
-internal fun ThermostatControlCard(
+internal fun ThermostatControl(
     ui: ThermostatDeviceUi,
     onSetTarget: (Double) -> Unit,
     onSetHvacMode: (HvacMode) -> Unit,
@@ -178,10 +186,10 @@ internal fun ThermostatControlCard(
     )
 
     // The plain Surface rather than HomeDashboardCard: the card body isn't tappable — every control
-    // is its own target — and ClimateCard already takes this route for the same reason.
+    // is its own target — and ClimateControl already takes this route for the same reason.
     //
     // Height wraps the content rather than being computed from the option counts. The card is always
-    // alone on its grid row (see [cardSpan]), so nothing needs it to be a predictable size — and a
+    // alone on its grid row (see `cardSpan`), so nothing needs it to be a predictable size — and a
     // formula silently clips the bottom row the moment the spacing or the content changes.
     Surface(
         shape = RoundedCornerShape(Dimens.CardCorner),
@@ -766,90 +774,133 @@ private fun String.modeLabel(): String =
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F, widthDp = 380)
 @Composable
-private fun ThermostatControlCardPreview() = ControlPreview {
-    // The Living Room thermostat as Home Assistant actually reports it. 72° in cool is Comfort's
-    // cool setpoint, so that pill fills — the match is derived, never stored.
-    ThermostatControlCard(previewThermostat("Comfort"), {}, {}, {}, {}, {})
-    // 69° in cool is Sleep's, so the same card fills a different pill on the strength of the
-    // temperature alone.
-    ThermostatControlCard(previewThermostat("Sleep", target = 69.0), {}, {}, {}, {}, {})
-    // Heating: the presets resolve against their heat setpoints instead, and 60° is Economy's.
-    ThermostatControlCard(
-        previewThermostat("Economy heating", mode = HvacMode.Heat, action = HvacAction.Heating, target = 60.0),
-        {}, {}, {}, {}, {},
-    )
-    // A setpoint matching no preset — nothing fills rather than guessing at the nearest.
-    ThermostatControlCard(previewThermostat("Off preset", target = 73.0), {}, {}, {}, {}, {})
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF1B1B1F, widthDp = 380)
-@Composable
-private fun ThermostatControlCardExtremePreview() = ControlPreview {
-    // Extreme on: its pill fills, and the three presets now resolve against their extreme pairs —
-    // 75° is Comfort's extreme cool setpoint, where 72° would have been its normal one.
-    ThermostatControlCard(
-        previewThermostat("Extreme comfort", extremeActive = true, target = 75.0),
-        {}, {}, {}, {}, {},
-    )
-    // The same 72° that reads as Comfort above matches nothing once Extreme is on.
-    ThermostatControlCard(
-        previewThermostat("Extreme, no match", extremeActive = true, target = 72.0),
-        {}, {}, {}, {}, {},
-    )
-    // A thermostat with presets but no helper entity: three pills, no Extreme.
-    ThermostatControlCard(
-        previewThermostat("No extreme toggle", hasExtremeToggle = false, target = 70.0),
-        {}, {}, {}, {}, {},
-    )
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF1B1B1F, widthDp = 380)
-@Composable
-private fun ThermostatControlCardEdgeCasePreview() = ControlPreview {
-    // Offline: readouts dash out and every control disables.
-    ThermostatControlCard(previewThermostat("Offline", offline = true), {}, {}, {}, {}, {})
-    // heat_cool set from the Home Assistant app — a mode the roster deliberately doesn't offer.
-    // No pill highlights and the setpoint is absent, because HA publishes a low/high pair instead.
-    ThermostatControlCard(
-        previewThermostat("Heat/Cool", mode = HvacMode.HeatCool, action = HvacAction.Idle, target = null),
-        {}, {}, {}, {}, {},
-    )
-    // Setpoint only — no selector rows at all, so the card is at its shortest.
-    ThermostatControlCard(
-        previewThermostat(
-            "Setpoint only",
-            hvacModes = emptyList(),
-            fanModes = emptyList(),
-            presetModes = emptyList(),
-            temperaturePresets = emptyList(),
-            hasExtremeToggle = false,
-        ),
-        {}, {}, {}, {}, {},
-    )
-    // The office heater's shape: two modes, three fan modes, no presets of either kind.
-    ThermostatControlCard(
-        previewThermostat(
-            "Office Heater",
-            mode = HvacMode.Heat,
-            action = HvacAction.Heating,
-            hvacModes = listOf(HvacMode.Off, HvacMode.Heat),
-            fanModes = listOf("auto", "low", "high"),
-            fanMode = "low",
-            presetModes = emptyList(),
-            temperaturePresets = emptyList(),
-            hasExtremeToggle = false,
-        ),
-        {}, {}, {}, {}, {},
-    )
-    // Six modes: proves the FlowRow wrap and the height formula agree.
-    ThermostatControlCard(
-        previewThermostat(
-            "Six modes",
-            hvacModes = listOf(
-                HvacMode.Off, HvacMode.Heat, HvacMode.Cool,
-                HvacMode.HeatCool, HvacMode.Auto, HvacMode.FanOnly,
+private fun ThermostatControlPreview() =
+    ControlPreview {
+        // The Living Room thermostat as Home Assistant actually reports it. 72° in cool is Comfort's
+        // cool setpoint, so that pill fills — the match is derived, never stored.
+        ThermostatControl(
+            previewThermostat("Comfort"),
+            {},
+            {},
+            {},
+            {},
+            {})
+        // 69° in cool is Sleep's, so the same card fills a different pill on the strength of the
+        // temperature alone.
+        ThermostatControl(
+            previewThermostat(
+                "Sleep",
+                target = 69.0
+            ), {}, {}, {}, {}, {})
+        // Heating: the presets resolve against their heat setpoints instead, and 60° is Economy's.
+        ThermostatControl(
+            previewThermostat(
+                "Economy heating",
+                mode = HvacMode.Heat,
+                action = HvacAction.Heating,
+                target = 60.0
             ),
-        ),
-        {}, {}, {}, {}, {},
-    )
-}
+            {}, {}, {}, {}, {},
+        )
+        // A setpoint matching no preset — nothing fills rather than guessing at the nearest.
+        ThermostatControl(
+            previewThermostat(
+                "Off preset",
+                target = 73.0
+            ), {}, {}, {}, {}, {})
+    }
+
+@Preview(showBackground = true, backgroundColor = 0xFF1B1B1F, widthDp = 380)
+@Composable
+private fun ThermostatControlExtremePreview() =
+    ControlPreview {
+        // Extreme on: its pill fills, and the three presets now resolve against their extreme pairs —
+        // 75° is Comfort's extreme cool setpoint, where 72° would have been its normal one.
+        ThermostatControl(
+            previewThermostat(
+                "Extreme comfort",
+                extremeActive = true,
+                target = 75.0
+            ),
+            {}, {}, {}, {}, {},
+        )
+        // The same 72° that reads as Comfort above matches nothing once Extreme is on.
+        ThermostatControl(
+            previewThermostat(
+                "Extreme, no match",
+                extremeActive = true,
+                target = 72.0
+            ),
+            {}, {}, {}, {}, {},
+        )
+        // A thermostat with presets but no helper entity: three pills, no Extreme.
+        ThermostatControl(
+            previewThermostat(
+                "No extreme toggle",
+                hasExtremeToggle = false,
+                target = 70.0
+            ),
+            {}, {}, {}, {}, {},
+        )
+    }
+
+@Preview(showBackground = true, backgroundColor = 0xFF1B1B1F, widthDp = 380)
+@Composable
+private fun ThermostatControlEdgeCasePreview() =
+    ControlPreview {
+        // Offline: readouts dash out and every control disables.
+        ThermostatControl(
+            previewThermostat(
+                "Offline",
+                offline = true
+            ), {}, {}, {}, {}, {})
+        // heat_cool set from the Home Assistant app — a mode the roster deliberately doesn't offer.
+        // No pill highlights and the setpoint is absent, because HA publishes a low/high pair instead.
+        ThermostatControl(
+            previewThermostat(
+                "Heat/Cool",
+                mode = HvacMode.HeatCool,
+                action = HvacAction.Idle,
+                target = null
+            ),
+            {}, {}, {}, {}, {},
+        )
+        // Setpoint only — no selector rows at all, so the card is at its shortest.
+        ThermostatControl(
+            previewThermostat(
+                "Setpoint only",
+                hvacModes = emptyList(),
+                fanModes = emptyList(),
+                presetModes = emptyList(),
+                temperaturePresets = emptyList(),
+                hasExtremeToggle = false,
+            ),
+            {}, {}, {}, {}, {},
+        )
+        // The office heater's shape: two modes, three fan modes, no presets of either kind.
+        ThermostatControl(
+            previewThermostat(
+                "Office Heater",
+                mode = HvacMode.Heat,
+                action = HvacAction.Heating,
+                hvacModes = listOf(HvacMode.Off, HvacMode.Heat),
+                fanModes = listOf("auto", "low", "high"),
+                fanMode = "low",
+                presetModes = emptyList(),
+                temperaturePresets = emptyList(),
+                hasExtremeToggle = false,
+            ),
+            {}, {}, {}, {}, {},
+        )
+        // Six modes: proves the FlowRow wrap and the height formula agree.
+        ThermostatControl(
+            previewThermostat(
+                "Six modes",
+                hvacModes = listOf(
+                    HvacMode.Off, HvacMode.Heat, HvacMode.Cool,
+                    HvacMode.HeatCool, HvacMode.Auto, HvacMode.FanOnly,
+                ),
+            ),
+            {}, {}, {}, {}, {},
+        )
+    }

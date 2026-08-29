@@ -1,6 +1,7 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.device
 
 import androidx.compose.runtime.Immutable
+import com.degree.homedash.office.SignalMode
 import com.degree.homedash.shared.model.device_metadata.OfficeSignalMetadata
 import com.degree.homedash.shared.model.device_state.OfficeSignalState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
@@ -8,7 +9,7 @@ import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 /**
  * Render state for the office signal selector.
  *
- * Unlike the other devices this isn't a single tile: it offers every [OfficeSignalMetadata.SignalMode] as a
+ * Unlike the other devices this isn't a single tile: it offers every [SignalMode] as a
  * pill and highlights whichever the signal currently reports, so it spans the full grid width.
  */
 @Immutable

@@ -1,5 +1,6 @@
 package com.degree.homedash.controls
 
+import com.degree.homedash.core.util.ThermostatTapGuard
 import kotlin.test.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue

@@ -1,4 +1,4 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.control
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -29,9 +29,12 @@ import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.degree.homedash.controls.ControlPreview
+import com.degree.homedash.controls.EntityToggleRow
+import com.degree.homedash.core.device.OfficeWorkstationUi
 import com.degree.homedash.office.PowerGraph
-import com.degree.homedash.office.previewHistory
 import com.degree.homedash.office.ToggleUi
+import com.degree.homedash.office.previewHistory
 import com.degree.homedash.shared.model.HistoricalEntityReading
 import com.degree.homedash.shared.model.device_metadata.OfficeWorkstationMetadata
 import com.degree.homedash.shared.model.device_state.OfficeWorkstationState
@@ -159,10 +162,11 @@ private fun WorkstationIcon(
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F, heightDp = 640)
 @Composable
-private fun WorkstationControlPreview() = ControlPreview {
-    WorkstationControl(previewWorkstation(isOn = true)) {}
-    WorkstationControl(previewWorkstation(isOn = false, offline = true)) {}
-}
+private fun WorkstationControlPreview() =
+    ControlPreview {
+        WorkstationControl(previewWorkstation(isOn = true)) {}
+        WorkstationControl(previewWorkstation(isOn = false, offline = true)) {}
+    }
 
 /** An offline workstation has no meters to read either, so its readouts dash and its chart is empty. */
 private fun previewWorkstation(
@@ -179,8 +183,14 @@ private fun previewWorkstation(
         entityId = "switch.office_workstation",
         isOn = isOn,
         isOffline = offline,
-        currentPower = if (offline) HistoricalEntityReading.Missing else HistoricalEntityReading(61.1, "W"),
-        totalPower = if (offline) HistoricalEntityReading.Missing else HistoricalEntityReading(34.8, "kWh"),
+        currentPower = if (offline) HistoricalEntityReading.Missing else HistoricalEntityReading(
+            61.1,
+            "W"
+        ),
+        totalPower = if (offline) HistoricalEntityReading.Missing else HistoricalEntityReading(
+            34.8,
+            "kWh"
+        ),
         powerHistory = if (offline) emptyList() else previewHistory,
     ),
 )

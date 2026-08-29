@@ -1,4 +1,4 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.device
 
 sealed interface DeviceUi {
 

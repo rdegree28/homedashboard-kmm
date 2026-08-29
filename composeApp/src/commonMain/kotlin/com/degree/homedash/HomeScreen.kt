@@ -27,18 +27,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.controls.EntityAction
-import com.degree.homedash.controls.DeviceControl
 import com.degree.homedash.controls.EntityControl
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.previewNavigation
-import com.degree.homedash.controls.ThermostatDeviceUi
 import com.degree.homedash.controls.previewThermostat
+import com.degree.homedash.core.DeviceControl
+import com.degree.homedash.core.device.ThermostatDeviceUi
 import com.degree.homedash.shared.model.device_metadata.NavigationMetadata.NavigationTarget
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun HomeScreen(

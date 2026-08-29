@@ -18,14 +18,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.degree.homedash.controls.SoilMoistureControl
-import com.degree.homedash.controls.moistureColor
-import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
+import com.degree.homedash.core.control.SoilMoistureControl
+import com.degree.homedash.core.control.moistureColor
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 import com.degree.homedash.ui.HistoryGraph
 import kotlin.math.roundToInt
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 /** Selectable history windows for the moisture graph. */
 enum class TimeRange(val label: String, val hoursBack: Int) {

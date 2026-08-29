@@ -26,12 +26,12 @@ import com.degree.homedash.controls.ControlPreview
 import com.degree.homedash.controls.EntityAction
 import com.degree.homedash.controls.EntityControl
 import com.degree.homedash.controls.EntityUi
-import com.degree.homedash.controls.DeviceControl
-import com.degree.homedash.controls.DeviceUi
 import com.degree.homedash.controls.cardSpan
 import com.degree.homedash.controls.entityId
 import com.degree.homedash.controls.previewFanUi
 import com.degree.homedash.controls.previewLight
+import com.degree.homedash.core.DeviceControl
+import com.degree.homedash.core.device.DeviceUi
 
 /**
  * A titled group of related controls with arbitrary [content] — the standard section container for

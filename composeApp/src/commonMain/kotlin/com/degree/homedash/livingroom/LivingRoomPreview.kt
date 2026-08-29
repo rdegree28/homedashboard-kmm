@@ -1,8 +1,8 @@
 package com.degree.homedash.livingroom
 
-import com.degree.homedash.controls.ClimateDeviceUi
-import com.degree.homedash.controls.FanDeviceUi
-import com.degree.homedash.controls.LightDeviceUi
+import com.degree.homedash.core.device.ClimateDeviceUi
+import com.degree.homedash.core.device.FanDeviceUi
+import com.degree.homedash.core.device.LightDeviceUi
 import com.degree.homedash.shared.model.HistoricalEntityReading
 import com.degree.homedash.shared.model.device_metadata.ClimateMetadata
 import com.degree.homedash.shared.model.device_metadata.FanMetadata

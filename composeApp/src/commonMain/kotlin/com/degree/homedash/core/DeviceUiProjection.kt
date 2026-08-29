@@ -1,5 +1,17 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core
 
+import com.degree.homedash.controls.EntityUi
+import com.degree.homedash.core.device.ClimateDeviceUi
+import com.degree.homedash.core.device.DeviceUi
+import com.degree.homedash.core.device.DoorDeviceUi
+import com.degree.homedash.core.device.FanDeviceUi
+import com.degree.homedash.core.device.LightDeviceUi
+import com.degree.homedash.core.device.OfficeSignalDeviceUi
+import com.degree.homedash.core.device.OfficeWorkstationUi
+import com.degree.homedash.core.device.PetFountainDeviceUi
+import com.degree.homedash.core.device.SoilMoistureDeviceUi
+import com.degree.homedash.core.device.ThermostatDeviceUi
+import com.degree.homedash.core.device.TriggerDeviceUi
 import com.degree.homedash.shared.model.device_metadata.ClimateMetadata
 import com.degree.homedash.shared.model.device_metadata.DeviceMetadata
 import com.degree.homedash.shared.model.device_metadata.DoorMetadata

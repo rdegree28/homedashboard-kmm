@@ -1,6 +1,6 @@
 package com.degree.homedash.plants
 
-import com.degree.homedash.controls.SoilMoistureDeviceUi
+import com.degree.homedash.core.device.SoilMoistureDeviceUi
 import com.degree.homedash.shared.model.HistoricalEntityReading
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.model.device_metadata.SoilMoistureMetadata

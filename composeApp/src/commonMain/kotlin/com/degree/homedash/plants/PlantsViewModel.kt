@@ -3,8 +3,8 @@ package com.degree.homedash.plants
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.degree.homedash.controls.SoilMoistureDeviceUi
-import com.degree.homedash.controls.loadDeviceUis
+import com.degree.homedash.core.device.SoilMoistureDeviceUi
+import com.degree.homedash.core.loadDeviceUis
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import kotlinx.coroutines.flow.SharingStarted

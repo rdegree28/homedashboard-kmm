@@ -8,11 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.degree.homedash.controls.SoilMoistureControl
-import org.koin.compose.viewmodel.koinViewModel
+import com.degree.homedash.core.control.SoilMoistureControl
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 import com.degree.homedash.ui.icons.RoomIcons
+import org.koin.compose.viewmodel.koinViewModel
 
 /** The Plants dashboard shows every entity whose id ends with this suffix. */
 object PlantEntities {

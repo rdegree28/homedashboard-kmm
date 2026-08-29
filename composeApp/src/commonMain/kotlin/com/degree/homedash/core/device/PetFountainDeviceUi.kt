@@ -1,6 +1,8 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.device
 
 import androidx.compose.runtime.Immutable
+import com.degree.homedash.core.control.PetFilterHealthControl
+import com.degree.homedash.core.control.WaterLevelControl
 import com.degree.homedash.shared.model.device_metadata.PetFountainMetadata
 import com.degree.homedash.shared.model.device_state.PetFilterState
 import com.degree.homedash.ui.readingText

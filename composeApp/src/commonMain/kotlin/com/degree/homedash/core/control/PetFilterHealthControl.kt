@@ -1,7 +1,8 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.control
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.degree.homedash.core.device.PetFountainDeviceUi
 import com.degree.homedash.ui.AppColors
 
 /**

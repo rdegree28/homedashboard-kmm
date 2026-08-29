@@ -1,7 +1,7 @@
 package com.degree.homedash.controls
 
-import com.degree.homedash.shared.model.device_metadata.*
 import androidx.compose.runtime.Immutable
+import com.degree.homedash.shared.model.device_metadata.*
 
 /**
  * Live render state for an entity, one variant per control type. Each variant nests its *typed*

@@ -1,4 +1,4 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.control
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,41 +25,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.degree.homedash.core.device.SoilMoistureDeviceUi
+import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.ui.AppColors
 
 /**
- * A percentage-level readout: name, a colored fill bar, and the percentage. When [onClick] is
+ * A plant's soil-moisture readout: name, a colored fill bar, and the percentage. When [onClick] is
  * provided the whole row is tappable (and shows a chevron) — used to open the history graph.
  */
 @Composable
-fun WaterLevelControl(
-    ui: PetFountainDeviceUi,
+fun SoilMoistureControl(
+    ui: SoilMoistureDeviceUi,
     onClick: (() -> Unit)? = null,
 ) {
-    LevelBarRow(
-        label = ui.name,
-        valueText = ui.valueText,
-        fraction = (ui.pct?.let { (it / 100.0).coerceIn(0.0, 1.0) } ?: 0.0).toFloat(),
-        barColor = waterLevelColor(ui.pct),
-        onClick = onClick,
-    )
-}
+    val fraction = ui.pct?.let { (it / 100.0).coerceIn(0.0, 1.0) } ?: 0.0
+    val barColor = moistureColor(ui.pct)
 
-/**
- * The shared shape of a level readout: name, value, and a filled bar underneath, optionally tappable
- * with a chevron.
- *
- * Factored out because the fountain shows two of these — its water level and its filter life — which
- * differ only in what they count and how they colour it. One layout, so they can't drift apart.
- */
-@Composable
-internal fun LevelBarRow(
-    label: String,
-    valueText: String,
-    fraction: Float,
-    barColor: Color,
-    onClick: (() -> Unit)? = null,
-) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -69,12 +50,12 @@ internal fun LevelBarRow(
     ) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = label,
+                text = ui.name,
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.titleMedium,
             )
             Text(
-                text = valueText,
+                text = ui.valueText,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = barColor,
@@ -98,7 +79,7 @@ internal fun LevelBarRow(
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(fraction)
+                    .fillMaxWidth(fraction.toFloat())
                     .height(10.dp)
                     .clip(RoundedCornerShape(5.dp))
                     .background(barColor),
@@ -107,10 +88,22 @@ internal fun LevelBarRow(
     }
 }
 
-/** Water-level status color: red (<10, refill) → yellow (10–35) → blue (>35, full). */
-internal fun waterLevelColor(pct: Double?): Color = when {
+/** Friendly name with a trailing "… moisture" / "… soil moisture" stripped so just the plant shows. */
+internal fun plantName(entity: EntityState): String {
+    val raw = entity.friendlyName ?: entity.entityId.substringAfter('.').replace('_', ' ')
+    return raw
+        .replace(Regex("(?i)\\s*soil\\s*moisture\\s*$"), "")
+        .replace(Regex("(?i)\\s*moisture\\s*$"), "")
+        .replace(Regex("(?i)\\s*moisture\\s*sensor\\s*$"), "")
+        .trim()
+        .ifEmpty { raw }
+}
+
+/** Soil-moisture status color: red (dry) → amber → green (healthy) → blue (very wet). */
+internal fun moistureColor(pct: Double?): Color = when {
     pct == null -> AppColors.StatusGray
-    pct <= 30 -> AppColors.StatusRed // needs refill
-    pct <= 45 -> AppColors.StatusAmber // getting low
-    else -> AppColors.Wet // full
+    pct < 20 -> AppColors.StatusRed // too dry
+    pct < 30 -> AppColors.StatusAmber // getting dry
+    pct > 80 -> AppColors.Wet // very wet
+    else -> AppColors.Healthy // healthy
 }

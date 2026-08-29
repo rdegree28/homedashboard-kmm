@@ -1,13 +1,14 @@
 package com.degree.homedash.controls
 
-import com.degree.homedash.shared.model.device_metadata.*
-import com.degree.homedash.shared.model.device_metadata.NavigationMetadata
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.degree.homedash.core.DeviceControl
+import com.degree.homedash.shared.model.device_metadata.*
+import com.degree.homedash.shared.model.device_metadata.NavigationMetadata
 
 /** An action a rendered [EntityUi] can emit; screens map these to their ViewModel at one boundary. */
 sealed interface EntityAction {
@@ -28,7 +29,7 @@ sealed interface EntityAction {
  * How many grid columns this entity's card should span (out of the grid's 2). Two types go wide:
  * a thermostat always (its stepper and mode pills need the room, and a card that changed width as
  * the mode changed would shuffle the grid under the user's finger), and a fan only while it is
- * showing its speed slider — the same condition `FanControlCard` uses for `showSlider`; otherwise
+ * showing its speed slider — the same condition `FanControl` uses for `showSlider`; otherwise
  * a fan is a single-column toggle tile like the rest.
  * `ControlGroup` packs rows to a total width of 2 using this, so cards reflow as fans toggle.
  */

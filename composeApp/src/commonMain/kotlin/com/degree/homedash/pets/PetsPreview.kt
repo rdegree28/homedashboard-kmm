@@ -1,6 +1,6 @@
 package com.degree.homedash.pets
 
-import com.degree.homedash.controls.PetFountainDeviceUi
+import com.degree.homedash.core.device.PetFountainDeviceUi
 import com.degree.homedash.shared.model.HistoricalEntityReading
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.model.device_metadata.PetFountainMetadata

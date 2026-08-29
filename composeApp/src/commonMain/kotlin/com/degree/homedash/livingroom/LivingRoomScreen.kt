@@ -10,10 +10,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.degree.homedash.controls.PreviewKoin
 import com.degree.homedash.controls.previewTrigger
-import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold
 import com.degree.homedash.ui.icons.RoomIcons
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun LivingRoomScreen(

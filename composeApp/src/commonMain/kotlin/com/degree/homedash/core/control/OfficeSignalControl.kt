@@ -1,4 +1,4 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.control
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.degree.homedash.controls.ControlPreview
 import com.degree.homedash.shared.model.device_metadata.OfficeSignalMetadata
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
@@ -25,12 +26,12 @@ import com.degree.homedash.ui.Dimens
  * The office signal's mode pills: one per [OfficeSignalMetadata.SignalMode], the active one filled
  * with its own colour. Read-write — tapping a pill runs that mode through [onSelect].
  *
- * Carries its own card surface, the way [DoorCard] and [ClimateCard] do, so it sits in a device grid
+ * Carries its own card surface, the way [DoorControl] and [ClimateControl] do, so it sits in a device grid
  * with the group's title above it rather than inside a wrapper. Full width rather than tile-height:
  * the pills set the height.
  */
 @Composable
-internal fun OfficeSignalSelector(
+internal fun OfficeSignalControl(
     activeMode: OfficeSignalMetadata.SignalMode?,
     onSelect: (OfficeSignalMetadata.SignalMode) -> Unit,
     modifier: Modifier = Modifier,
@@ -81,9 +82,10 @@ private fun signalColor(mode: OfficeSignalMetadata.SignalMode): Color = when (mo
  */
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F, widthDp = 380)
 @Composable
-private fun OfficeSignalSelectorPreview() = ControlPreview {
-    OfficeSignalMetadata.SignalMode.entries.forEach { mode ->
-        OfficeSignalSelector(activeMode = mode, onSelect = {})
+private fun OfficeSignalControlPreview() =
+    ControlPreview {
+        OfficeSignalMetadata.SignalMode.entries.forEach { mode ->
+            OfficeSignalControl(activeMode = mode, onSelect = {})
+        }
+        OfficeSignalControl(activeMode = null, onSelect = {})
     }
-    OfficeSignalSelector(activeMode = null, onSelect = {})
-}

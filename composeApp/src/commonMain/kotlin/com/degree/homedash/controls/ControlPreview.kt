@@ -1,6 +1,5 @@
 package com.degree.homedash.controls
 
-import com.degree.homedash.shared.model.device_metadata.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -12,8 +11,13 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.degree.homedash.core.device.DeviceUi
+import com.degree.homedash.core.device.LightDeviceUi
+import com.degree.homedash.core.device.ThermostatDeviceUi
+import com.degree.homedash.core.device.TriggerDeviceUi
 import com.degree.homedash.office.FanUi
 import com.degree.homedash.office.ToggleUi
+import com.degree.homedash.shared.model.device_metadata.*
 import com.degree.homedash.shared.model.device_metadata.factories.livingRoomThermostat
 import com.degree.homedash.shared.model.device_state.LightState
 import com.degree.homedash.shared.model.device_state.ThermostatState
@@ -26,7 +30,7 @@ import org.koin.dsl.module
 /**
  * Supplies the Koin graph a preview needs.
  *
- * A [com.degree.homedash.controls.DeviceUi] carries its own behavior and reaches for an
+ * A [DeviceUi] carries its own behavior and reaches for an
  * [ExpHomeAssistantRepo] to run it through — `DeviceControl` resolves one with `koinInject()`. The app
  * provides that from its graph, but previews render outside it, so they register an inert repo
  * instead. Without this, any preview containing a device card throws instead of rendering.

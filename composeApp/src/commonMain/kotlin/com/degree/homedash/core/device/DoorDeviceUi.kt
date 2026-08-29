@@ -1,4 +1,4 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.device
 
 import androidx.compose.runtime.Immutable
 import com.degree.homedash.shared.model.device_metadata.DoorMetadata

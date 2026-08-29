@@ -2,17 +2,17 @@ package com.degree.homedash.controls
 
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.device_metadata.ClimateMetadata
-import com.degree.homedash.shared.model.device_metadata.DoorMetadata
 import com.degree.homedash.shared.model.device_metadata.DeviceMetadata
+import com.degree.homedash.shared.model.device_metadata.DoorMetadata
 import com.degree.homedash.shared.model.device_metadata.FanMetadata
 import com.degree.homedash.shared.model.device_metadata.LightMetadata
 import com.degree.homedash.shared.model.device_metadata.NavigationMetadata
 import com.degree.homedash.shared.model.device_metadata.OfficeSignalMetadata
 import com.degree.homedash.shared.model.device_metadata.OfficeWorkstationMetadata
+import com.degree.homedash.shared.model.device_metadata.PetFountainMetadata
 import com.degree.homedash.shared.model.device_metadata.SoilMoistureMetadata
 import com.degree.homedash.shared.model.device_metadata.ThermostatMetadata
 import com.degree.homedash.shared.model.device_metadata.TriggerDeviceMetadata
-import com.degree.homedash.shared.model.device_metadata.PetFountainMetadata
 import com.degree.homedash.ui.readingText
 import kotlin.math.roundToInt
 

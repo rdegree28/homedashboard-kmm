@@ -1,8 +1,8 @@
 package com.degree.homedash.update
 
+import kotlin.js.Promise
 import kotlinx.browser.window
 import kotlinx.coroutines.await
-import kotlin.js.Promise
 
 /**
  * Fetches the deploy stamp written by `tools/deploy-web.sh`.

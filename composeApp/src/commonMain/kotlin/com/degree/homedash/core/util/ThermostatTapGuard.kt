@@ -1,4 +1,4 @@
-package com.degree.homedash.controls
+package com.degree.homedash.core.util
 
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
