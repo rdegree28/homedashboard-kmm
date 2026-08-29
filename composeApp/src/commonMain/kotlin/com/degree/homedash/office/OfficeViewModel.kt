@@ -4,7 +4,6 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.controls.ClimateDeviceUi
-import com.degree.homedash.shared.model.entity.*
 import com.degree.homedash.controls.FanDeviceUi
 import com.degree.homedash.controls.LightDeviceUi
 import com.degree.homedash.controls.DeviceUi
@@ -14,7 +13,6 @@ import com.degree.homedash.controls.OfficeWorkstationUi
 import com.degree.homedash.controls.loadDeviceUis
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
-import com.degree.homedash.shared.model.EntityState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged

@@ -1,6 +1,6 @@
 package com.degree.homedash.controls
 
-import com.degree.homedash.shared.model.entity.*
+import com.degree.homedash.shared.model.device_metadata.*
 import androidx.compose.runtime.Immutable
 
 /**

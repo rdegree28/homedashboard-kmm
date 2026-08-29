@@ -1,4 +1,4 @@
-package com.degree.homedash.shared.model.entity
+package com.degree.homedash.shared.model.device_metadata
 
 /**
  * Static descriptor for a device: its identity ([entityId]), the label to show for it

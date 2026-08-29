@@ -1,8 +1,8 @@
 package com.degree.homedash.controls
 
 import androidx.compose.runtime.Immutable
-import com.degree.homedash.shared.model.entity.LightMetadata
-import com.degree.homedash.shared.model.states.LightState
+import com.degree.homedash.shared.model.device_metadata.LightMetadata
+import com.degree.homedash.shared.model.device_state.LightState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 
 /**

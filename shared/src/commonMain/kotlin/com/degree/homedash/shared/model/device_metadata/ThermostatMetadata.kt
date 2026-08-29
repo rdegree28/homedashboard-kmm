@@ -1,6 +1,6 @@
-package com.degree.homedash.shared.model.entity
+package com.degree.homedash.shared.model.device_metadata
 
-import com.degree.homedash.shared.model.states.ThermostatState
+import com.degree.homedash.shared.model.device_state.ThermostatState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

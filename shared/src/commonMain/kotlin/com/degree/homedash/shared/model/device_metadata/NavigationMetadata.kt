@@ -1,4 +1,4 @@
-package com.degree.homedash.shared.model.entity
+package com.degree.homedash.shared.model.device_metadata
 
 /**
  * A launcher card that opens another dashboard.

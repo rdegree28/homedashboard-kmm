@@ -1,7 +1,7 @@
 package com.degree.homedash.controls
 
 import androidx.compose.runtime.Immutable
-import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
+import com.degree.homedash.shared.model.device_metadata.TriggerDeviceMetadata
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 
 /**

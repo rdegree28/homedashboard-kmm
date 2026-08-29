@@ -2,13 +2,13 @@ package com.degree.homedash.shared.repo
 
 import com.degree.homedash.shared.api.HaConfig
 import com.degree.homedash.shared.api.HaConnectionStatus
+import com.degree.homedash.shared.api.HaProtocolHelper
 import com.degree.homedash.shared.api.HaWebSocketClient
 import com.degree.homedash.shared.api.HomeAssistantApi
 import com.degree.homedash.shared.api.WebSocketHomeAssistantApi
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
-import com.degree.homedash.shared.model.StatisticsPeriod
-import com.degree.homedash.shared.model.entity.HvacMode
+import com.degree.homedash.shared.model.device_metadata.HvacMode
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -147,7 +147,7 @@ class HomeAssistantRepo internal constructor(
 
         if (hoursBack <= RAW_HISTORY_MAX_HOURS) return api.history(entityId, startIso, endIso)
 
-        val period = if (hoursBack <= HOURLY_STATS_MAX_HOURS) StatisticsPeriod.HOUR else StatisticsPeriod.DAY
+        val period = if (hoursBack <= HOURLY_STATS_MAX_HOURS) HaProtocolHelper.StatisticsPeriod.HOUR else HaProtocolHelper.StatisticsPeriod.DAY
         return api.statistics(entityId, startIso, endIso, period)
             .ifEmpty { api.history(entityId, startIso, endIso) }
     }

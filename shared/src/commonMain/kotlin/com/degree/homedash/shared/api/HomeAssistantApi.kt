@@ -2,7 +2,6 @@ package com.degree.homedash.shared.api
 
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
-import com.degree.homedash.shared.model.StatisticsPeriod
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
 
@@ -62,6 +61,6 @@ internal interface HomeAssistantApi {
         entityId: String,
         startIso: String,
         endIso: String,
-        period: StatisticsPeriod,
+        period: HaProtocolHelper.StatisticsPeriod,
     ): List<HistoryPoint>
 }

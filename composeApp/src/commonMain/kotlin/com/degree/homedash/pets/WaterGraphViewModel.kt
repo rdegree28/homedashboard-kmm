@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.controls.PetFountainDeviceUi
 import com.degree.homedash.plants.TimeRange
-import com.degree.homedash.shared.model.entity.PetFountainMetadata
+import com.degree.homedash.shared.model.device_metadata.PetFountainMetadata
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo

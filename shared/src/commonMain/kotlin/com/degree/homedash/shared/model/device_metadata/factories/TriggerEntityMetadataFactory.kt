@@ -1,21 +1,12 @@
-package com.degree.homedash.shared.model.entity
+package com.degree.homedash.shared.model.device_metadata.factories
+
+import com.degree.homedash.shared.model.device_metadata.TriggerDeviceMetadata
 
 /*
 
  File contains some factories for commonly created triggerentities.
 
  */
-
-/** A card wired to nothing — fires a call with no domain, service or target. */
-fun TriggerDeviceMetadata.Companion.testCard(): TriggerDeviceMetadata {
-    return TriggerDeviceMetadata(
-        entityId = "trigger.testcard",
-        displayName = "TestCard",
-        targetEntityId = "",
-        service = "",
-        serviceDomain = "",
-    )
-}
 
 /** Living Room "Main Lights" scene. */
 fun TriggerDeviceMetadata.Companion.mainLights(): TriggerDeviceMetadata {

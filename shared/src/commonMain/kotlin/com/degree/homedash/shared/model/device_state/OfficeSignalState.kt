@@ -1,6 +1,6 @@
-package com.degree.homedash.shared.model.states
+package com.degree.homedash.shared.model.device_state
 
-import com.degree.homedash.shared.model.entity.OfficeSignalMetadata
+import com.degree.homedash.shared.model.device_metadata.OfficeSignalMetadata
 
 /**
  * Live state of the office signal: which mode it is currently showing.

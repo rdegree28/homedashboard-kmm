@@ -1,4 +1,4 @@
-package com.degree.homedash.shared.model.states
+package com.degree.homedash.shared.model.device_state
 
 /**
  * Live state of a door contact sensor. Read-only — [isOpen] is all there is to report.

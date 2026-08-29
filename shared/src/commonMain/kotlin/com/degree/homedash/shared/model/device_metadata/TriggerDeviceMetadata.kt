@@ -1,4 +1,4 @@
-package com.degree.homedash.shared.model.entity
+package com.degree.homedash.shared.model.device_metadata
 
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 

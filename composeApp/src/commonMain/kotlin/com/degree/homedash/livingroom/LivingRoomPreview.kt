@@ -4,12 +4,12 @@ import com.degree.homedash.controls.ClimateDeviceUi
 import com.degree.homedash.controls.FanDeviceUi
 import com.degree.homedash.controls.LightDeviceUi
 import com.degree.homedash.shared.model.HistoricalEntityReading
-import com.degree.homedash.shared.model.entity.ClimateMetadata
-import com.degree.homedash.shared.model.entity.FanMetadata
-import com.degree.homedash.shared.model.entity.LightMetadata
-import com.degree.homedash.shared.model.states.ClimateState
-import com.degree.homedash.shared.model.states.FanState
-import com.degree.homedash.shared.model.states.LightState
+import com.degree.homedash.shared.model.device_metadata.ClimateMetadata
+import com.degree.homedash.shared.model.device_metadata.FanMetadata
+import com.degree.homedash.shared.model.device_metadata.LightMetadata
+import com.degree.homedash.shared.model.device_state.ClimateState
+import com.degree.homedash.shared.model.device_state.FanState
+import com.degree.homedash.shared.model.device_state.LightState
 
 // Sample data for the Living Room @Previews (which live next to their composables in this package).
 

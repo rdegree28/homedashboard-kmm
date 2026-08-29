@@ -1,8 +1,8 @@
 package com.degree.homedash.controls
 
 import androidx.compose.runtime.Immutable
-import com.degree.homedash.shared.model.entity.FanMetadata
-import com.degree.homedash.shared.model.states.FanState
+import com.degree.homedash.shared.model.device_metadata.FanMetadata
+import com.degree.homedash.shared.model.device_state.FanState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 
 /**

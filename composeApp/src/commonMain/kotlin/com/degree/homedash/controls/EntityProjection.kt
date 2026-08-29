@@ -1,18 +1,18 @@
 package com.degree.homedash.controls
 
 import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.shared.model.entity.ClimateMetadata
-import com.degree.homedash.shared.model.entity.DoorMetadata
-import com.degree.homedash.shared.model.entity.DeviceMetadata
-import com.degree.homedash.shared.model.entity.FanMetadata
-import com.degree.homedash.shared.model.entity.LightMetadata
-import com.degree.homedash.shared.model.entity.NavigationMetadata
-import com.degree.homedash.shared.model.entity.OfficeSignalMetadata
-import com.degree.homedash.shared.model.entity.OfficeWorkstationMetadata
-import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
-import com.degree.homedash.shared.model.entity.ThermostatMetadata
-import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
-import com.degree.homedash.shared.model.entity.PetFountainMetadata
+import com.degree.homedash.shared.model.device_metadata.ClimateMetadata
+import com.degree.homedash.shared.model.device_metadata.DoorMetadata
+import com.degree.homedash.shared.model.device_metadata.DeviceMetadata
+import com.degree.homedash.shared.model.device_metadata.FanMetadata
+import com.degree.homedash.shared.model.device_metadata.LightMetadata
+import com.degree.homedash.shared.model.device_metadata.NavigationMetadata
+import com.degree.homedash.shared.model.device_metadata.OfficeSignalMetadata
+import com.degree.homedash.shared.model.device_metadata.OfficeWorkstationMetadata
+import com.degree.homedash.shared.model.device_metadata.SoilMoistureMetadata
+import com.degree.homedash.shared.model.device_metadata.ThermostatMetadata
+import com.degree.homedash.shared.model.device_metadata.TriggerDeviceMetadata
+import com.degree.homedash.shared.model.device_metadata.PetFountainMetadata
 import com.degree.homedash.ui.readingText
 import kotlin.math.roundToInt
 

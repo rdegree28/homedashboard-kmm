@@ -35,7 +35,7 @@ import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.previewNavigation
 import com.degree.homedash.controls.ThermostatDeviceUi
 import com.degree.homedash.controls.previewThermostat
-import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
+import com.degree.homedash.shared.model.device_metadata.NavigationMetadata.NavigationTarget
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.ControlGroup
 import com.degree.homedash.ui.DashboardScaffold

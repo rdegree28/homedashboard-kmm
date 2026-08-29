@@ -1,8 +1,8 @@
 package com.degree.homedash.controls
 
 import androidx.compose.runtime.Immutable
-import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
-import com.degree.homedash.shared.model.states.SoilMoistureState
+import com.degree.homedash.shared.model.device_metadata.SoilMoistureMetadata
+import com.degree.homedash.shared.model.device_state.SoilMoistureState
 import com.degree.homedash.ui.readingText
 
 /**

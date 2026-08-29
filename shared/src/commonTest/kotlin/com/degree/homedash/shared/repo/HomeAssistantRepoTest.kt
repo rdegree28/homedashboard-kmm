@@ -6,7 +6,7 @@ import com.degree.homedash.shared.api.HomeAssistantApi
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.model.StatisticsPeriod
-import com.degree.homedash.shared.model.entity.HvacMode
+import com.degree.homedash.shared.model.device_metadata.HvacMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonObject

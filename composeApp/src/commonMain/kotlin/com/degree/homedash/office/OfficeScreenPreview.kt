@@ -1,7 +1,7 @@
 package com.degree.homedash.office
 
 import com.degree.homedash.controls.ClimateDeviceUi
-import com.degree.homedash.shared.model.entity.*
+import com.degree.homedash.shared.model.device_metadata.*
 import com.degree.homedash.controls.FanDeviceUi
 import com.degree.homedash.controls.DoorDeviceUi
 import com.degree.homedash.controls.LightDeviceUi
@@ -9,12 +9,12 @@ import com.degree.homedash.controls.OfficeSignalDeviceUi
 import com.degree.homedash.controls.OfficeWorkstationUi
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.model.HistoricalEntityReading
-import com.degree.homedash.shared.model.states.ClimateState
-import com.degree.homedash.shared.model.states.FanState
-import com.degree.homedash.shared.model.states.DoorState
-import com.degree.homedash.shared.model.states.LightState
-import com.degree.homedash.shared.model.states.OfficeSignalState
-import com.degree.homedash.shared.model.states.OfficeWorkstationState
+import com.degree.homedash.shared.model.device_state.ClimateState
+import com.degree.homedash.shared.model.device_state.FanState
+import com.degree.homedash.shared.model.device_state.DoorState
+import com.degree.homedash.shared.model.device_state.LightState
+import com.degree.homedash.shared.model.device_state.OfficeSignalState
+import com.degree.homedash.shared.model.device_state.OfficeWorkstationState
 import kotlin.math.sin
 
 // Shared sample data for the Office screen preview.

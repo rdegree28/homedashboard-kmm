@@ -2,8 +2,8 @@ package com.degree.homedash.controls
 
 import androidx.compose.runtime.Immutable
 import com.degree.homedash.shared.model.HistoryPoint
-import com.degree.homedash.shared.model.entity.OfficeWorkstationMetadata
-import com.degree.homedash.shared.model.states.OfficeWorkstationState
+import com.degree.homedash.shared.model.device_metadata.OfficeWorkstationMetadata
+import com.degree.homedash.shared.model.device_state.OfficeWorkstationState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import com.degree.homedash.ui.readingText
 

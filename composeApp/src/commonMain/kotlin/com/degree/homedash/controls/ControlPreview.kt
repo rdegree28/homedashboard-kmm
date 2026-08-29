@@ -1,6 +1,6 @@
 package com.degree.homedash.controls
 
-import com.degree.homedash.shared.model.entity.*
+import com.degree.homedash.shared.model.device_metadata.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -14,8 +14,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.degree.homedash.office.FanUi
 import com.degree.homedash.office.ToggleUi
-import com.degree.homedash.shared.model.states.LightState
-import com.degree.homedash.shared.model.states.ThermostatState
+import com.degree.homedash.shared.model.device_metadata.factories.livingRoomThermostat
+import com.degree.homedash.shared.model.device_state.LightState
+import com.degree.homedash.shared.model.device_state.ThermostatState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import org.koin.compose.KoinApplicationPreview
 import org.koin.dsl.module

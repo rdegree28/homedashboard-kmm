@@ -1,7 +1,7 @@
-package com.degree.homedash.shared.model.states
+package com.degree.homedash.shared.model.device_state
 
-import com.degree.homedash.shared.model.entity.HvacAction
-import com.degree.homedash.shared.model.entity.HvacMode
+import com.degree.homedash.shared.model.device_metadata.HvacAction
+import com.degree.homedash.shared.model.device_metadata.HvacMode
 
 /**
  * Live state of a thermostat.

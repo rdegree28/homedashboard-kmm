@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.shared.model.entity.LightMetadata
+import com.degree.homedash.shared.model.device_metadata.LightMetadata
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin

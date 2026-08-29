@@ -1,26 +1,13 @@
 package com.degree.homedash.controls
 
-import com.degree.homedash.shared.model.entity.*
-import com.degree.homedash.shared.model.entity.NavigationMetadata
+import com.degree.homedash.shared.model.device_metadata.*
+import com.degree.homedash.shared.model.device_metadata.NavigationMetadata
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Opacity
-import androidx.compose.material.icons.filled.Thermostat
-import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.office.DoorUi
-import com.degree.homedash.office.FanUi
-import com.degree.homedash.office.SensorUi
-import com.degree.homedash.office.ToggleUi
-import com.degree.homedash.ui.AppColors
-import com.degree.homedash.ui.Dimens
 
 /** An action a rendered [EntityUi] can emit; screens map these to their ViewModel at one boundary. */
 sealed interface EntityAction {

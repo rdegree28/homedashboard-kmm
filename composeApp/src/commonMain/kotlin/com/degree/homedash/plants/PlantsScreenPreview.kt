@@ -3,8 +3,8 @@ package com.degree.homedash.plants
 import com.degree.homedash.controls.SoilMoistureDeviceUi
 import com.degree.homedash.shared.model.HistoricalEntityReading
 import com.degree.homedash.shared.model.HistoryPoint
-import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
-import com.degree.homedash.shared.model.states.SoilMoistureState
+import com.degree.homedash.shared.model.device_metadata.SoilMoistureMetadata
+import com.degree.homedash.shared.model.device_state.SoilMoistureState
 import kotlin.math.sin
 
 // Sample data for the Plants @Previews (which live next to their composables in this package).

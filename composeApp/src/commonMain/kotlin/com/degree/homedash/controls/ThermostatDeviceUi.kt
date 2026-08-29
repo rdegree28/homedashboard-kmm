@@ -1,10 +1,10 @@
 package com.degree.homedash.controls
 
 import androidx.compose.runtime.Immutable
-import com.degree.homedash.shared.model.entity.HvacAction
-import com.degree.homedash.shared.model.entity.HvacMode
-import com.degree.homedash.shared.model.entity.ThermostatMetadata
-import com.degree.homedash.shared.model.states.ThermostatState
+import com.degree.homedash.shared.model.device_metadata.HvacAction
+import com.degree.homedash.shared.model.device_metadata.HvacMode
+import com.degree.homedash.shared.model.device_metadata.ThermostatMetadata
+import com.degree.homedash.shared.model.device_state.ThermostatState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 
 /**

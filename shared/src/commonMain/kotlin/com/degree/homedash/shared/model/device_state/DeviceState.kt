@@ -1,4 +1,4 @@
-package com.degree.homedash.shared.model.states
+package com.degree.homedash.shared.model.device_state
 
 /**
  * The live state of a device — what it is doing right now, as opposed to `DeviceMetadata`'s static

@@ -1,6 +1,6 @@
-package com.degree.homedash.shared.model.entity
+package com.degree.homedash.shared.model.device_metadata
 
-import com.degree.homedash.shared.model.states.PetFilterState
+import com.degree.homedash.shared.model.device_state.PetFilterState
 import com.degree.homedash.shared.model.toReading
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import kotlinx.coroutines.flow.Flow

@@ -1,8 +1,8 @@
 package com.degree.homedash.controls
 
 import androidx.compose.runtime.Immutable
-import com.degree.homedash.shared.model.entity.ClimateMetadata
-import com.degree.homedash.shared.model.states.ClimateState
+import com.degree.homedash.shared.model.device_metadata.ClimateMetadata
+import com.degree.homedash.shared.model.device_state.ClimateState
 import com.degree.homedash.ui.readingText
 
 @Immutable

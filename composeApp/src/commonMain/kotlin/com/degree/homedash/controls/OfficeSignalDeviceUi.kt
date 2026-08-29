@@ -1,8 +1,8 @@
 package com.degree.homedash.controls
 
 import androidx.compose.runtime.Immutable
-import com.degree.homedash.shared.model.entity.OfficeSignalMetadata
-import com.degree.homedash.shared.model.states.OfficeSignalState
+import com.degree.homedash.shared.model.device_metadata.OfficeSignalMetadata
+import com.degree.homedash.shared.model.device_state.OfficeSignalState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 
 /**

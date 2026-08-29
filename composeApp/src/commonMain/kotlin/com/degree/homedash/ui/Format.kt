@@ -1,7 +1,7 @@
 package com.degree.homedash.ui
 
 import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.shared.model.states.ClimateState
+import com.degree.homedash.shared.model.device_state.ClimateState
 import com.degree.homedash.shared.model.HistoricalEntityReading
 import kotlin.math.pow
 import kotlin.math.round

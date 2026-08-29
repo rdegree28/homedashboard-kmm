@@ -1,4 +1,4 @@
-package com.degree.homedash.shared.model.states
+package com.degree.homedash.shared.model.device_state
 
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.model.HistoricalEntityReading

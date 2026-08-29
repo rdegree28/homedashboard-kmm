@@ -40,7 +40,7 @@ import com.degree.homedash.plants.PlantsScreen
 import com.degree.homedash.shared.model.FeatureFlag
 import com.degree.homedash.shared.api.HaConfig
 import com.degree.homedash.shared.di.sharedModule
-import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
+import com.degree.homedash.shared.model.device_metadata.NavigationMetadata.NavigationTarget
 import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens

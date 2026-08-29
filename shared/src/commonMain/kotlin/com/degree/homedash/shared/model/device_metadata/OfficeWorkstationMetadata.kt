@@ -1,7 +1,7 @@
-package com.degree.homedash.shared.model.entity
+package com.degree.homedash.shared.model.device_metadata
 
 import com.degree.homedash.shared.model.toReading
-import com.degree.homedash.shared.model.states.OfficeWorkstationState
+import com.degree.homedash.shared.model.device_state.OfficeWorkstationState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

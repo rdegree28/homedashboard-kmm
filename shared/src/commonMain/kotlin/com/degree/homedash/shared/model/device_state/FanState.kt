@@ -1,4 +1,4 @@
-package com.degree.homedash.shared.model.states
+package com.degree.homedash.shared.model.device_state
 
 data class FanState(
     override val entityId: String,

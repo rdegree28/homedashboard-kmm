@@ -4,8 +4,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.path
-import com.degree.homedash.shared.model.entity.NavigationMetadata
-import com.degree.homedash.shared.model.entity.NavigationMetadata.RoomIcon
+import com.degree.homedash.shared.model.device_metadata.NavigationMetadata
+import com.degree.homedash.shared.model.device_metadata.NavigationMetadata.RoomIcon
 
 /**
  * Hand-drawn room glyphs, replacing the Material icons the launcher used to borrow. Filled

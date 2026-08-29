@@ -1,8 +1,8 @@
 package com.degree.homedash.controls
 
 import androidx.compose.runtime.Immutable
-import com.degree.homedash.shared.model.entity.DoorMetadata
-import com.degree.homedash.shared.model.states.DoorState
+import com.degree.homedash.shared.model.device_metadata.DoorMetadata
+import com.degree.homedash.shared.model.device_state.DoorState
 
 /**
  * Render state for a door row. Read-only: there is nothing to drive, so unlike the toggleable

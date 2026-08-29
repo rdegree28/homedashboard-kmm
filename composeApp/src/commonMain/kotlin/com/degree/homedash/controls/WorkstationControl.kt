@@ -33,8 +33,8 @@ import com.degree.homedash.office.PowerGraph
 import com.degree.homedash.office.previewHistory
 import com.degree.homedash.office.ToggleUi
 import com.degree.homedash.shared.model.HistoricalEntityReading
-import com.degree.homedash.shared.model.entity.OfficeWorkstationMetadata
-import com.degree.homedash.shared.model.states.OfficeWorkstationState
+import com.degree.homedash.shared.model.device_metadata.OfficeWorkstationMetadata
+import com.degree.homedash.shared.model.device_state.OfficeWorkstationState
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 

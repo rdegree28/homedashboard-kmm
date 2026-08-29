@@ -31,9 +31,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.degree.homedash.shared.model.entity.NavigationMetadata
-import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
-import com.degree.homedash.ui.Dimens
+import com.degree.homedash.shared.model.device_metadata.NavigationMetadata
+import com.degree.homedash.shared.model.device_metadata.NavigationMetadata.NavigationTarget
 import com.degree.homedash.ui.icons.cardPhoto
 import com.degree.homedash.ui.icons.roomIcon
 import com.degree.homedash.ui.roomTint

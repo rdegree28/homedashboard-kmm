@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.degree.homedash.office.ToggleUi
-import com.degree.homedash.shared.model.entity.ClimateMetadata
+import com.degree.homedash.shared.model.device_metadata.ClimateMetadata
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens

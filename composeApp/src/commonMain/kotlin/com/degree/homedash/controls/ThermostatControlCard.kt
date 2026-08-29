@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -40,11 +39,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.degree.homedash.shared.model.entity.HvacAction
-import com.degree.homedash.shared.model.entity.HvacMode
-import com.degree.homedash.shared.model.entity.PresetKind
-import com.degree.homedash.shared.model.entity.TemperaturePreset
-import com.degree.homedash.shared.model.entity.ThermostatMetadata
+import com.degree.homedash.shared.model.device_metadata.HvacAction
+import com.degree.homedash.shared.model.device_metadata.HvacMode
+import com.degree.homedash.shared.model.device_metadata.PresetKind
+import com.degree.homedash.shared.model.device_metadata.TemperaturePreset
+import com.degree.homedash.shared.model.device_metadata.ThermostatMetadata
 import com.degree.homedash.shared.model.dewPoint
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
@@ -52,7 +51,6 @@ import com.degree.homedash.ui.formatNumber
 import com.degree.homedash.ui.icons.ControlIcons
 import kotlinx.coroutines.delay
 import kotlin.math.abs
-import kotlin.math.ceil
 import kotlin.math.round
 
 /** Pills per selector row. Fixed so the card's height can be computed rather than measured. */

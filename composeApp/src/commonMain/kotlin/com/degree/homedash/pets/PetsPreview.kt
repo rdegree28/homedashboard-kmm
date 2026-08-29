@@ -3,8 +3,8 @@ package com.degree.homedash.pets
 import com.degree.homedash.controls.PetFountainDeviceUi
 import com.degree.homedash.shared.model.HistoricalEntityReading
 import com.degree.homedash.shared.model.HistoryPoint
-import com.degree.homedash.shared.model.entity.PetFountainMetadata
-import com.degree.homedash.shared.model.states.PetFilterState
+import com.degree.homedash.shared.model.device_metadata.PetFountainMetadata
+import com.degree.homedash.shared.model.device_state.PetFilterState
 
 // Sample data for the Pets @Previews (which live next to their composables in this package).
 

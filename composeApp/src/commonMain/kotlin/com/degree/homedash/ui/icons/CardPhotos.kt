@@ -2,7 +2,7 @@ package com.degree.homedash.ui.icons
 
 import com.degree.homedash.resources.Res
 import com.degree.homedash.resources.callie
-import com.degree.homedash.shared.model.entity.NavigationMetadata.CardPhoto
+import com.degree.homedash.shared.model.device_metadata.NavigationMetadata.CardPhoto
 import org.jetbrains.compose.resources.DrawableResource
 
 /**
