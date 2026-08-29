@@ -17,12 +17,33 @@ import org.koin.dsl.module
  * `:composeApp`, which this module knows nothing about.
  */
 val sharedModule = module {
-    single<HaClient> { HaWebSocketClient() }
-    single<ExpHomeAssistantApi> { WebSocketExpHomeAssistantApi(get()) }
-    single { ExpHomeAssistantRepo(get()) }
-    single { EntityMetadataRepo(get(), get()) }
-    single { ConfigStore() }
+    single<HaClient> {
+        HaWebSocketClient()
+    }
+    single<ExpHomeAssistantApi> {
+        WebSocketExpHomeAssistantApi(
+            client = get(),
+        )
+    }
+    single {
+        ExpHomeAssistantRepo(
+            api = get(),
+        )
+    }
+    single {
+        EntityMetadataRepo(
+            featureFlagDao = get(),
+            authRepo = get(),
+        )
+    }
+    single {
+        ConfigStore()
+    }
     // AuthRepo's constructor is internal (it wraps the private AuthDao), so build it via its factory.
-    single { AuthRepo.create() }
-    single<FeatureFlagDao> { FeatureFlagDaoStaticImpl() }
+    single {
+        AuthRepo.create()
+    }
+    single<FeatureFlagDao> {
+        FeatureFlagDaoStaticImpl()
+    }
 }

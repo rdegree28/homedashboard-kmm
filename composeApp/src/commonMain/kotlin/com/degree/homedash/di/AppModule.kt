@@ -25,18 +25,51 @@ import org.koin.dsl.module
  * `parametersOf(entityId)`.
  */
 fun appModule(defaultConfig: HaConfig?) = module {
-    viewModel { AppViewModel(defaultConfig, get(), get(), get(), get()) }
-    viewModel { HomeViewModel(get(), get()) }
+    viewModel {
+        AppViewModel(
+            defaultConfig = defaultConfig,
+            configStore = get(),
+            authRepo = get(),
+            featureFlagDao = get(),
+            repository = get(),
+        )
+    }
+    viewModel {
+        HomeViewModel(
+            metadataRepo = get(),
+            deviceRepo = get(),
+        )
+    }
     viewModel {
         OfficeViewModel(
             metadataRepo = get(),
             deviceRepo = get(),
         )
     }
-    viewModel { LivingRoomViewModel(get(), get()) }
-    viewModel { BedroomViewModel(get(), get()) }
-    viewModel { PetsViewModel(get(), get()) }
-    viewModel { PlantsViewModel(get(), get()) }
+    viewModel {
+        LivingRoomViewModel(
+            metadataRepo = get(),
+            deviceRepo = get(),
+        )
+    }
+    viewModel {
+        BedroomViewModel(
+            metadataRepo = get(),
+            deviceRepo = get(),
+        )
+    }
+    viewModel {
+        PetsViewModel(
+            metadataRepo = get(),
+            deviceRepo = get(),
+        )
+    }
+    viewModel {
+        PlantsViewModel(
+            metadataRepo = get(),
+            deviceRepo = get(),
+        )
+    }
     viewModel { (entityId: String) ->
         PlantGraphViewModel(
             entityId = entityId,
