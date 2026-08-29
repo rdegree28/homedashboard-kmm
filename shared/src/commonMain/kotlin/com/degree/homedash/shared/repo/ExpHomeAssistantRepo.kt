@@ -1,6 +1,10 @@
 package com.degree.homedash.shared.repo
 
+import co.touchlab.kermit.Logger
 import com.degree.homedash.shared.api.ExpHomeAssistantApi
+import com.degree.homedash.shared.api.HaConfig
+import com.degree.homedash.shared.api.HaConnectionStatus
+import com.degree.homedash.shared.api.HaProtocolHelper
 import com.degree.homedash.shared.api.PreviewExpHomeAssistantApi
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
@@ -11,15 +15,26 @@ import com.degree.homedash.shared.model.device_metadata.ThermostatMetadata
 import com.degree.homedash.shared.model.device_metadata.ToggleableDeviceMetadata
 import com.degree.homedash.shared.model.device_metadata.TriggerDeviceMetadata
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import kotlin.collections.ifEmpty
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.ExperimentalTime
 
 /**
- * Public face of the experimental stack — the exp counterpart to [HomeAssistantRepo], wired as a Koin
- * `single` in `SharedModule`. [ExpHomeAssistantApi] is internal, so this forwards the actions callers
- * need rather than handing out an api.
+ * Public face of the Home Assistant stack: live entity states, the connection itself, history, and
+ * the typed actions devices fire. Wired as a Koin `single` in `SharedModule`.
+ *
+ * [ExpHomeAssistantApi] is internal, so this forwards what callers need rather than handing out an
+ * api. Device actions take metadata rather than ids — driving a device needs its identity, not its
+ * live value — and are reached through the matching `DeviceMetadata` methods.
  */
 class ExpHomeAssistantRepo internal constructor(
     private val api: ExpHomeAssistantApi,
@@ -36,6 +51,18 @@ class ExpHomeAssistantRepo internal constructor(
      */
     fun loadEntityStates(): Flow<Map<String, EntityState>> = api.loadAllStates()
 
+    /**
+     * Live connection status. The app root provides it to every dashboard header, and the graph
+     * screens re-fetch their history whenever it comes back up.
+     */
+    val connection: StateFlow<HaConnectionStatus> get() = api.connection
+
+    /** Open (or restart) the connection with [config], reconnecting automatically until [disconnect]. */
+    fun connect(config: HaConfig) = api.connect(config)
+
+    /** Close the connection and stop reconnecting. */
+    fun disconnect() = api.disconnect()
+
 
     /**
      * One entity's live state, re-emitting only when *that* entity changes rather than on every push.
@@ -50,12 +77,30 @@ class ExpHomeAssistantRepo internal constructor(
 
     /**
      * [hoursBack] hours of numeric history for [entityId], for a device that charts one of its
-     * sensors. Empty until the first fetch lands, and re-fetched on every reconnect.
+     * sensors. Empty until the first fetch lands, and re-fetched on every reconnect: a history query
+     * is a request/response round trip, so it can only run while connected, and the window it covers
+     * moves on as the app stays open.
+     *
+     * A failed fetch reads as no data rather than taking the device's whole state flow down with it —
+     * the chart says so itself, and the next reconnect tries again.
      */
     internal fun historyForEntity(
         entityId: String,
         hoursBack: Int,
-    ): Flow<List<HistoryPoint>> = api.loadHistoryForEntity(entityId, hoursBack)
+    ): Flow<List<HistoryPoint>> =
+        connection
+            .filter { it == HaConnectionStatus.Connected }
+            .map {
+                try {
+                    getHistoryForEntity(entityId, hoursBack)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    log.e(e) { "history fetch failed for $entityId" }
+                    emptyList()
+                }
+            }
+            .onStart { emit(emptyList()) }
 
     /**
      * Flips [entity] on or off.
@@ -163,7 +208,48 @@ class ExpHomeAssistantRepo internal constructor(
         oscillating: Boolean,
     ) = api.callService("fan", "oscillate", metadata.entityId, buildJsonObject { put("oscillating", oscillating) })
 
+    /**
+     * Fetch [hoursBack] hours of numeric history for [entityId], ending now, picking the best source
+     * for the window: raw recorder states for short ranges, long-term statistics beyond them.
+     *
+     * The recorder purges raw states after `purge_keep_days` (10 by default), so a raw query for a
+     * month or a year silently returns only the last week or so — every chart looked capped at the
+     * purge horizon. Statistics are rolled up hourly/daily and kept indefinitely, so longer windows
+     * read from those instead and come back with a mean plus the min/max spread of each bucket.
+     *
+     * Falls back to raw states when an entity has no statistics at all (sensors without a
+     * `state_class` never get them) — a short chart beats an empty one.
+     */
+    @OptIn(ExperimentalTime::class)
+    suspend fun getHistoryForEntity(
+        entityId: String,
+        hoursBack: Int,
+    ): List<HistoryPoint> {
+        val end = Clock.System.now()
+        val start = end.minus(hoursBack.hours)
+        val startIso = start.toString()
+        val endIso = end.toString()
+
+        if (hoursBack <= RAW_HISTORY_MAX_HOURS) return api.history(entityId, startIso, endIso)
+
+        val period = if (hoursBack <= HOURLY_STATS_MAX_HOURS) HaProtocolHelper.StatisticsPeriod.HOUR else HaProtocolHelper.StatisticsPeriod.DAY
+        return api.statistics(entityId, startIso, endIso, period)
+            .ifEmpty { api.history(entityId, startIso, endIso) }
+    }
+
+    private val log = Logger.withTag("ExpHomeAssistantRepo")
+
     companion object {
+
+        /**
+         * Longest window still served from raw recorder states. Sits inside the recorder's default
+         * 10-day retention so the short-range charts keep full per-sample detail, while anything
+         * longer — where raw data would be partly purged anyway — comes from statistics.
+         */
+        private const val RAW_HISTORY_MAX_HOURS = 24 * 7
+
+        /** Above this, hourly buckets would be too many points to plot usefully; switch to daily. */
+        private const val HOURLY_STATS_MAX_HOURS = 24 * 90
 
         /**
          * An inert repo for `@Preview` use: no states ever arrive and actions do nothing.

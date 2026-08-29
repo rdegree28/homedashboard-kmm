@@ -11,7 +11,6 @@ import com.degree.homedash.pets.PetsEntities
 import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
-import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -35,7 +34,6 @@ data class HomeWarning(val message: String, val severity: WarningSeverity)
  * (the cat water fountain level and her medication reminders).
  */
 class HomeViewModel(
-    private val repo: HomeAssistantRepo,
     metadataRepo: EntityMetadataRepo,
     deviceRepo: ExpHomeAssistantRepo,
 ) : ViewModel() {
@@ -71,7 +69,7 @@ class HomeViewModel(
      * [catMedicationWarning]).
      */
     val warnings: StateFlow<List<HomeWarning>> =
-        combine(petEntities.loadDeviceUis(deviceRepo), repo.states) { devices, states ->
+        combine(petEntities.loadDeviceUis(deviceRepo), deviceRepo.loadEntityStates()) { devices, states ->
             devices.filterIsInstance<PetFountainDeviceUi>().mapNotNull(::catWaterWarning) +
                 listOfNotNull(catMedicationWarning(states))
         }

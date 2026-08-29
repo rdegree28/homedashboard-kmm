@@ -1,27 +1,14 @@
 package com.degree.homedash.di
 
-import com.degree.homedash.plants.PlantGraphViewModel
-import com.degree.homedash.plants.PlantsViewModel
 import com.degree.homedash.shared.api.HaConfig
 import com.degree.homedash.shared.dao.AuthRepo
 import com.degree.homedash.shared.dao.FeatureFlagDao
 import com.degree.homedash.shared.data.ConfigStore
-import com.degree.homedash.shared.di.sharedModule
 import com.degree.homedash.shared.repo.EntityMetadataRepo
-import com.degree.homedash.shared.repo.HomeAssistantRepo
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
+import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import org.koin.core.annotation.KoinExperimentalAPI
-import org.koin.core.parameter.parametersOf
-import org.koin.dsl.koinApplication
 import org.koin.test.verify.verify
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertNotNull
 
 /**
  * Guards the DI graph. A missing binding compiles fine and only blows up when the screen is opened,
@@ -29,32 +16,12 @@ import kotlin.test.assertNotNull
  */
 class AppModuleTest {
 
-    // ViewModels build their state flows on viewModelScope, which needs a main dispatcher.
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @BeforeTest
-    fun setUp() = Dispatchers.setMain(UnconfinedTestDispatcher())
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @AfterTest
-    fun tearDown() = Dispatchers.resetMain()
-
-    /**
-     * The ViewModels that can be built off-device resolve and construct from the real two-module graph.
-     *
-     * Only Plants and its graph screen qualify. Everything else — Home, Office, Living Room, Pets,
-     * WaterGraph, and AppViewModel — reaches `EntityMetadataRepo` or `ConfigStore`, both of which lead
-     * to multiplatform-settings' no-arg factory and so need a real Android context. Covering those here
-     * would mean adding Robolectric; until then their wiring is checked by
-     * [appModuleDefinitionsAreSatisfiable], which never instantiates anything.
-     */
-    @Test
-    fun contextFreeViewModelsResolve() {
-        val koin = koinApplication { modules(sharedModule, appModule(defaultConfig = null)) }.koin
-
-        assertNotNull(koin.get<PlantsViewModel>())
-        // Takes its entity id as a runtime parameter.
-        assertNotNull(koin.get<PlantGraphViewModel> { parametersOf("sensor.louie_moisture_sensor_soil_moisture") })
-    }
+    // No `contextFreeViewModelsResolve` counterpart any more: every ViewModel now reads its roster
+    // from `EntityMetadataRepo`, which leads to multiplatform-settings' no-arg factory and so needs a
+    // real Android context. Plants and PlantGraph were the last two that could be built off-device,
+    // and they went the same way when they moved onto the roster. Restoring that check means adding
+    // Robolectric; until then [appModuleDefinitionsAreSatisfiable] is the guard, and it never
+    // instantiates anything.
 
     /**
      * Reflection-only check that every constructor parameter of every definition in [appModule] is
@@ -74,7 +41,7 @@ class AppModuleTest {
                 ConfigStore::class,
                 AuthRepo::class,
                 FeatureFlagDao::class,
-                HomeAssistantRepo::class,
+                ExpHomeAssistantRepo::class,
                 EntityMetadataRepo::class,
             ),
         )
@@ -82,6 +49,5 @@ class AppModuleTest {
 
     // sharedModule deliberately gets no verify() counterpart: several of its types take defaulted
     // constructor args (ConfigStore's Settings) or internal ones (AuthRepo's AuthDao, which this
-    // module can't even name), and verify() reflects on constructors without seeing either. Its
-    // bindings are covered for real by screenViewModelsResolve instead.
+    // module can't even name), and verify() reflects on constructors without seeing either.
 }

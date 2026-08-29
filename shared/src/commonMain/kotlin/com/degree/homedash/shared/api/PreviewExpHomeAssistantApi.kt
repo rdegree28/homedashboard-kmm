@@ -4,16 +4,29 @@ import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.serialization.json.JsonObject
 
 /** Backs [ExpHomeAssistantRepo.preview]; every call is a no-op. */
 internal object PreviewExpHomeAssistantApi : ExpHomeAssistantApi {
     override fun loadAllStates(): Flow<Map<String, EntityState>> = emptyFlow()
 
-    // Emits (empty) rather than never, so a device combining history with its entities still produces a state.
-    override fun loadHistoryForEntity(entityId: String, hoursBack: Int): Flow<List<HistoryPoint>> = flowOf(emptyList())
+    // Never connects, so a preview shows whatever its hand-built state says rather than a live one.
+    override val connection: StateFlow<HaConnectionStatus> = MutableStateFlow(HaConnectionStatus.Disconnected)
+
+    override fun connect(config: HaConfig) = Unit
+    override fun disconnect() = Unit
+
+    override suspend fun history(entityId: String, startIso: String, endIso: String): List<HistoryPoint> = emptyList()
+
+    override suspend fun statistics(
+        entityId: String,
+        startIso: String,
+        endIso: String,
+        period: HaProtocolHelper.StatisticsPeriod,
+    ): List<HistoryPoint> = emptyList()
 
     override fun toggleEntity(entityId: String) = Unit
     override fun callService(

@@ -7,7 +7,6 @@ import com.degree.homedash.controls.SoilMoistureDeviceUi
 import com.degree.homedash.controls.loadDeviceUis
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
-import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.api.HaConnectionStatus
 import kotlinx.coroutines.flow.Flow
@@ -33,17 +32,11 @@ data class PlantGraphUiState(
  * [entityId] arrives as the destination's navigation argument — the row the user tapped on the Plants
  * list — and is looked up in the same roster that list renders, so this screen shows the sensor under
  * the name and metadata the rest of the app uses rather than a second description of it.
- *
- * Two repos, deliberately: the reading at the top of the screen is a device, projected through
- * [ExpHomeAssistantRepo] like every other card, while the chart's history still comes from
- * [HomeAssistantRepo] — its ranges reach a year back, where the recorder's raw states are long purged
- * and only that repo's long-term-statistics path returns anything.
  */
 class PlantGraphViewModel(
-    private val repo: HomeAssistantRepo,
     private val entityId: String,
     metadataRepo: EntityMetadataRepo,
-    deviceRepo: ExpHomeAssistantRepo,
+    private val repo: ExpHomeAssistantRepo,
 ) : ViewModel() {
 
     private val range = MutableStateFlow(TimeRange.WEEK)
@@ -57,7 +50,7 @@ class PlantGraphViewModel(
     private val plant: Flow<SoilMoistureDeviceUi?> =
         metadataRepo.loadPlantsEntityMetadataList()
             .filter { it.entityId == entityId }
-            .loadDeviceUis(deviceRepo)
+            .loadDeviceUis(repo)
             .map { devices -> devices.filterIsInstance<SoilMoistureDeviceUi>().firstOrNull() }
 
     val uiState: StateFlow<PlantGraphUiState> =
@@ -72,7 +65,7 @@ class PlantGraphViewModel(
             combine(repo.connection, range) { connection, range -> connection to range }
                 .collect { (connection, range) ->
                     if (connection == HaConnectionStatus.Connected) {
-                        runCatching { history.value = repo.history(entityId, hoursBack = range.hoursBack) }
+                        runCatching { history.value = repo.getHistoryForEntity(entityId, hoursBack = range.hoursBack) }
                     }
                 }
         }

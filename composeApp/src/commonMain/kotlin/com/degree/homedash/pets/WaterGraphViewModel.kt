@@ -8,7 +8,6 @@ import com.degree.homedash.plants.TimeRange
 import com.degree.homedash.shared.model.device_metadata.PetFountainMetadata
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
-import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.api.HaConnectionStatus
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,17 +28,11 @@ data class WaterGraphUiState(
 
 /**
  * Owns the selected [TimeRange] and re-fetches level history for [entityId] as it/connection change.
- *
- * Two repos, deliberately: the reading at the top of the screen is a device, projected through
- * [ExpHomeAssistantRepo] like every other card, while the chart's history still comes from
- * [HomeAssistantRepo] — its ranges reach a year back, where the recorder's raw states are long purged
- * and only that repo's long-term-statistics path returns anything.
  */
 class WaterGraphViewModel(
-    private val repo: HomeAssistantRepo,
     private val entityId: String,
     metadataRepo: EntityMetadataRepo,
-    deviceRepo: ExpHomeAssistantRepo,
+    private val repo: ExpHomeAssistantRepo,
 ) : ViewModel() {
 
     /** The graphed entity's descriptor, so this screen's title matches the Pets list it was opened from. */
@@ -53,7 +46,7 @@ class WaterGraphViewModel(
     private val history = MutableStateFlow<List<HistoryPoint>>(emptyList())
 
     /** The fountain itself, projected through its own metadata the way the Pets list renders it. */
-    private val item = metadata.loadState(deviceRepo)
+    private val item = metadata.loadState(repo)
         .map { state -> PetFountainDeviceUi(metadata = metadata, state = state) }
 
     val uiState: StateFlow<WaterGraphUiState> =
@@ -69,7 +62,7 @@ class WaterGraphViewModel(
                 .collect { (connection, range) ->
                     if (connection == HaConnectionStatus.Connected) {
                         runCatching {
-                            history.value = repo.history(entityId, hoursBack = range.hoursBack).dropTransientDips()
+                            history.value = repo.getHistoryForEntity(entityId, hoursBack = range.hoursBack).dropTransientDips()
                         }
                     }
                 }

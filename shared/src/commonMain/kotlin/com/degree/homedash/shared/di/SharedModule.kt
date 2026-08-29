@@ -5,13 +5,10 @@ import com.degree.homedash.shared.dao.FeatureFlagDao
 import com.degree.homedash.shared.dao.FeatureFlagDaoStaticImpl
 import com.degree.homedash.shared.data.ConfigStore
 import com.degree.homedash.shared.repo.EntityMetadataRepo
-import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.shared.api.HaClient
 import com.degree.homedash.shared.api.HaWebSocketClient
 import com.degree.homedash.shared.api.ExpHomeAssistantApi
-import com.degree.homedash.shared.api.HomeAssistantApi
 import com.degree.homedash.shared.api.WebSocketExpHomeAssistantApi
-import com.degree.homedash.shared.api.WebSocketHomeAssistantApi
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import org.koin.dsl.module
 
@@ -21,9 +18,7 @@ import org.koin.dsl.module
  */
 val sharedModule = module {
     single<HaClient> { HaWebSocketClient() }
-    single<HomeAssistantApi> { WebSocketHomeAssistantApi(get()) }
     single<ExpHomeAssistantApi> { WebSocketExpHomeAssistantApi(get()) }
-    single { HomeAssistantRepo(get()) }
     single { ExpHomeAssistantRepo(get()) }
     single { EntityMetadataRepo(get(), get()) }
     single { ConfigStore() }
