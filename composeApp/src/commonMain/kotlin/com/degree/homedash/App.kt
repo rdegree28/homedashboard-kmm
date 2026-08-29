@@ -37,6 +37,8 @@ import com.degree.homedash.pets.PetsScreen
 import com.degree.homedash.pets.PetFountainGraphScreen
 import com.degree.homedash.plants.PlantGraphScreen
 import com.degree.homedash.plants.PlantsScreen
+import com.degree.homedash.settings.LoginScreen
+import com.degree.homedash.settings.SettingsScreen
 import com.degree.homedash.shared.api.HaConfig
 import com.degree.homedash.shared.di.sharedModule
 import com.degree.homedash.shared.model.FeatureFlag
@@ -110,7 +112,8 @@ private fun AppContent() {
                                 if (backStack.size > 1) {
                                     goBack()
                                 } else {
-                                    backStack[0] = if (currentUser == null) Screen.Login else Screen.Home
+                                    backStack[0] =
+                                        if (currentUser == null) Screen.Login else Screen.Home
                                 }
                             },
                             onCancel = if (backStack.size > 1) ({ goBack() }) else null,

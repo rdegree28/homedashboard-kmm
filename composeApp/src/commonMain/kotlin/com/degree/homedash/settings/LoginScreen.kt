@@ -1,4 +1,4 @@
-package com.degree.homedash
+package com.degree.homedash.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
