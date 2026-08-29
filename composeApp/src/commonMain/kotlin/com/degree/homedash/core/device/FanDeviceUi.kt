@@ -3,7 +3,7 @@ package com.degree.homedash.core.device
 import androidx.compose.runtime.Immutable
 import com.degree.homedash.shared.model.device_metadata.FanMetadata
 import com.degree.homedash.shared.model.device_state.FanState
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 
 /**
  * Render state for a fan card: the static descriptor plus the live state, both plain values.
@@ -33,19 +33,19 @@ data class FanDeviceUi(
     val hasMisting: Boolean = metadata.misting != null
     val isMisting: Boolean = state.isMisting
 
-    fun onToggle(repo: ExpHomeAssistantRepo) = metadata.onToggle(repo)
+    fun onToggle(repo: HomeAssistantRepo) = metadata.onToggle(repo)
 
-    fun toggleOscillation(repo: ExpHomeAssistantRepo) = metadata.setOscillationState(
+    fun toggleOscillation(repo: HomeAssistantRepo) = metadata.setOscillationState(
         newOscillationState = !isOscillating,
         repo = repo,
     )
 
-    fun toggleMisting(repo: ExpHomeAssistantRepo) = metadata.setMistingState(
+    fun toggleMisting(repo: HomeAssistantRepo) = metadata.setMistingState(
         newMistingState = !isMisting,
         repo = repo,
     )
 
-    fun setFanSpeed(percentage: Int, repo: ExpHomeAssistantRepo) = metadata.setFanSpeed(
+    fun setFanSpeed(percentage: Int, repo: HomeAssistantRepo) = metadata.setFanSpeed(
         newFanPercentage = percentage,
         repo = repo,
     )

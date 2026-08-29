@@ -36,7 +36,7 @@ import kotlin.time.ExperimentalTime
  * api. Device actions take metadata rather than ids — driving a device needs its identity, not its
  * live value — and are reached through the matching `DeviceMetadata` methods.
  */
-class ExpHomeAssistantRepo internal constructor(
+class HomeAssistantRepo internal constructor(
     private val api: ExpHomeAssistantApi,
 ) {
 
@@ -259,6 +259,6 @@ class ExpHomeAssistantRepo internal constructor(
          * resolve. This exists because the real constructor is internal to `:shared`, so `:composeApp`
          * can't build a stand-in itself.
          */
-        fun preview(): ExpHomeAssistantRepo = ExpHomeAssistantRepo(PreviewExpHomeAssistantApi)
+        fun preview(): HomeAssistantRepo = HomeAssistantRepo(PreviewExpHomeAssistantApi)
     }
 }

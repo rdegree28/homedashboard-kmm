@@ -43,7 +43,7 @@ import com.degree.homedash.shared.api.HaConfig
 import com.degree.homedash.shared.di.sharedModule
 import com.degree.homedash.shared.model.FeatureFlag
 import com.degree.homedash.shared.model.device_metadata.NavigationMetadata.NavigationTarget
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 import com.degree.homedash.ui.LocalHaConnectionStatus
@@ -68,7 +68,7 @@ private fun AppContent() {
     val config by appVm.config.collectAsStateWithLifecycle()
     val currentUser by appVm.currentUser.collectAsStateWithLifecycle()
     val featureFlags by appVm.featureFlags.collectAsStateWithLifecycle()
-    val repository: ExpHomeAssistantRepo = koinInject()
+    val repository: HomeAssistantRepo = koinInject()
     val connection by repository.connection.collectAsStateWithLifecycle()
 
     // Entity id whose history is shown on the PlantGraph destination.

@@ -1,7 +1,7 @@
 package com.degree.homedash.shared.model.device_metadata
 
 import com.degree.homedash.shared.model.device_state.OfficeSignalState
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -24,7 +24,7 @@ data class OfficeSignalMetadata(
     val modeScripts: Map<SignalMode, String>,
 ) : StatefulDeviceMetadata<OfficeSignalState> {
 
-    override fun loadState(repo: ExpHomeAssistantRepo): Flow<OfficeSignalState> =
+    override fun loadState(repo: HomeAssistantRepo): Flow<OfficeSignalState> =
         repo.entityForDevice(this).map { entity ->
             OfficeSignalState(
                 entityId = entityId,
@@ -34,7 +34,7 @@ data class OfficeSignalMetadata(
         }
 
     /** Switches the signal to [mode]. Fire-and-forget; the sensor reports the result. */
-    fun setMode(mode: SignalMode, repo: ExpHomeAssistantRepo) {
+    fun setMode(mode: SignalMode, repo: HomeAssistantRepo) {
         val script = modeScripts[mode]
         if (script == null) repo.turnOff(trafficLight) else repo.runScript(script)
     }

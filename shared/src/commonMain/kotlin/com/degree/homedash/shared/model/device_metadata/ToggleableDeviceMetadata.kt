@@ -1,6 +1,6 @@
 package com.degree.homedash.shared.model.device_metadata
 
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 
 /**
  * Metadata for a device that can be flipped on and off.
@@ -20,5 +20,5 @@ sealed interface ToggleableDeviceMetadata {
      * Flips the device through [repo]. Fire-and-forget: HA reports the result by pushing a new state,
      * so there is nothing to await and nothing to hand back.
      */
-    fun onToggle(repo: ExpHomeAssistantRepo) = repo.toggleEntity(this)
+    fun onToggle(repo: HomeAssistantRepo) = repo.toggleEntity(this)
 }

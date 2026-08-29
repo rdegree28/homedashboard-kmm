@@ -21,7 +21,7 @@ import kotlin.test.assertEquals
  * Covers the exact wire shape of the `climate.*` service calls. Previews can show the card's every
  * state but can't catch a misspelled service name or a mode sent as `"Cool"` instead of `"cool"`.
  */
-class ExpHomeAssistantRepoTest {
+class HomeAssistantRepoTest {
 
     private val thermostat = ThermostatMetadata(
         entityId = "climate.living_room_thermostat",
@@ -32,7 +32,7 @@ class ExpHomeAssistantRepoTest {
     fun setTargetTemperatureCallsClimateSetTemperature() = runTest {
         val api = FakeExpHomeAssistantApi()
 
-        ExpHomeAssistantRepo(api).setTargetTemperature(thermostat, 72.0)
+        HomeAssistantRepo(api).setTargetTemperature(thermostat, 72.0)
 
         assertEquals(
             FakeExpHomeAssistantApi.ServiceCall(
@@ -47,7 +47,7 @@ class ExpHomeAssistantRepoTest {
     fun setHvacModeSendsHomeAssistantsSnakeCaseValue() = runTest {
         val api = FakeExpHomeAssistantApi()
 
-        ExpHomeAssistantRepo(api).setHvacMode(thermostat, HvacMode.HeatCool)
+        HomeAssistantRepo(api).setHvacMode(thermostat, HvacMode.HeatCool)
 
         assertEquals(
             FakeExpHomeAssistantApi.ServiceCall(
@@ -72,7 +72,7 @@ class ExpHomeAssistantRepoTest {
     fun setThermostatFanModeCallsClimateNotFan() = runTest {
         val api = FakeExpHomeAssistantApi()
 
-        ExpHomeAssistantRepo(api).setThermostatFanMode(thermostat, "low")
+        HomeAssistantRepo(api).setThermostatFanMode(thermostat, "low")
 
         assertEquals(
             FakeExpHomeAssistantApi.ServiceCall(
@@ -87,7 +87,7 @@ class ExpHomeAssistantRepoTest {
     fun setPresetModeCallsClimateSetPresetMode() = runTest {
         val api = FakeExpHomeAssistantApi()
 
-        ExpHomeAssistantRepo(api).setPresetMode(thermostat, "eco")
+        HomeAssistantRepo(api).setPresetMode(thermostat, "eco")
 
         assertEquals(
             FakeExpHomeAssistantApi.ServiceCall(
@@ -108,7 +108,7 @@ class ExpHomeAssistantRepoTest {
             extremeToggle = ThermostatMetadata.ExtremeToggle("input_boolean.extreme_temperatures"),
         )
 
-        ExpHomeAssistantRepo(api).setExtremeTemperatures(withHelper, extreme = true)
+        HomeAssistantRepo(api).setExtremeTemperatures(withHelper, extreme = true)
 
         assertEquals(
             FakeExpHomeAssistantApi.ServiceCall(
@@ -122,7 +122,7 @@ class ExpHomeAssistantRepoTest {
     fun setExtremeTemperaturesIsANoOpWithoutAHelper() = runTest {
         val api = FakeExpHomeAssistantApi()
 
-        ExpHomeAssistantRepo(api).setExtremeTemperatures(thermostat, extreme = true)
+        HomeAssistantRepo(api).setExtremeTemperatures(thermostat, extreme = true)
 
         assertEquals(0, api.serviceCalls.size)
     }
@@ -137,8 +137,8 @@ class ExpHomeAssistantRepoTest {
         api.historyResult = listOf(HistoryPoint(1.0, 40.0))
 
         // A day and a full week both stay inside the purge window.
-        assertEquals(api.historyResult, ExpHomeAssistantRepo(api).getHistoryForEntity("sensor.power", hoursBack = 24))
-        assertEquals(api.historyResult, ExpHomeAssistantRepo(api).getHistoryForEntity("sensor.power", hoursBack = 24 * 7))
+        assertEquals(api.historyResult, HomeAssistantRepo(api).getHistoryForEntity("sensor.power", hoursBack = 24))
+        assertEquals(api.historyResult, HomeAssistantRepo(api).getHistoryForEntity("sensor.power", hoursBack = 24 * 7))
 
         assertEquals(2, api.historyCalls.size)
         assertEquals(0, api.statisticsCalls.size)
@@ -149,8 +149,8 @@ class ExpHomeAssistantRepoTest {
         val api = FakeExpHomeAssistantApi()
         api.statisticsResult = listOf(HistoryPoint(1.0, 40.0, min = 10.0, max = 90.0))
 
-        assertEquals(api.statisticsResult, ExpHomeAssistantRepo(api).getHistoryForEntity("sensor.power", hoursBack = 24 * 30))
-        assertEquals(api.statisticsResult, ExpHomeAssistantRepo(api).getHistoryForEntity("sensor.power", hoursBack = 24 * 365))
+        assertEquals(api.statisticsResult, HomeAssistantRepo(api).getHistoryForEntity("sensor.power", hoursBack = 24 * 30))
+        assertEquals(api.statisticsResult, HomeAssistantRepo(api).getHistoryForEntity("sensor.power", hoursBack = 24 * 365))
 
         assertEquals(0, api.historyCalls.size)
         // A month of hourly buckets is ~720 points; a year of them would be ~8,700, so that steps to daily.
@@ -168,7 +168,7 @@ class ExpHomeAssistantRepoTest {
         api.historyResult = listOf(HistoryPoint(1.0, 40.0))
 
         // Sensors without a state_class never get statistics — a short chart beats a blank one.
-        assertEquals(api.historyResult, ExpHomeAssistantRepo(api).getHistoryForEntity("sensor.odd", hoursBack = 24 * 30))
+        assertEquals(api.historyResult, HomeAssistantRepo(api).getHistoryForEntity("sensor.odd", hoursBack = 24 * 30))
 
         assertEquals(1, api.statisticsCalls.size)
         assertEquals(1, api.historyCalls.size)

@@ -10,7 +10,7 @@ import kotlinx.serialization.json.JsonObject
  * The experimental stack's Home Assistant surface: live typed states in, entity actions out.
  *
  * Internal to the module — repos are the public boundary, so callers outside `:shared` reach this
- * through [com.degree.homedash.shared.repo.ExpHomeAssistantRepo] rather than holding an api.
+ * through [com.degree.homedash.shared.repo.HomeAssistantRepo] rather than holding an api.
  */
 internal interface ExpHomeAssistantApi {
 

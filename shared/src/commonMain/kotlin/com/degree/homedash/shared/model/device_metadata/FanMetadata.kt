@@ -1,7 +1,7 @@
 package com.degree.homedash.shared.model.device_metadata
 
 import com.degree.homedash.shared.model.device_state.FanState
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
@@ -26,7 +26,7 @@ data class FanMetadata(
      * fan attribute (see [MistingControl]), so its flow is combined in rather than read off [entityId].
      * A fan with no mister contributes a constant null instead.
      */
-    override fun loadState(repo: ExpHomeAssistantRepo): Flow<FanState> =
+    override fun loadState(repo: HomeAssistantRepo): Flow<FanState> =
         combine(
             repo.entityForDevice(this),
             misting?.let { repo.entityFor(it.entityId) } ?: flowOf(null),
@@ -70,15 +70,15 @@ data class FanMetadata(
         }
     }
 
-    fun setFanSpeed(newFanPercentage: Int, repo: ExpHomeAssistantRepo) {
+    fun setFanSpeed(newFanPercentage: Int, repo: HomeAssistantRepo) {
         repo.setFanPercentage(metadata = this, percentage = newFanPercentage)
     }
 
-    fun setOscillationState(newOscillationState: Boolean, repo: ExpHomeAssistantRepo) {
+    fun setOscillationState(newOscillationState: Boolean, repo: HomeAssistantRepo) {
         repo.setFanOscillating(metadata = this, oscillating = newOscillationState)
     }
 
-    fun setMistingState(newMistingState: Boolean, repo: ExpHomeAssistantRepo) {
+    fun setMistingState(newMistingState: Boolean, repo: HomeAssistantRepo) {
         repo.setMisting(metadata = this, misting = newMistingState)
     }
 

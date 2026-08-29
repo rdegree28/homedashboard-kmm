@@ -12,7 +12,7 @@ import com.degree.homedash.core.device.OfficeSignalDeviceUi
 import com.degree.homedash.core.device.OfficeWorkstationUi
 import com.degree.homedash.core.loadDeviceUis
 import com.degree.homedash.shared.repo.EntityMetadataRepo
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -35,7 +35,7 @@ data class OfficeUiState(
  */
 class OfficeViewModel(
     metadataRepo: EntityMetadataRepo,
-    deviceRepo: ExpHomeAssistantRepo,
+    deviceRepo: HomeAssistantRepo,
 ) : ViewModel() {
 
     val uiState: StateFlow<OfficeUiState> =

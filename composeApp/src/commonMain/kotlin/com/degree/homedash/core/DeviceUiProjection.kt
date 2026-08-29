@@ -23,7 +23,7 @@ import com.degree.homedash.shared.model.device_metadata.PetFountainMetadata
 import com.degree.homedash.shared.model.device_metadata.SoilMoistureMetadata
 import com.degree.homedash.shared.model.device_metadata.ThermostatMetadata
 import com.degree.homedash.shared.model.device_metadata.TriggerDeviceMetadata
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
@@ -40,7 +40,7 @@ import kotlinx.coroutines.flow.map
  * Null only for [NavigationMetadata], which the launcher builds itself; every other metadata type
  * has a device control, and leaving the `when` exhaustive means a new one can't be forgotten here.
  */
-fun DeviceMetadata.loadUi(repo: ExpHomeAssistantRepo): Flow<DeviceUi>? = when (this) {
+fun DeviceMetadata.loadUi(repo: HomeAssistantRepo): Flow<DeviceUi>? = when (this) {
     is LightMetadata -> {
         val metadata = this
         loadState(repo).map { state -> LightDeviceUi(metadata = metadata, state = state) }
@@ -101,7 +101,7 @@ fun DeviceMetadata.loadUi(repo: ExpHomeAssistantRepo): Flow<DeviceUi>? = when (t
  * The empty case is guarded because `combine` over no flows never emits — without it a roster with no
  * stateful devices would stall the caller's own `combine` and leave the screen blank.
  */
-fun List<DeviceMetadata>.loadDeviceUis(repo: ExpHomeAssistantRepo): Flow<List<DeviceUi>> {
+fun List<DeviceMetadata>.loadDeviceUis(repo: HomeAssistantRepo): Flow<List<DeviceUi>> {
     val flows = mapNotNull { metadata -> metadata.loadUi(repo) }
     if (flows.isEmpty()) return flowOf(emptyList())
     return combine(flows) { uis -> uis.toList() }

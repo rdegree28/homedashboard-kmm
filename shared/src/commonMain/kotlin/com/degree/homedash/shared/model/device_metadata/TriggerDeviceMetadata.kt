@@ -1,6 +1,6 @@
 package com.degree.homedash.shared.model.device_metadata
 
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 
 /**
  * A pressable card that fires a Home Assistant service — activating a scene, running a script,
@@ -32,7 +32,7 @@ data class TriggerDeviceMetadata(
      * Fires this card's call through [repo]. Fire-and-forget: a scene or script reports its result by
      * pushing new states for whatever it touched, so there is nothing to await and nothing to hand back.
      */
-    fun onActivate(repo: ExpHomeAssistantRepo) = repo.activateTrigger(this)
+    fun onActivate(repo: HomeAssistantRepo) = repo.activateTrigger(this)
 
     companion object
 }

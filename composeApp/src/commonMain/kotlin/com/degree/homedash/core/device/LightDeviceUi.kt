@@ -3,7 +3,7 @@ package com.degree.homedash.core.device
 import androidx.compose.runtime.Immutable
 import com.degree.homedash.shared.model.device_metadata.LightMetadata
 import com.degree.homedash.shared.model.device_state.LightState
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 
 /**
  * Render state for a light card: the static descriptor plus the live state, both plain values.
@@ -28,7 +28,7 @@ data class LightDeviceUi(
     val icon: LightMetadata.LightIcon get() = metadata.icon
     val tint: Long get() = metadata.tint
 
-    fun onToggle(repo: ExpHomeAssistantRepo) = metadata.onToggle(repo)
+    fun onToggle(repo: HomeAssistantRepo) = metadata.onToggle(repo)
 
     override val cardSpan: Int
         get() = 1

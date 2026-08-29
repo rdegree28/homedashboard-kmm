@@ -5,7 +5,7 @@ import com.degree.homedash.shared.model.device_metadata.HvacAction
 import com.degree.homedash.shared.model.device_metadata.HvacMode
 import com.degree.homedash.shared.model.device_metadata.ThermostatMetadata
 import com.degree.homedash.shared.model.device_state.ThermostatState
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 
 /**
  * Render state for a thermostat card: the static descriptor plus the live readings.
@@ -37,15 +37,15 @@ data class ThermostatDeviceUi(
     val presetMode: String? get() = state.presetMode
     val extremeActive: Boolean get() = state.extremeActive
 
-    fun setTargetTemperature(temperature: Double, repo: ExpHomeAssistantRepo) =
+    fun setTargetTemperature(temperature: Double, repo: HomeAssistantRepo) =
         metadata.setTargetTemperature(temperature, repo)
 
-    fun setHvacMode(mode: HvacMode, repo: ExpHomeAssistantRepo) = metadata.setHvacMode(mode, repo)
+    fun setHvacMode(mode: HvacMode, repo: HomeAssistantRepo) = metadata.setHvacMode(mode, repo)
 
-    fun setFanMode(mode: String, repo: ExpHomeAssistantRepo) = metadata.setFanMode(mode, repo)
+    fun setFanMode(mode: String, repo: HomeAssistantRepo) = metadata.setFanMode(mode, repo)
 
-    fun setPresetMode(mode: String, repo: ExpHomeAssistantRepo) = metadata.setPresetMode(mode, repo)
+    fun setPresetMode(mode: String, repo: HomeAssistantRepo) = metadata.setPresetMode(mode, repo)
 
-    fun setExtremeTemperatures(extreme: Boolean, repo: ExpHomeAssistantRepo) =
+    fun setExtremeTemperatures(extreme: Boolean, repo: HomeAssistantRepo) =
         metadata.setExtremeTemperatures(extreme, repo)
 }

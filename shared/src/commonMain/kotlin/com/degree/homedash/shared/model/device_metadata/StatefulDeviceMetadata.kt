@@ -1,7 +1,7 @@
 package com.degree.homedash.shared.model.device_metadata
 
 import com.degree.homedash.shared.model.device_state.DeviceState
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -28,6 +28,6 @@ sealed interface StatefulDeviceMetadata<out S : DeviceState> : DeviceMetadata {
      * vanishing from the screen.
      */
     fun loadState(
-        repo: ExpHomeAssistantRepo,
+        repo: HomeAssistantRepo,
     ): Flow<S>
 }

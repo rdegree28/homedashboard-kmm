@@ -1,7 +1,7 @@
 package com.degree.homedash.shared.model.device_metadata
 
 import com.degree.homedash.shared.model.device_state.ThermostatState
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
@@ -55,7 +55,7 @@ data class ThermostatMetadata(
      * that isn't there. [extremeActive] is deliberately outside that guard — it belongs to the helper,
      * not the thermostat, and the preset pills still need to show which setpoints they would write.
      */
-    override fun loadState(repo: ExpHomeAssistantRepo): Flow<ThermostatState> =
+    override fun loadState(repo: HomeAssistantRepo): Flow<ThermostatState> =
         combine(
             repo.entityForDevice(this),
             extremeToggle?.let { repo.entityFor(it.entityId) } ?: flowOf(null),
@@ -79,22 +79,22 @@ data class ThermostatMetadata(
         }
 
     /** Writes a new setpoint. Fire-and-forget, like every other device action. */
-    fun setTargetTemperature(temperature: Double, repo: ExpHomeAssistantRepo) =
+    fun setTargetTemperature(temperature: Double, repo: HomeAssistantRepo) =
         repo.setTargetTemperature(metadata = this, temperature = temperature)
 
-    fun setHvacMode(mode: HvacMode, repo: ExpHomeAssistantRepo) =
+    fun setHvacMode(mode: HvacMode, repo: HomeAssistantRepo) =
         repo.setHvacMode(metadata = this, mode = mode)
 
     /** [mode] is one of the vendor strings [fanModes] declares, not a `fan.*` entity speed. */
-    fun setFanMode(mode: String, repo: ExpHomeAssistantRepo) =
+    fun setFanMode(mode: String, repo: HomeAssistantRepo) =
         repo.setThermostatFanMode(metadata = this, fanMode = mode)
 
     /** [mode] is one of the vendor strings [presetModes] declares — HA's presets, not ours. */
-    fun setPresetMode(mode: String, repo: ExpHomeAssistantRepo) =
+    fun setPresetMode(mode: String, repo: HomeAssistantRepo) =
         repo.setPresetMode(metadata = this, presetMode = mode)
 
     /** Flips the [extremeToggle] helper; a no-op on a thermostat that declares none. */
-    fun setExtremeTemperatures(extreme: Boolean, repo: ExpHomeAssistantRepo) =
+    fun setExtremeTemperatures(extreme: Boolean, repo: HomeAssistantRepo) =
         repo.setExtremeTemperatures(metadata = this, extreme = extreme)
 
     /**

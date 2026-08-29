@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.degree.homedash.core.device.PetFountainDeviceUi
 import com.degree.homedash.core.loadDeviceUis
 import com.degree.homedash.shared.repo.EntityMetadataRepo
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -21,7 +21,7 @@ data class PetsUiState(
 /** Projects the configured Pets sensors (the cat water fountain) into [PetsUiState]. */
 class PetsViewModel(
     metadataRepo: EntityMetadataRepo,
-    deviceRepo: ExpHomeAssistantRepo,
+    deviceRepo: HomeAssistantRepo,
 ) : ViewModel() {
 
     val uiState: StateFlow<PetsUiState> =

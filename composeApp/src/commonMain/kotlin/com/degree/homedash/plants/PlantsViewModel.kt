@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.degree.homedash.core.device.SoilMoistureDeviceUi
 import com.degree.homedash.core.loadDeviceUis
 import com.degree.homedash.shared.repo.EntityMetadataRepo
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -27,7 +27,7 @@ data class PlantsUiState(val plants: List<SoilMoistureDeviceUi>)
  */
 class PlantsViewModel(
     metadataRepo: EntityMetadataRepo,
-    deviceRepo: ExpHomeAssistantRepo,
+    deviceRepo: HomeAssistantRepo,
 ) : ViewModel() {
 
     val uiState: StateFlow<PlantsUiState> =

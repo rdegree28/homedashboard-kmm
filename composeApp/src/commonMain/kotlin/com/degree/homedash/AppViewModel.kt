@@ -8,7 +8,7 @@ import com.degree.homedash.shared.dao.FeatureFlagDao
 import com.degree.homedash.shared.data.ConfigStore
 import com.degree.homedash.shared.model.AuthUser
 import com.degree.homedash.shared.model.FeatureFlag
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -27,7 +27,7 @@ class AppViewModel(
     private val configStore: ConfigStore,
     private val authRepo: AuthRepo,
     private val featureFlagDao: FeatureFlagDao,
-    private val repository: ExpHomeAssistantRepo,
+    private val repository: HomeAssistantRepo,
 ) : ViewModel() {
 
     private val _config = MutableStateFlow(configStore.load() ?: defaultConfig)

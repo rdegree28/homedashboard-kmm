@@ -8,7 +8,7 @@ import com.degree.homedash.core.loadDeviceUis
 import com.degree.homedash.shared.api.HaConnectionStatus
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.repo.EntityMetadataRepo
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -36,7 +36,7 @@ data class PlantGraphUiState(
 class PlantGraphViewModel(
     private val entityId: String,
     metadataRepo: EntityMetadataRepo,
-    private val repo: ExpHomeAssistantRepo,
+    private val repo: HomeAssistantRepo,
 ) : ViewModel() {
 
     private val range = MutableStateFlow(TimeRange.WEEK)

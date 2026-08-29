@@ -3,7 +3,7 @@ package com.degree.homedash.core.device
 import androidx.compose.runtime.Immutable
 import com.degree.homedash.shared.model.device_metadata.OfficeSignalMetadata
 import com.degree.homedash.shared.model.device_state.OfficeSignalState
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 
 /**
  * Render state for the office signal selector.
@@ -24,7 +24,7 @@ data class OfficeSignalDeviceUi(
     val activeMode: OfficeSignalMetadata.SignalMode? get() = state.mode
     val offline: Boolean get() = state.isOffline
 
-    fun select(mode: OfficeSignalMetadata.SignalMode, repo: ExpHomeAssistantRepo) =
+    fun select(mode: OfficeSignalMetadata.SignalMode, repo: HomeAssistantRepo) =
         metadata.setMode(mode, repo)
 
     /** Full width: four pills don't fit a half-width tile. */

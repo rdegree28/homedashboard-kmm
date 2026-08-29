@@ -2,7 +2,7 @@ package com.degree.homedash.shared.model.device_metadata
 
 import com.degree.homedash.shared.model.device_state.PetFilterState
 import com.degree.homedash.shared.model.toReading
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
@@ -37,7 +37,7 @@ data class PetFountainMetadata(
      * `sensor.*` rather than an attribute of the water level, so its flow is combined in rather than
      * read off [entityId]. A fountain with no filter contributes a constant null instead.
      */
-    override fun loadState(repo: ExpHomeAssistantRepo): Flow<PetFilterState> =
+    override fun loadState(repo: HomeAssistantRepo): Flow<PetFilterState> =
         combine(
             repo.entityForDevice(this),
             filterHealth?.let { repo.entityFor(it.entityId) } ?: flowOf(null),

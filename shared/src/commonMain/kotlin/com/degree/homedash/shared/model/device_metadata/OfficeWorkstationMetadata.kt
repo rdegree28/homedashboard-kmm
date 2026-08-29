@@ -2,7 +2,7 @@ package com.degree.homedash.shared.model.device_metadata
 
 import com.degree.homedash.shared.model.toReading
 import com.degree.homedash.shared.model.device_state.OfficeWorkstationState
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
@@ -29,7 +29,7 @@ data class OfficeWorkstationMetadata(
 ) : ToggleableDeviceMetadata, StatefulDeviceMetadata<OfficeWorkstationState> {
     override val entityId: String = toggleEntityId
 
-    override fun loadState(repo: ExpHomeAssistantRepo): Flow<OfficeWorkstationState> {
+    override fun loadState(repo: HomeAssistantRepo): Flow<OfficeWorkstationState> {
         return combine(
             repo.entityForDevice(this),
             repo.entityFor(currentPowerEntityId),

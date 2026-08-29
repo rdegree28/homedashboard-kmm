@@ -1,7 +1,7 @@
 package com.degree.homedash.shared.model.device_metadata
 
 import com.degree.homedash.shared.model.device_state.LightState
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -21,7 +21,7 @@ data class LightMetadata(
 ) : ToggleableDeviceMetadata, StatefulDeviceMetadata<LightState> {
 
     override fun loadState(
-        repo: ExpHomeAssistantRepo,
+        repo: HomeAssistantRepo,
     ): Flow<LightState> {
         return repo.entityForDevice(this).map { entity ->
             LightState(

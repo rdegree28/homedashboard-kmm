@@ -1,7 +1,7 @@
 package com.degree.homedash.shared.model.device_metadata
 
 import com.degree.homedash.shared.model.device_state.DoorState
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -14,7 +14,7 @@ data class DoorMetadata(
     override val displayName: String,
 ) : StatefulDeviceMetadata<DoorState> {
 
-    override fun loadState(repo: ExpHomeAssistantRepo): Flow<DoorState> =
+    override fun loadState(repo: HomeAssistantRepo): Flow<DoorState> =
         repo.entityForDevice(this).map { entity ->
             DoorState(
                 entityId = entityId,

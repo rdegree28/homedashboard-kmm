@@ -5,7 +5,7 @@ import com.degree.homedash.shared.dao.AuthRepo
 import com.degree.homedash.shared.dao.FeatureFlagDao
 import com.degree.homedash.shared.data.ConfigStore
 import com.degree.homedash.shared.repo.EntityMetadataRepo
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlin.test.Test
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.test.verify.verify
@@ -41,7 +41,7 @@ class AppModuleTest {
                 ConfigStore::class,
                 AuthRepo::class,
                 FeatureFlagDao::class,
-                ExpHomeAssistantRepo::class,
+                HomeAssistantRepo::class,
                 EntityMetadataRepo::class,
             ),
         )

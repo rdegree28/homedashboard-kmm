@@ -23,7 +23,7 @@ import com.degree.homedash.shared.model.device_metadata.factories.livingRoomTher
 import com.degree.homedash.shared.model.device_state.FanState
 import com.degree.homedash.shared.model.device_state.LightState
 import com.degree.homedash.shared.model.device_state.ThermostatState
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlin.math.sin
 import org.koin.compose.KoinApplicationPreview
 import org.koin.dsl.module
@@ -38,14 +38,14 @@ internal val previewHistory: List<HistoryPoint> =
  * Supplies the Koin graph a preview needs.
  *
  * A [DeviceUi] carries its own behavior and reaches for an
- * [ExpHomeAssistantRepo] to run it through — `DeviceControl` resolves one with `koinInject()`. The app
+ * [HomeAssistantRepo] to run it through — `DeviceControl` resolves one with `koinInject()`. The app
  * provides that from its graph, but previews render outside it, so they register an inert repo
  * instead. Without this, any preview containing a device card throws instead of rendering.
  */
 @Composable
 internal fun PreviewKoin(content: @Composable () -> Unit) {
     KoinApplicationPreview(
-        application = { modules(module { single { ExpHomeAssistantRepo.preview() } }) },
+        application = { modules(module { single { HomeAssistantRepo.preview() } }) },
         content = content,
     )
 }

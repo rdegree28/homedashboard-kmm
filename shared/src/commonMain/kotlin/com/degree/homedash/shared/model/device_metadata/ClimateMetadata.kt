@@ -5,7 +5,7 @@ import com.degree.homedash.shared.model.HistoricalEntityReading
 import com.degree.homedash.shared.model.dewPoint
 import com.degree.homedash.shared.model.device_state.ClimateState
 import com.degree.homedash.shared.model.toReading
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -25,7 +25,7 @@ data class ClimateMetadata(
     val dewPointSource: DewPointSource? = null,
 ) : StatefulDeviceMetadata<ClimateState> {
 
-    override fun loadState(repo: ExpHomeAssistantRepo): Flow<ClimateState> {
+    override fun loadState(repo: HomeAssistantRepo): Flow<ClimateState> {
         val source = dewPointSource
             ?: return repo.entityForDevice(this).map { entity ->
                 ClimateState(

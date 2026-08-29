@@ -2,7 +2,7 @@ package com.degree.homedash.core.device
 
 import androidx.compose.runtime.Immutable
 import com.degree.homedash.shared.model.device_metadata.TriggerDeviceMetadata
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 
 /**
  * Render state for a scene/script card.
@@ -21,5 +21,5 @@ data class TriggerDeviceUi(
 
     val name: String get() = metadata.displayName
 
-    fun onActivate(repo: ExpHomeAssistantRepo) = metadata.onActivate(repo)
+    fun onActivate(repo: HomeAssistantRepo) = metadata.onActivate(repo)
 }

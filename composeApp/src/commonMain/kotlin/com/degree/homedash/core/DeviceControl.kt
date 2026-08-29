@@ -33,7 +33,7 @@ import com.degree.homedash.core.device.ThermostatDeviceUi
 import com.degree.homedash.core.device.TriggerDeviceUi
 import com.degree.homedash.core.util.LightIcon
 import com.degree.homedash.shared.model.device_metadata.ClimateMetadata
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.ui.AppColors
 import com.degree.homedash.ui.Dimens
 import org.koin.compose.koinInject
@@ -43,7 +43,7 @@ import org.koin.compose.koinInject
  * [modifier] applies to the card cell (grid weighting).
  *
  * There is no `onAction` here — a [DeviceUi] carries its own behavior, so this
- * only has to supply the repo to run it through. [ExpHomeAssistantRepo] is resolved from Koin at this
+ * only has to supply the repo to run it through. [HomeAssistantRepo] is resolved from Koin at this
  * one dispatch site rather than threaded down from the screen.
  */
 @Composable
@@ -51,7 +51,7 @@ fun DeviceControl(
     device: DeviceUi,
     modifier: Modifier = Modifier,
 ) {
-    val repo: ExpHomeAssistantRepo = koinInject()
+    val repo: HomeAssistantRepo = koinInject()
 
     when (device) {
         is LightDeviceUi -> {

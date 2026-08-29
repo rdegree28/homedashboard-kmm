@@ -9,7 +9,7 @@ import com.degree.homedash.shared.api.HaClient
 import com.degree.homedash.shared.api.HaWebSocketClient
 import com.degree.homedash.shared.api.ExpHomeAssistantApi
 import com.degree.homedash.shared.api.WebSocketExpHomeAssistantApi
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import org.koin.dsl.module
 
 /**
@@ -26,7 +26,7 @@ val sharedModule = module {
         )
     }
     single {
-        ExpHomeAssistantRepo(
+        HomeAssistantRepo(
             api = get(),
         )
     }

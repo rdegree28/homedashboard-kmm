@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.model.device_metadata.OfficeWorkstationMetadata
 import com.degree.homedash.shared.model.device_state.OfficeWorkstationState
-import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import com.degree.homedash.shared.repo.HomeAssistantRepo
 import com.degree.homedash.ui.readingText
 
 /**
@@ -39,5 +39,5 @@ data class OfficeWorkstationUi(
     /** Empty until the history fetch lands, which the chart draws as "Loading…". */
     val powerHistoryPoints: List<HistoryPoint> get() = state.powerHistory
 
-    fun onToggle(repo: ExpHomeAssistantRepo) = metadata.onToggle(repo)
+    fun onToggle(repo: HomeAssistantRepo) = metadata.onToggle(repo)
 }
