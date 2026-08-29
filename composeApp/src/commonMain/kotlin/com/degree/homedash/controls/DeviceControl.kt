@@ -93,6 +93,16 @@ fun DeviceControl(
             )
         }
 
+        is ThermostatDeviceUi -> ThermostatControlCard(
+            ui = device,
+            onSetTarget = { temperature -> device.setTargetTemperature(temperature, repo) },
+            onSetHvacMode = { mode -> device.setHvacMode(mode, repo) },
+            onSetFanMode = { mode -> device.setFanMode(mode, repo) },
+            onSetPresetMode = { mode -> device.setPresetMode(mode, repo) },
+            onSetExtreme = { extreme -> device.setExtremeTemperatures(extreme, repo) },
+            modifier = modifier,
+        )
+
         // Read-only here: the tap that opens its history graph is navigation, so the Plants screen
         // renders its own tappable rows rather than going through this dispatcher.
         is SoilMoistureDeviceUi -> SoilMoistureControl(ui = device)

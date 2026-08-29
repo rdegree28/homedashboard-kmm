@@ -9,6 +9,7 @@ import com.degree.homedash.shared.model.entity.OfficeSignalMetadata
 import com.degree.homedash.shared.model.entity.OfficeWorkstationMetadata
 import com.degree.homedash.shared.model.entity.PetFountainMetadata
 import com.degree.homedash.shared.model.entity.SoilMoistureMetadata
+import com.degree.homedash.shared.model.entity.ThermostatMetadata
 import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import kotlinx.coroutines.flow.Flow
@@ -55,6 +56,11 @@ fun DeviceMetadata.loadUi(repo: ExpHomeAssistantRepo): Flow<DeviceUi>? = when (t
     is OfficeWorkstationMetadata -> {
         val metadata = this
         loadState(repo).map { state -> OfficeWorkstationUi(metadata = metadata, state = state) }
+    }
+
+    is ThermostatMetadata -> {
+        val metadata = this
+        loadState(repo).map { state -> ThermostatDeviceUi(metadata = metadata, state = state) }
     }
 
     is PetFountainMetadata -> {

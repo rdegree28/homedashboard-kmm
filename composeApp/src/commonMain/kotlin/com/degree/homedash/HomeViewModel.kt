@@ -4,11 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.PetFountainDeviceUi
+import com.degree.homedash.controls.ThermostatDeviceUi
 import com.degree.homedash.controls.loadDeviceUis
 import com.degree.homedash.controls.toEntityUis
 import com.degree.homedash.pets.PetsEntities
 import com.degree.homedash.shared.model.EntityState
-import com.degree.homedash.shared.model.entity.HvacMode
 import com.degree.homedash.shared.repo.EntityMetadataRepo
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import com.degree.homedash.shared.repo.HomeAssistantRepo
@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 
 /**
  * Severity of a [HomeWarning] — drives the warning card's color, listed lowest urgency first.
@@ -50,11 +49,9 @@ class HomeViewModel(
      * bearing on the other, so a shared state object would only make each recompose for the other's
      * changes.
      */
-    val thermostats: StateFlow<List<EntityUi.Thermostat>> =
-        repo.states
-            .map { states ->
-                thermostatEntities.toEntityUis(states).filterIsInstance<EntityUi.Thermostat>()
-            }
+    val thermostats: StateFlow<List<ThermostatDeviceUi>> =
+        thermostatEntities.loadDeviceUis(deviceRepo)
+            .map { devices -> devices.filterIsInstance<ThermostatDeviceUi>() }
             .distinctUntilChanged()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
@@ -79,28 +76,6 @@ class HomeViewModel(
                 listOfNotNull(catMedicationWarning(states))
         }
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
-
-    fun setTargetTemperature(entityId: String, temperature: Double) {
-        viewModelScope.launch { repo.setTargetTemperature(entityId, temperature) }
-    }
-
-    fun setHvacMode(entityId: String, mode: HvacMode) {
-        viewModelScope.launch { repo.setHvacMode(entityId, mode) }
-    }
-
-    /** [mode] is one of the thermostat's own `fan_modes`, not a `fan.*` entity speed. */
-    fun setThermostatFanMode(entityId: String, mode: String) {
-        viewModelScope.launch { repo.setThermostatFanMode(entityId, mode) }
-    }
-
-    fun setPresetMode(entityId: String, mode: String) {
-        viewModelScope.launch { repo.setPresetMode(entityId, mode) }
-    }
-
-    /** [entityId] is the `input_boolean.*` helper, not the thermostat. */
-    fun setExtremeTemperatures(entityId: String, extreme: Boolean) {
-        viewModelScope.launch { repo.setExtremeTemperatures(entityId, extreme) }
-    }
 }
 
 /**

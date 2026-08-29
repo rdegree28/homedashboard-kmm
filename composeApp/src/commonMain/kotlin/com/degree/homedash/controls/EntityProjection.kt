@@ -5,8 +5,6 @@ import com.degree.homedash.shared.model.entity.ClimateMetadata
 import com.degree.homedash.shared.model.entity.DoorMetadata
 import com.degree.homedash.shared.model.entity.DeviceMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
-import com.degree.homedash.shared.model.entity.HvacAction
-import com.degree.homedash.shared.model.entity.HvacMode
 import com.degree.homedash.shared.model.entity.LightMetadata
 import com.degree.homedash.shared.model.entity.NavigationMetadata
 import com.degree.homedash.shared.model.entity.OfficeSignalMetadata
@@ -54,28 +52,8 @@ fun DeviceMetadata.toEntityUi(
         valueText = state.readingText(decimals = 1),
     )
 
-    is ThermostatMetadata -> {
-        val offline = state.isOffline()
-        EntityUi.Thermostat(
-            metadata = this,
-            offline = offline,
-            // An unavailable entity's state is literally "unavailable", so this already lands on null.
-            hvacMode = HvacMode.fromHa(state?.state),
-            // The attributes are guarded anyway: some integrations keep stale ones around while
-            // the device is gone, which would show a live-looking readout for an offline unit.
-            hvacAction = if (offline) null else HvacAction.fromHa(state?.attrString("hvac_action")),
-            // Null in heat_cool, where HA publishes target_temp_low/high instead — the stepper reads
-            // "—" and disables rather than pretending to drive a setpoint that isn't there.
-            targetTemperature = if (offline) null else state?.attrDouble("temperature"),
-            currentTemperature = if (offline) null else state?.attrDouble("current_temperature"),
-            currentHumidity = if (offline) null else state?.attrDouble("current_humidity"),
-            fanMode = if (offline) null else state?.attrString("fan_mode"),
-            presetMode = if (offline) null else state?.attrString("preset_mode"),
-            // Its own input_boolean, so it survives the thermostat being unavailable — the preset
-            // pills still need to show which setpoints they would write.
-            extremeActive = extremeToggle?.let { allStates[it.entityId]?.isOn == true } == true,
-        )
-    }
+    // Fully migrated to the device stack — rendered by DeviceControl, with no [EntityUi] form at all.
+    is ThermostatMetadata -> null
 
     is DoorMetadata -> {
         val open = state?.state == "on" // device_class opening: on = open

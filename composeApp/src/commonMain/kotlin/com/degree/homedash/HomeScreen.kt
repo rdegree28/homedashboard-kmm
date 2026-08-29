@@ -29,9 +29,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.compose.viewmodel.koinViewModel
 import com.degree.homedash.controls.EntityAction
+import com.degree.homedash.controls.DeviceControl
 import com.degree.homedash.controls.EntityControl
 import com.degree.homedash.controls.EntityUi
 import com.degree.homedash.controls.previewNavigation
+import com.degree.homedash.controls.ThermostatDeviceUi
 import com.degree.homedash.controls.previewThermostat
 import com.degree.homedash.shared.model.entity.NavigationMetadata.NavigationTarget
 import com.degree.homedash.ui.AppColors
@@ -47,19 +49,11 @@ fun HomeScreen(
     val warnings by vm.warnings.collectAsStateWithLifecycle()
     val thermostats by vm.thermostats.collectAsStateWithLifecycle()
 
-    // The launcher is the one screen whose controls aren't all navigation, so it maps the two kinds
-    // here rather than taking a lambda per thermostat action the way the room screens do.
+    // The launcher cards are the last controls here still on the entity path; the thermostat carries
+    // its own behavior.
     val onAction: (EntityAction) -> Unit = { action ->
         when (action) {
             is EntityAction.Navigate -> onNavigate(action.target)
-            is EntityAction.SetTargetTemperature ->
-                vm.setTargetTemperature(action.entityId, action.temperature)
-            is EntityAction.SetHvacMode -> vm.setHvacMode(action.entityId, action.mode)
-            is EntityAction.SetThermostatFanMode ->
-                vm.setThermostatFanMode(action.entityId, action.mode)
-            is EntityAction.SetPresetMode -> vm.setPresetMode(action.entityId, action.mode)
-            is EntityAction.SetExtremeTemperatures ->
-                vm.setExtremeTemperatures(action.entityId, action.extreme)
             else -> Unit
         }
     }
@@ -77,7 +71,7 @@ fun HomeScreen(
 @Composable
 fun HomeContent(
     warnings: List<HomeWarning>,
-    thermostats: List<EntityUi.Thermostat>,
+    thermostats: List<ThermostatDeviceUi>,
     navigation: List<EntityUi.Navigation>,
     onAction: (EntityAction) -> Unit,
     onOpenSettings: () -> Unit,
@@ -112,11 +106,9 @@ fun HomeContent(
         // keeps its bare look by staying outside any group. The card spans the full width on its
         // own (see `cardSpan`), so the group holds exactly one row.
         Spacer(modifier = Modifier.height(16.dp))
-        ControlGroup(
-            title = "Climate",
-            entities = thermostats,
-            onAction = onAction,
-        )
+        ControlGroup(title = "Climate") {
+            thermostats.forEach { DeviceControl(it) }
+        }
     }
 }
 

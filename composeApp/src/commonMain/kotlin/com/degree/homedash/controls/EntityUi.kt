@@ -37,35 +37,6 @@ sealed interface EntityUi {
         val subvalueText: String? = null,
     ) : EntityUi
 
-    /**
-     * A thermostat. Unlike [Climate] and the sensor variants, the numbers stay numbers rather than
-     * pre-formatted text: the setpoint stepper does arithmetic on them, so a display string would
-     * only have to be parsed back.
-     */
-    @Immutable
-    data class Thermostat(
-        override val metadata: ThermostatMetadata,
-        val offline: Boolean,
-        /** The entity's own state. null when offline, or reporting a mode we don't model. */
-        val hvacMode: HvacMode?,
-        /** `hvac_action` — the live Idle/Heating/Cooling badge. null when the device omits it. */
-        val hvacAction: HvacAction?,
-        /** `temperature`. Absent in heat_cool, which publishes a low/high pair instead. */
-        val targetTemperature: Double?,
-        /** `current_temperature` — the ambient reading shown under the setpoint. */
-        val currentTemperature: Double?,
-        /** `current_humidity`, as a percentage. null on the many thermostats that don't report it. */
-        val currentHumidity: Double?,
-        /** Raw Home Assistant strings, matched against the lists the metadata declares. */
-        val fanMode: String?,
-        val presetMode: String?,
-        /**
-         * Whether the extreme setpoints are in force. Read off the `input_boolean` the metadata
-         * names, not the thermostat — the same second-entity arrangement as a fan's mister.
-         */
-        val extremeActive: Boolean = false,
-    ) : EntityUi
-
     @Immutable
     data class Door(
         override val metadata: DoorMetadata,

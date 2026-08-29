@@ -31,16 +31,6 @@ sealed interface EntityAction {
     /** [entityId] is the mister's own `humidifier.*` entity, not the fan's. */
     data class SetMisting(val entityId: String, val misting: Boolean) : EntityAction
 
-    data class SetTargetTemperature(val entityId: String, val temperature: Double) : EntityAction
-    data class SetHvacMode(val entityId: String, val mode: HvacMode) : EntityAction
-
-    /** [mode] is one of the vendor strings the thermostat's metadata declares, not a `fan.*` speed. */
-    data class SetThermostatFanMode(val entityId: String, val mode: String) : EntityAction
-    data class SetPresetMode(val entityId: String, val mode: String) : EntityAction
-
-    /** [entityId] is the `input_boolean.*` helper the thermostat names, not the thermostat itself. */
-    data class SetExtremeTemperatures(val entityId: String, val extreme: Boolean) : EntityAction
-
     data class OpenGraph(val entityId: String) : EntityAction
 
     /** Carries the typed destination rather than an entity id — a nav card's id is synthetic. */
@@ -56,7 +46,6 @@ sealed interface EntityAction {
  * `ControlGroup` packs rows to a total width of 2 using this, so cards reflow as fans toggle.
  */
 fun EntityUi.cardSpan(): Int = when {
-    this is EntityUi.Thermostat -> 2
     // Oscillation counts too: without it, an oscillating fan with no speed control would never get
     // the wide card its toggle lives on, leaving the control unreachable.
     this is EntityUi.Fan && isOn &&
@@ -81,24 +70,6 @@ fun EntityControl(
             val onClick = { onAction(EntityAction.Navigate(entity.metadata.destination)) }
             NavigationTile(entity, onClick, modifier)
         }
-
-        // The card is the only form a thermostat has, so both layouts render it — the controls need
-        // more room than an entity row gives, and every group that shows one uses cards anyway.
-        is EntityUi.Thermostat -> ThermostatControlCard(
-            ui = entity,
-            onSetTarget = { temp -> onAction(EntityAction.SetTargetTemperature(entity.entityId, temp)) },
-            onSetHvacMode = { mode -> onAction(EntityAction.SetHvacMode(entity.entityId, mode)) },
-            onSetFanMode = { mode -> onAction(EntityAction.SetThermostatFanMode(entity.entityId, mode)) },
-            onSetPresetMode = { mode -> onAction(EntityAction.SetPresetMode(entity.entityId, mode)) },
-            // Targets the helper entity, so a thermostat without one can't emit this at all.
-            onSetExtreme = { on ->
-                entity.metadata.extremeToggle?.let {
-                    onAction(EntityAction.SetExtremeTemperatures(it.entityId, on))
-                }
-                Unit
-            },
-            modifier = modifier,
-        )
 
         else -> throw IllegalStateException("Unknown control $entity")
     }
@@ -127,7 +98,7 @@ private fun EntityFanCardPreview() = ControlPreview {
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F, widthDp = 380)
 @Composable
 private fun EntityThermostatCardPreview() = ControlPreview {
-    EntityControl(previewThermostat("Thermostat"),  {})
+    DeviceControl(previewThermostat("Thermostat"))
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF1B1B1F)

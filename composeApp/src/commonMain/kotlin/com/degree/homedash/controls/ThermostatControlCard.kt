@@ -82,7 +82,7 @@ private const val TemperatureEpsilon = 0.01
  */
 @Composable
 internal fun ThermostatControlCard(
-    ui: EntityUi.Thermostat,
+    ui: ThermostatDeviceUi,
     onSetTarget: (Double) -> Unit,
     onSetHvacMode: (HvacMode) -> Unit,
     onSetFanMode: (String) -> Unit,
@@ -106,15 +106,15 @@ internal fun ThermostatControlCard(
     // are optimistic, so gating the call would let the readout jump to a value the user then declines,
     // and snap back seconds later.
     val guarded: (() -> Unit) -> Unit = { action ->
-        if (tapGuard.isConfirmed(ui.entityId)) action() else awaitingConfirmation = action
+        if (tapGuard.isConfirmed(ui.id)) action() else awaitingConfirmation = action
     }
 
     awaitingConfirmation?.let { action ->
         ThermostatConfirmationDialog(
-            displayName = ui.displayName,
+            displayName = ui.name,
             onConfirm = {
                 awaitingConfirmation = null
-                tapGuard.confirm(ui.entityId)
+                tapGuard.confirm(ui.id)
                 action()
             },
             onDismiss = { awaitingConfirmation = null },
@@ -146,10 +146,10 @@ internal fun ThermostatControlCard(
 
     // Which preset the thermostat is *actually* sitting on. Derived from the setpoint rather than
     // stored, so it stays right when the temperature is changed from the HA app or the unit itself.
+    val target = ui.targetTemperature
     val activePreset = presets.firstOrNull { preset ->
         val setpoint = preset.setpointFor(shownHvacMode, ui.extremeActive)
-        setpoint != null && ui.targetTemperature != null &&
-            abs(setpoint - ui.targetTemperature) < TemperatureEpsilon
+        setpoint != null && target != null && abs(setpoint - target) < TemperatureEpsilon
     }
     // A tapped preset fills straight away rather than waiting on the round trip, and gives way as
     // soon as Home Assistant reports a setpoint.
@@ -207,7 +207,7 @@ internal fun ThermostatControlCard(
                     modifier = Modifier.size(Dimens.RowIconSize),
                 )
                 Text(
-                    text = ui.displayName,
+                    text = ui.name,
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     modifier = Modifier.weight(1f),
@@ -685,15 +685,19 @@ private fun statusTint(action: HvacAction?, mode: HvacMode?): Color =
     (action?.tone ?: mode?.tone ?: HvacTone.Neutral).color
 
 /** The badge in the card's top-right: what it's doing, or failing that what it's set to. */
-private fun statusText(ui: EntityUi.Thermostat): String = when {
-    ui.offline -> "Offline"
-    ui.hvacAction != null -> ui.hvacAction.label
-    ui.hvacMode != null -> ui.hvacMode.label
-    else -> "—"
+private fun statusText(ui: ThermostatDeviceUi): String {
+    val action = ui.hvacAction
+    val mode = ui.hvacMode
+    return when {
+        ui.offline -> "Offline"
+        action != null -> action.label
+        mode != null -> mode.label
+        else -> "—"
+    }
 }
 
 /** The badge in the card's top-right: what it's doing, or failing that what it's set to. */
-private fun isFanSpinning(ui: EntityUi.Thermostat): Boolean = when (ui.hvacAction) {
+private fun isFanSpinning(ui: ThermostatDeviceUi): Boolean = when (ui.hvacAction) {
     null, HvacAction.Off, HvacAction.Idle -> false
     else -> true
 }

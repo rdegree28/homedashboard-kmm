@@ -6,6 +6,8 @@ import com.degree.homedash.shared.model.EntityState
 import com.degree.homedash.shared.model.HistoryPoint
 import com.degree.homedash.shared.model.entity.DeviceMetadata
 import com.degree.homedash.shared.model.entity.FanMetadata
+import com.degree.homedash.shared.model.entity.HvacMode
+import com.degree.homedash.shared.model.entity.ThermostatMetadata
 import com.degree.homedash.shared.model.entity.ToggleableDeviceMetadata
 import com.degree.homedash.shared.model.entity.TriggerDeviceMetadata
 import kotlinx.coroutines.flow.Flow
@@ -86,6 +88,54 @@ class ExpHomeAssistantRepo internal constructor(
     /** Run a `script.*` entity. */
     internal fun runScript(scriptEntityId: String) =
         api.callService("script", "turn_on", scriptEntityId)
+
+    /**
+     * Set a thermostat's setpoint. The value arrives back via the entity's `temperature` attribute.
+     *
+     * These five thermostat calls take metadata rather than an id for the same reason [toggleEntity]
+     * does — driving a thermostat needs its identity, not its live value — and are reached through
+     * the matching `ThermostatMetadata` methods rather than called directly.
+     */
+    internal fun setTargetTemperature(
+        metadata: ThermostatMetadata,
+        temperature: Double,
+    ) = api.callService("climate", "set_temperature", metadata.entityId,
+        buildJsonObject { put("temperature", temperature) })
+
+    /** Set a thermostat's mode. The value arrives back as the entity's own state, not an attribute. */
+    internal fun setHvacMode(
+        metadata: ThermostatMetadata,
+        mode: HvacMode,
+    ) = api.callService("climate", "set_hvac_mode", metadata.entityId,
+        buildJsonObject { put("hvac_mode", mode.haValue) })
+
+    /** [fanMode] is one of the vendor strings [ThermostatMetadata.fanModes] declares, not a `fan.*` speed. */
+    internal fun setThermostatFanMode(
+        metadata: ThermostatMetadata,
+        fanMode: String,
+    ) = api.callService("climate", "set_fan_mode", metadata.entityId,
+        buildJsonObject { put("fan_mode", fanMode) })
+
+    /** [presetMode] is one of the vendor strings [ThermostatMetadata.presetModes] declares. */
+    internal fun setPresetMode(
+        metadata: ThermostatMetadata,
+        presetMode: String,
+    ) = api.callService("climate", "set_preset_mode", metadata.entityId,
+        buildJsonObject { put("preset_mode", presetMode) })
+
+    /**
+     * Turn the extreme-setpoint mode on or off.
+     *
+     * Targets the `input_boolean.*` helper the metadata names, not the thermostat — the same
+     * composite-entity arrangement as a fan's mister. No-ops for a thermostat that declares none.
+     */
+    internal fun setExtremeTemperatures(
+        metadata: ThermostatMetadata,
+        extreme: Boolean,
+    ) {
+        val helperId = metadata.extremeToggle?.entityId ?: return
+        api.callService(helperId.substringBefore('.'), if (extreme) "turn_on" else "turn_off", helperId)
+    }
 
     /** Set a fan's speed (0–100%). The value arrives back via the entity's `percentage` attribute. */
     internal fun setFanPercentage(

@@ -1,5 +1,11 @@
 package com.degree.homedash.shared.model.entity
 
+import com.degree.homedash.shared.model.states.ThermostatState
+import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
+
 /**
  * A thermostat (`climate.*`).
  *
@@ -37,7 +43,59 @@ data class ThermostatMetadata(
      * and converted back, so a bare "°" isn't enough to go on.
      */
     val fahrenheit: Boolean = true,
-) : DeviceMetadata {
+) : StatefulDeviceMetadata<ThermostatState> {
+
+    /**
+     * Assembled from two entities: the extreme-setpoint mode lives in its own `input_boolean.*` (see
+     * [ExtremeToggle]), so its flow is combined in rather than read off [entityId]. A thermostat
+     * without one contributes a constant null instead.
+     *
+     * The attributes are guarded on [isOffline] rather than read blind: some integrations keep stale
+     * attributes around while the device is gone, which would show a live-looking readout for a unit
+     * that isn't there. [extremeActive] is deliberately outside that guard — it belongs to the helper,
+     * not the thermostat, and the preset pills still need to show which setpoints they would write.
+     */
+    override fun loadState(repo: ExpHomeAssistantRepo): Flow<ThermostatState> =
+        combine(
+            repo.entityForDevice(this),
+            extremeToggle?.let { repo.entityFor(it.entityId) } ?: flowOf(null),
+        ) { entity, extreme ->
+            val offline = entity == null || entity.isUnavailable
+            ThermostatState(
+                entityId = entityId,
+                isOffline = offline,
+                // An unavailable entity's state is literally "unavailable", so this already lands on null.
+                hvacMode = HvacMode.fromHa(entity?.state),
+                hvacAction = if (offline) null else HvacAction.fromHa(entity?.attrString("hvac_action")),
+                // Null in heat_cool, where HA publishes target_temp_low/high instead — the stepper reads
+                // "—" and disables rather than pretending to drive a setpoint that isn't there.
+                targetTemperature = if (offline) null else entity?.attrDouble("temperature"),
+                currentTemperature = if (offline) null else entity?.attrDouble("current_temperature"),
+                currentHumidity = if (offline) null else entity?.attrDouble("current_humidity"),
+                fanMode = if (offline) null else entity?.attrString("fan_mode"),
+                presetMode = if (offline) null else entity?.attrString("preset_mode"),
+                extremeActive = extreme?.isOn == true,
+            )
+        }
+
+    /** Writes a new setpoint. Fire-and-forget, like every other device action. */
+    fun setTargetTemperature(temperature: Double, repo: ExpHomeAssistantRepo) =
+        repo.setTargetTemperature(metadata = this, temperature = temperature)
+
+    fun setHvacMode(mode: HvacMode, repo: ExpHomeAssistantRepo) =
+        repo.setHvacMode(metadata = this, mode = mode)
+
+    /** [mode] is one of the vendor strings [fanModes] declares, not a `fan.*` entity speed. */
+    fun setFanMode(mode: String, repo: ExpHomeAssistantRepo) =
+        repo.setThermostatFanMode(metadata = this, fanMode = mode)
+
+    /** [mode] is one of the vendor strings [presetModes] declares — HA's presets, not ours. */
+    fun setPresetMode(mode: String, repo: ExpHomeAssistantRepo) =
+        repo.setPresetMode(metadata = this, presetMode = mode)
+
+    /** Flips the [extremeToggle] helper; a no-op on a thermostat that declares none. */
+    fun setExtremeTemperatures(extreme: Boolean, repo: ExpHomeAssistantRepo) =
+        repo.setExtremeTemperatures(metadata = this, extreme = extreme)
 
     /**
      * The Home Assistant helper holding whether extreme setpoints are in force.

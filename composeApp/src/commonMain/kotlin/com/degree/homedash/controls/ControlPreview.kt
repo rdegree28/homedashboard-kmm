@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.degree.homedash.office.FanUi
 import com.degree.homedash.office.ToggleUi
 import com.degree.homedash.shared.model.states.LightState
+import com.degree.homedash.shared.model.states.ThermostatState
 import com.degree.homedash.shared.repo.ExpHomeAssistantRepo
 import org.koin.compose.KoinApplicationPreview
 import org.koin.dsl.module
@@ -190,28 +191,32 @@ internal fun previewThermostat(
     temperaturePresets: List<TemperaturePreset>? = null,
     // A flag rather than a nullable override, since null already means "inherit from the roster".
     hasExtremeToggle: Boolean = true,
-): EntityUi.Thermostat {
+): ThermostatDeviceUi {
     val roster = ThermostatMetadata.livingRoomThermostat(
         entityId = "climate.${name.lowercase().replace(' ', '_')}",
         displayName = name,
     )
-    return EntityUi.Thermostat(
-        metadata = roster.copy(
-            hvacModes = hvacModes ?: roster.hvacModes,
-            fanModes = fanModes ?: roster.fanModes,
-            presetModes = presetModes ?: roster.presetModes,
-            temperaturePresets = temperaturePresets ?: roster.temperaturePresets,
-            extremeToggle = if (hasExtremeToggle) roster.extremeToggle else null,
+    val metadata = roster.copy(
+        hvacModes = hvacModes ?: roster.hvacModes,
+        fanModes = fanModes ?: roster.fanModes,
+        presetModes = presetModes ?: roster.presetModes,
+        temperaturePresets = temperaturePresets ?: roster.temperaturePresets,
+        extremeToggle = if (hasExtremeToggle) roster.extremeToggle else null,
+    )
+    return ThermostatDeviceUi(
+        metadata = metadata,
+        state = ThermostatState(
+            entityId = metadata.entityId,
+            isOffline = offline,
+            hvacMode = if (offline) null else mode,
+            hvacAction = if (offline) null else action,
+            targetTemperature = if (offline) null else target,
+            currentTemperature = if (offline) null else current,
+            currentHumidity = if (offline) null else humidity,
+            fanMode = if (offline) null else fanMode,
+            presetMode = if (offline) null else presetMode,
+            extremeActive = extremeActive,
         ),
-        offline = offline,
-        hvacMode = if (offline) null else mode,
-        hvacAction = if (offline) null else action,
-        targetTemperature = if (offline) null else target,
-        currentTemperature = if (offline) null else current,
-        currentHumidity = if (offline) null else humidity,
-        fanMode = if (offline) null else fanMode,
-        presetMode = if (offline) null else presetMode,
-        extremeActive = extremeActive,
     )
 }
 
