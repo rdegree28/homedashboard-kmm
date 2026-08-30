@@ -22,6 +22,7 @@ data class EntityState(
     val domain: String get() = entityId.substringBefore('.')
 
     val isOn: Boolean get() = state.equals("on", ignoreCase = true)
+    /** True for `unavailable` *and* `unknown` — to a control, both mean there is nothing to show. */
     val isUnavailable: Boolean get() = state == "unavailable" || state == "unknown"
 
     val friendlyName: String? get() = attrString("friendly_name")
