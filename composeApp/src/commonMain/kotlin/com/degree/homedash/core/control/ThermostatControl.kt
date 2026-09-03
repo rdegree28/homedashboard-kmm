@@ -198,7 +198,7 @@ internal fun ThermostatControl(
         modifier = modifier,
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(Dimens.EntityCardPadding),
+            modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Row(

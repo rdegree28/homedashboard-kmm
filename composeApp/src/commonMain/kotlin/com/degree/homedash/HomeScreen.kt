@@ -100,7 +100,7 @@ fun HomeContent(
         // keeps its bare look by staying outside any group. The card spans the full width on its
         // own (see `cardSpan`), so the group holds exactly one row.
         Spacer(modifier = Modifier.height(16.dp))
-        ControlGroup(title = "Climate") {
+        ControlGroup(title = "Climate", titleOutsideCard = true) {
             thermostats.forEach { DeviceControl(it) }
         }
     }
